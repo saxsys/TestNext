@@ -1,31 +1,28 @@
-import {TestCaseRegistry} from "../testCaseRegistry";
+import {SpecRegistry} from "../specRegistry";
 
 
-export function Spec(description: string) {
+export function Spec(testCaseName: string) {
   return (constructor: Function) => {
-    let testClass = {};
-    constructor.call(testClass);
-    TestCaseRegistry.registerTestCase(testClass, description);
+    let specClass = constructor.prototype;
+    console.log(specClass);
+    SpecRegistry.registerSpec(specClass, testCaseName);
   }
 }
 
-export function Given(description: string, execNumber: number) {
+export function Given(description: string, execNumber?: number) {
   return (target: any, key: string, descriptor: any) => {
-    TestCaseRegistry.registerGivenForTestCase(target.name, key, description, execNumber);
-    // TODO implement given
+    SpecRegistry.registerGivenForSpec(target.name, key, description, execNumber);
   }
 }
 
 export function When(description: string) {
   return (target: any, key: string, descriptor: any) => {
-    TestCaseRegistry.registerWhenForTestCase(target.name, key, description);
+    SpecRegistry.registerWhenForSpec(target.name, key, description);
   }
-  // TODO implement when
 }
 
-export function Then(description: string, execNumber: number) {
+export function Then(description: string, execNumber?: number) {
   return (target: any, key: string, descriptor: any) => {
-    TestCaseRegistry.registerThenForTestCase(target.name, key, description, execNumber);
+    SpecRegistry.registerThenForSpec(target.name, key, description, execNumber);
   }
-  // TODO implement then
 }

@@ -1,33 +1,33 @@
 /**
  * Created by paul.brandes on 24.05.2017.
  */
-import {TestCaseRegistryEntry} from "app/testRunner/testCaseRegistry/testCaseRegistryEntry/testCase-registry-entry";
+import {SpecRegistryEntry} from "app/testRunner/testCaseRegistry/specRegistryEntry/spec-registry-entry";
 
-class ExampleTestClass {
+class ExampleSpecClass {
 
 }
 
-describe('TestCaseRegistryEntry', () => {
+describe('SpecRegistryEntry', () => {
 
   let testCaseEntry;
-  const testClass = ExampleTestClass;
+  const specClass = new ExampleSpecClass();
   const testDescription = 'A Class without Decorators';
   beforeEach(() => {
-    testCaseEntry = new TestCaseRegistryEntry(testClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
   });
 
   it('should be constructed with proper parameters', () => {
     expect(testCaseEntry).toBeDefined();
-    expect(testCaseEntry.getDescription()).toEqual(testDescription);
-    expect(testCaseEntry.getClass()).toEqual(testClass);
+    expect(testCaseEntry.getSpecName()).toEqual(testDescription);
+    expect(testCaseEntry.getClass()).toEqual(specClass);
   });
 });
 
-describe('TestCaseRegistryEntry.given', () => {
+describe('SpecRegistryEntry.given', () => {
 
   let testCaseEntry;
-  const testClass = ExampleTestClass;
-  const testClassName = 'ExampleTestClass';
+  const specClass = new ExampleSpecClass();
+  const specClassName = 'ExampleSpecClass';
   const testDescription = 'A Class without Decorators';
   const givenName0 = 'valueSetter';
   const givenDescription0 = 'a Value is getting set';
@@ -35,7 +35,7 @@ describe('TestCaseRegistryEntry.given', () => {
   const givenDescription1 = 'an other Value is getting set';
 
   beforeEach(() => {
-    testCaseEntry = new TestCaseRegistryEntry(testClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
   });
 
   it('should accept one added "given" without execNumber as 0', () => {
@@ -70,18 +70,18 @@ describe('TestCaseRegistryEntry.given', () => {
     testCaseEntry.addGiven(givenName0, givenDescription0, 0);
     expect(() => {testCaseEntry.addGiven(givenName1, givenDescription1, 0)})
       .toThrow(new Error('Multiple @given, without ExecNumber, or it (0) already exists on ' +
-        testClassName + '.' + givenName1));
+        specClassName + '.' + givenName1));
 
   });
 
 
 });
 
-describe('TestCaseRegistryEntry.then', () => {
+describe('SpecRegistryEntry.then', () => {
 
   let testCaseEntry;
-  const testClass = ExampleTestClass;
-  const testClassName = 'ExampleTestClass';
+  const specClass = new ExampleSpecClass();
+  const specClassName = 'ExampleSpecClass';
   const testDescription = 'A Class without Decorators';
   const thenName0 = 'ValueChanged';
   const thenDescription0 = 'a Value is was changed';
@@ -89,7 +89,7 @@ describe('TestCaseRegistryEntry.then', () => {
   const thenDescription1 = 'an other Value was changed';
 
   beforeEach(() => {
-    testCaseEntry = new TestCaseRegistryEntry(testClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
   });
 
   it('should accept one added "then" without execNumber as 0', () => {
@@ -126,16 +126,16 @@ describe('TestCaseRegistryEntry.then', () => {
       testCaseEntry.addThen(thenName1, thenDescription1, 0)
     })
       .toThrow(new Error('Multiple @then, without ExecNumber, or it (0) already exists on ' +
-        testClassName + '.' + thenName1));
+        specClassName + '.' + thenName1));
 
   });
 });
 
-describe('TestCaseRegistryEntry.when', () => {
+describe('SpecRegistryEntry.when', () => {
 
   let testCaseEntry;
-  const testClass = ExampleTestClass;
-  const testClassName = 'ExampleTestClass';
+  const specClass = new ExampleSpecClass();
+  const specClassName = 'ExampleSpecClass';
   const testDescription = 'A Class without Decorators';
   const whenName = 'ValueChanged';
   const whenDescription = 'a Value changed';
@@ -143,7 +143,7 @@ describe('TestCaseRegistryEntry.when', () => {
   const whenDescription1 = 'da special Situation happened';
 
   beforeEach(() => {
-    testCaseEntry = new TestCaseRegistryEntry(testClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
   });
 
   it('should accept single "when"', () => {
@@ -159,7 +159,7 @@ describe('TestCaseRegistryEntry.when', () => {
   it('should refuse multiple added "when" with same execNumber', () => {
     testCaseEntry.addWhen(whenName, whenDescription);
     expect(() => {testCaseEntry.addWhen(whenName1, whenDescription1, 0)})
-      .toThrow(new Error('@When (' + whenName1 + ') already exists on ' + testClassName));
+      .toThrow(new Error('@When (' + whenName1 + ') already exists on ' + specClassName));
 
   });
 
