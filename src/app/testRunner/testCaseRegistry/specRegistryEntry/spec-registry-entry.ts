@@ -7,9 +7,12 @@ export class SpecRegistryEntry {
   private when: TestMethodRegistryEntry;
   private then = new Map<number, TestMethodRegistryEntry>(); // exec-Number, MethodName
 
-  constructor(specClass: any, specName: string) {
+  constructor(specClass: any) {
     this.specClass = specClass;
-    this.specName = specName;
+  }
+
+  setSpecName(specName: string){
+    this.specName = specName
   }
 
   addGiven(functionName: string, description: string, execNumber?: number) {

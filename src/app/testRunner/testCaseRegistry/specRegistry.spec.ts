@@ -14,41 +14,41 @@ describe('SpecRegistry.registerSpec()', () => {
     private stuff: string;
   }
   let specClass2 = new Spec2();
-  let specName2 = 'Spec2';
+  let specClassName2 = 'Spec2';
+  let specName2 = 'spec2';
 
-  class OtherSpec {
-    private member: boolean;
-  }
-  let specClass3 = new OtherSpec();
-  let otherSpecClassName = 'OtherSpec';
-  let specClassName3 = 'Spec3';
 
   beforeAll(() => {
     SpecRegistry.registerSpec(specClass2, specName2);
   });
 
   it('should have registered a SpecRegistry', () => {
-    let includedSpecs = SpecRegistry.getSpecNames().indexOf(specName2);
-    expect(includedSpecs).toBeGreaterThanOrEqual(0)
+    let includedSpecs = SpecRegistry.getSpecClassNames().indexOf(specClassName2);
+    expect(includedSpecs).toBeGreaterThanOrEqual(0);
   });
 
-  it('should refuse SpecRegistry added twice, with the same SpecName', () => {
+  it('should accept twice Specs, with the same SpecName', () => {
 
     let existingSpecName = specName2;
-    expect(() => {
-      SpecRegistry.registerSpec(specClass3, existingSpecName);
-    }).toThrow(
-      new Error('SpecRegistry with same name already exists ' + existingSpecName + ' (Class: ' + otherSpecClassName + ')'));
+    class SpecRegisterSpecNameDoulbleClass {
+      private member: boolean;
+    }
+    let specRegisterSpecNameDoulbleClass = new SpecRegisterSpecNameDoulbleClass();
+    let SpecNameDubleClassName = 'SpecRegisterSpecNameDoulbleClass';
+    SpecRegistry.registerSpec(specRegisterSpecNameDoulbleClass, existingSpecName);
+
+    expect(SpecRegistry.getSpecByClassName(SpecNameDubleClassName)).not.toBeUndefined();
   });
 
-  it('should refuse Added same SpecClass twice', () => {
-    class SpecClassTestSpecRegAddedTwice{};
-    let specClassTestSpecRegAddedTwice =new SpecClassTestSpecRegAddedTwice()
+  it('should refuse Added same SpecClassProperSpecDecorator twice', () => {
+    class SpecClassTestSpecRegAddedTwice {
+    }
+    let specClassTestSpecRegAddedTwice = new SpecClassTestSpecRegAddedTwice();
     SpecRegistry.registerSpec(specClassTestSpecRegAddedTwice, 'specNameTestSpecRegAddedTwice1');
     expect(() => {
       SpecRegistry.registerSpec(specClassTestSpecRegAddedTwice, 'specNameTestSpecRegAddedTwice2');
     }).toThrow(
-    new Error('SpecClassTestSpecRegAddedTwice is already registered for Spec:specNameTestSpecRegAddedTwice1, can only be registered once, cannot register for Spec:specNameTestSpecRegAddedTwice2')
+      new Error('SpecClassTestSpecRegAddedTwice is already registered for Spec:specNameTestSpecRegAddedTwice1, can only be registered once, cannot register for Spec:specNameTestSpecRegAddedTwice2')
     );
   });
 });
@@ -59,20 +59,21 @@ describe('SpecRegistry.getSpecByName', () => {
     private member: boolean;
   }
   let specClass = new Spec3();
+  let specClassName = 'Spec3'
   let specName = 'thirdSpec';
   let nonRegisteredSpecClassName = 'NonRegisteredSpecClass';
 
   beforeAll(() => {
     SpecRegistry.registerSpec(specClass, specName)
   });
-  it('should return correct SpecRegistryEntry for existing specName', () => {
-    let thirdTCaseRegEntry = SpecRegistry.getSpecByName(specName);
+  it('should return correct SpecRegistryEntry for existing specClassName', () => {
+    let thirdTCaseRegEntry = SpecRegistry.getSpecByClassName(specClassName);
     expect(thirdTCaseRegEntry.getSpecName()).toEqual(specName);
     expect(thirdTCaseRegEntry.getClass()).toEqual(specClass);
   });
 
-  it('should return null for not existing specName', () => {
-    expect(SpecRegistry.getSpecByName(nonRegisteredSpecClassName)).toBeUndefined();
+  it('should return null for not existing specClassName', () => {
+    expect(SpecRegistry.getSpecByClassName(nonRegisteredSpecClassName)).toBeUndefined();
   });
 });
 
@@ -91,8 +92,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
   let specClassName = 'Spec4';
   let specName = 'spec4';
 
-  let nonRegisteredSpecClassName = 'NonRegisteredSpecClass';
-  let nonExistentTestGivenName = 'nonExistentSpecClassFunction';
+
   let nonExistPropName = 'nonExist';
   let numericPropertyName = 'numericProperty';
 
@@ -103,15 +103,30 @@ describe('SpecRegistry.registerGivenForSpec', () => {
   beforeAll(() => {
     SpecRegistry.registerSpec(specClass, specName);
   });
-  it('should refuse Given registration for non existent specs', () => {
-    expect(() => {
-      SpecRegistry.registerGivenForSpec(nonRegisteredSpecClassName, nonExistentTestGivenName, givenDescription, givenExecNumber);
-    }).toThrow(new Error('Class ' + nonRegisteredSpecClassName + ' is not registered as SpecRegistry'));
+  it('should accept Given registration for non existent specs', () => {
+    class SpecRegistryGiven_NotYetRegisteredClass {
+      private givenFunction() {
+      }
+    }
+    let notYetRegisteredClass = new SpecRegistryGiven_NotYetRegisteredClass();
+    let notYetRegisteredClassName = 'SpecRegistryGiven_NotYetRegisteredClass';
+    let notYetRegisteredGivenName = 'givenFunction';
+
+    SpecRegistry.registerGivenForSpec(notYetRegisteredClass, notYetRegisteredGivenName, givenDescription, givenExecNumber);
+    let entry = SpecRegistry.getSpecByClassName(notYetRegisteredClassName);
+    expect(entry).not.toBeUndefined();
+    expect(entry.getSpecName()).toBeUndefined();
+    expect(entry.getClass()).toEqual(notYetRegisteredClass);
+    let givenEntry = entry.getGivenArray()[0];
+    expect(givenEntry.getName()).toEqual(notYetRegisteredGivenName);
+    expect(givenEntry.getDescription()).toEqual(givenDescription);
+
+
   });
 
   it('should refuse the Given, if no property with the Name exists on the SpecClass', () => {
     expect(() => {
-      SpecRegistry.registerGivenForSpec(specClassName, nonExistPropName, givenDescription);
+      SpecRegistry.registerGivenForSpec(specClass, nonExistPropName, givenDescription);
     }).toThrow(
       new Error(specClassName + '.' + nonExistPropName + ' does not exist.')
     );
@@ -119,15 +134,41 @@ describe('SpecRegistry.registerGivenForSpec', () => {
 
   it('should refuse the Given, if property with the Name exists on the SpecClass, but is not a function', () => {
     expect(() => {
-      SpecRegistry.registerGivenForSpec(specClassName, numericPropertyName, givenDescription);
+      SpecRegistry.registerGivenForSpec(specClass, numericPropertyName, givenDescription);
     }).toThrow(
       new Error(specClassName + '.' + numericPropertyName + ' is not a function.')
     );
   });
 
+  it('should refuse to add a Given to a Class, which has the same Name, but is different', () => {
+    class SpecRegistryGiven_ClassNameDouble {
+      private givenFunction() {
+      }
+    }
+    let specRegistryThen_ClassNameDouble = new SpecRegistryGiven_ClassNameDouble();
+    let classNameDoubleName = 'SpecRegistryGiven_ClassNameDouble';
+    let doubleDescription = 'a Class occurring twice with the same Name';
+    let functionName = 'givenFunction';
+    let functionDescription = 'does something';
+
+    SpecRegistry.registerSpec(specRegistryThen_ClassNameDouble, doubleDescription);
+    expect(() => {
+        class SpecRegistryGiven_ClassNameDouble {
+          private givenFunction() {
+          }
+        }
+        let specRegistryGiven_ClassNameDouble = new SpecRegistryGiven_ClassNameDouble();
+
+        SpecRegistry.registerGivenForSpec(specRegistryGiven_ClassNameDouble, functionName, functionDescription);
+      }
+    ).toThrow(new Error(
+      'SpecClass ' + classNameDoubleName + ' already exists, but is not same Class (for @Given ' + functionName + ')'
+    ));
+  });
+
   it('should register the Given, while parameters are correct', () => {
-    SpecRegistry.registerGivenForSpec(specClassName, givenFunctionName, givenDescription, givenExecNumber);
-    let specRegEntry = SpecRegistry.getSpecByName(specName);
+    SpecRegistry.registerGivenForSpec(specClass, givenFunctionName, givenDescription, givenExecNumber);
+    let specRegEntry = SpecRegistry.getSpecByClassName(specClassName);
     let givenRegEntry = specRegEntry.getGivenArray()[givenExecNumber];
     expect(givenRegEntry.getName()).toEqual(givenFunctionName);
     expect(givenRegEntry.getDescription()).toEqual(givenDescription);
@@ -147,49 +188,87 @@ describe('SpecRegistry.registerThenForSpec', () => {
   }
 
   let specClass = new Spec5();
-  let testCLassName = 'Spec5';
+  let specClassName = 'Spec5';
   let specName = 'spec5';
 
-  let nonRegisteredSpecClassName = 'NonRegisteredSpecClass';
-  let nonExistentTestThenName = 'nonExistentSpecClassFunction';
   let nonExistPropName = 'nonExist';
   let numericPropertyName = 'numericProperty';
 
-  let thenFunctionName = 'aThenFunction';
-  let thenDescription = 'Then Description 4';
-  let thenExecNumber = 0;
+  let functionName = 'aThenFunction';
+  let description = 'Then Description 4';
+  let execNumber = 0;
 
   beforeAll(() => {
     SpecRegistry.registerSpec(specClass, specName);
   });
-  it('should refuse Then registration for non existent specs', () => {
-    expect(() => {
-      SpecRegistry.registerThenForSpec(nonRegisteredSpecClassName, nonExistentTestThenName, thenDescription, thenExecNumber);
-    }).toThrow(new Error('Class ' + nonRegisteredSpecClassName + ' is not registered as SpecRegistry'));
+
+  it('should accept Then registration for non existent specs', () => {
+    class SpecRegistryThen_NotYetRegisteredClass {
+      private thenFunction() {
+      }
+    }
+    let notYetRegisteredClass = new SpecRegistryThen_NotYetRegisteredClass();
+    let notYetRegisteredClassName = 'SpecRegistryThen_NotYetRegisteredClass';
+    let notYetRegisteredFunctionName = 'thenFunction';
+
+    SpecRegistry.registerThenForSpec(notYetRegisteredClass, notYetRegisteredFunctionName, description, execNumber);
+    let specEntry = SpecRegistry.getSpecByClassName(notYetRegisteredClassName);
+    expect(specEntry).not.toBeUndefined();
+    expect(specEntry.getSpecName()).toBeUndefined();
+    expect(specEntry.getClass()).toEqual(notYetRegisteredClass);
+    let thenEntry = specEntry.getThenArray()[0];
+    expect(thenEntry.getName()).toEqual(notYetRegisteredFunctionName);
+    expect(thenEntry.getDescription()).toEqual(description);
   });
 
   it('should refuse the Then, if no property with the Name exists on the SpecClass', () => {
     expect(() => {
-      SpecRegistry.registerThenForSpec(testCLassName, nonExistPropName, thenDescription);
+      SpecRegistry.registerThenForSpec(specClass, nonExistPropName, description);
     }).toThrow(
-      new Error(testCLassName + '.' + nonExistPropName + ' does not exist.')
+      new Error(specClassName + '.' + nonExistPropName + ' does not exist.')
     );
   });
 
   it('should refuse the Then, if property with the Name exists on the SpecClass, but is not a function', () => {
     expect(() => {
-      SpecRegistry.registerThenForSpec(testCLassName, numericPropertyName, thenDescription);
+      SpecRegistry.registerThenForSpec(specClass, numericPropertyName, description);
     }).toThrow(
-      new Error(testCLassName + '.' + numericPropertyName + ' is not a function.')
+      new Error(specClassName + '.' + numericPropertyName + ' is not a function.')
     );
   });
 
+  it('should refuse to add a Then to a Class, which has the same Name, but is different', () => {
+    class SpecRegistryThen_ClassNameDouble {
+      private thenFunction() {
+      }
+    }
+    let specRegistryThen_ClassNameDouble = new SpecRegistryThen_ClassNameDouble();
+    let classNameDoubleName = 'SpecRegistryThen_ClassNameDouble';
+    let doubleDescription = 'a Class occurring twice with the same Name';
+    let functionName = 'givenFunction';
+    let functionDescription = 'does something';
+
+    SpecRegistry.registerSpec(specRegistryThen_ClassNameDouble, doubleDescription);
+    expect(() => {
+        class SpecRegistryThen_ClassNameDouble {
+          private thenFunction() {
+          }
+        }
+        let specRegistryThen_ClassNameDouble = new SpecRegistryThen_ClassNameDouble();
+
+        SpecRegistry.registerThenForSpec(specRegistryThen_ClassNameDouble, functionName, functionDescription);
+      }
+    ).toThrow(new Error(
+      'SpecClass ' + classNameDoubleName + ' already exists, but is not same Class (for @Then ' + functionName + ')'
+    ));
+  });
+
   it('should register the Then, while parameters are correct', () => {
-    SpecRegistry.registerThenForSpec(testCLassName, thenFunctionName, thenDescription, thenExecNumber);
-    let specRegEntry = SpecRegistry.getSpecByName(specName);
-    let thenRegEntry = specRegEntry.getThenArray()[thenExecNumber];
-    expect(thenRegEntry.getName()).toEqual(thenFunctionName);
-    expect(thenRegEntry.getDescription()).toEqual(thenDescription);
+    SpecRegistry.registerThenForSpec(specClass, functionName, description, execNumber);
+    let specRegEntry = SpecRegistry.getSpecByClassName(specClassName);
+    let thenRegEntry = specRegEntry.getThenArray()[execNumber];
+    expect(thenRegEntry.getName()).toEqual(functionName);
+    expect(thenRegEntry.getDescription()).toEqual(description);
   });
 });
 
@@ -213,40 +292,54 @@ describe('SpecRegistry.registerWhenForSpec', () => {
   let nonExistPropName = 'nonExist';
   let numericPropertyName = 'numericProperty';
 
-  let whenFunctionName = 'aWhenFunction';
-  let whenDescription = 'When Description 4';
+  let functionName = 'aWhenFunction';
+  let description = 'When Description 4';
 
   beforeAll(() => {
     SpecRegistry.registerSpec(specClass, specName);
   });
-  it('should refuse When registration for non existent specs', () => {
-    expect(() => {
-      SpecRegistry.registerWhenForSpec(nonRegisteredSpecClassName, nonExistentTestThenName, whenDescription);
-    }).toThrow(new Error('Class ' + nonRegisteredSpecClassName + ' is not registered as SpecRegistry'));
+
+  it('should accept When registration for non existent specs', () => {
+    class SpecRegistryWhen_NotYetRegisteredClass {
+      private givenFunction() {
+      }
+    }
+    let notYetRegisteredClass = new SpecRegistryWhen_NotYetRegisteredClass();
+    let notYetRegisteredClassName = 'SpecRegistryWhen_NotYetRegisteredClass';
+    let notYetRegisteredFunctionName = 'givenFunction';
+
+    SpecRegistry.registerWhenForSpec(notYetRegisteredClass, notYetRegisteredFunctionName, description);
+    let specEntry = SpecRegistry.getSpecByClassName(notYetRegisteredClassName);
+    expect(specEntry).not.toBeUndefined();
+    expect(specEntry.getSpecName()).toBeUndefined();
+    expect(specEntry.getClass()).toEqual(notYetRegisteredClass);
+    let whenEntry = specEntry.getWhen();
+    expect(whenEntry.getName()).toEqual(notYetRegisteredFunctionName);
+    expect(whenEntry.getDescription()).toEqual(description);
   });
 
   it('should refuse the When, if no property with the Name exists on the SpecClass', () => {
     expect(() => {
-      SpecRegistry.registerWhenForSpec(specClassName, nonExistPropName, whenDescription);
+      SpecRegistry.registerWhenForSpec(specClass, nonExistPropName, description);
     }).toThrow(
       new Error(specClassName + '.' + nonExistPropName + ' does not exist.')
     );
   });
 
-  it('should refuse the When, if property with the Name exists on the SpecClass, but is not a function', () => {
+  it('should refuse the When, if property with the Name exists on the SpecClassProperSpecDecorator, but is not a function', () => {
     expect(() => {
-      SpecRegistry.registerWhenForSpec(specClassName, numericPropertyName, whenDescription);
+      SpecRegistry.registerWhenForSpec(specClass, numericPropertyName, description);
     }).toThrow(
       new Error(specClassName + '.' + numericPropertyName + ' is not a function.')
     );
   });
 
   it('should register the When, while parameters are correct', () => {
-    SpecRegistry.registerWhenForSpec(specClassName, whenFunctionName, whenDescription);
-    let specRegEntry = SpecRegistry.getSpecByName(specName);
+    SpecRegistry.registerWhenForSpec(specClass, functionName, description);
+    let specRegEntry = SpecRegistry.getSpecByClassName(specClassName);
     let thenRegEntry = specRegEntry.getWhen();
-    expect(thenRegEntry.getName()).toEqual(whenFunctionName);
-    expect(thenRegEntry.getDescription()).toEqual(whenDescription);
+    expect(thenRegEntry.getName()).toEqual(functionName);
+    expect(thenRegEntry.getDescription()).toEqual(description);
   });
 });
 

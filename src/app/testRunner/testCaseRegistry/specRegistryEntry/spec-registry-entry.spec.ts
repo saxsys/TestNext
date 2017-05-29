@@ -11,14 +11,15 @@ describe('SpecRegistryEntry', () => {
 
   let testCaseEntry;
   const specClass = new ExampleSpecClass();
-  const testDescription = 'A Class without Decorators';
+  const specName = 'A Class without Decorators';
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass);
+    testCaseEntry.setSpecName(specName);
   });
 
   it('should be constructed with proper parameters', () => {
     expect(testCaseEntry).toBeDefined();
-    expect(testCaseEntry.getSpecName()).toEqual(testDescription);
+    expect(testCaseEntry.getSpecName()).toEqual(specName);
     expect(testCaseEntry.getClass()).toEqual(specClass);
   });
 });
@@ -28,14 +29,15 @@ describe('SpecRegistryEntry.given', () => {
   let testCaseEntry;
   const specClass = new ExampleSpecClass();
   const specClassName = 'ExampleSpecClass';
-  const testDescription = 'A Class without Decorators';
+  const specName = 'A Class without Decorators';
   const givenName0 = 'valueSetter';
   const givenDescription0 = 'a Value is getting set';
   const givenName1 = 'otherValueSetter';
   const givenDescription1 = 'an other Value is getting set';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass);
+    testCaseEntry.setSpecName(specName);
   });
 
   it('should accept one added "given" without execNumber as 0', () => {
@@ -82,14 +84,15 @@ describe('SpecRegistryEntry.then', () => {
   let testCaseEntry;
   const specClass = new ExampleSpecClass();
   const specClassName = 'ExampleSpecClass';
-  const testDescription = 'A Class without Decorators';
+  const specName = 'A Class without Decorators';
   const thenName0 = 'ValueChanged';
   const thenDescription0 = 'a Value is was changed';
   const thenName1 = 'otherValueChanged';
   const thenDescription1 = 'an other Value was changed';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass);
+    testCaseEntry.setSpecName(specName);
   });
 
   it('should accept one added "then" without execNumber as 0', () => {
@@ -136,14 +139,15 @@ describe('SpecRegistryEntry.when', () => {
   let testCaseEntry;
   const specClass = new ExampleSpecClass();
   const specClassName = 'ExampleSpecClass';
-  const testDescription = 'A Class without Decorators';
+  const specName = 'A Class without Decorators';
   const whenName = 'ValueChanged';
   const whenDescription = 'a Value changed';
   const whenName1 = 'Situation';
   const whenDescription1 = 'da special Situation happened';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass, testDescription);
+    testCaseEntry = new SpecRegistryEntry(specClass);
+    testCaseEntry.setSpecName(specName);
   });
 
   it('should accept single "when"', () => {
