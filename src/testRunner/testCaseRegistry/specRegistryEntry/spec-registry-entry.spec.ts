@@ -1,7 +1,7 @@
 /**
  * Created by paul.brandes on 24.05.2017.
  */
-import {SpecRegistryEntry} from "app/testRunner/testCaseRegistry/specRegistryEntry/spec-registry-entry";
+import {SpecRegistryEntry} from "testRunner/testCaseRegistry/specRegistryEntry/spec-registry-entry";
 
 class ExampleSpecClass {
 
@@ -163,7 +163,10 @@ describe('SpecRegistryEntry.when', () => {
   it('should refuse multiple added "when" with same execNumber', () => {
     testCaseEntry.addWhen(whenName, whenDescription);
     expect(() => {testCaseEntry.addWhen(whenName1, whenDescription1, 0)})
-      .toThrow(new Error('@When (' + whenName1 + ') already exists on ' + specClassName));
+      .toThrow(
+        new Error('Only one @When allowed on ' + specClassName +
+          'cannot add ' + whenName1 + ', ' + whenName + ' is already @When')
+        );
 
   });
 

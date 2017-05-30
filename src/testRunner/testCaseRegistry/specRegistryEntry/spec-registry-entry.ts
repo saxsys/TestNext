@@ -35,7 +35,7 @@ export class SpecRegistryEntry {
     if (this.when != null)
       {
 
-        throw new Error('@When (' + functionName + ') already exists on ' + this.getClassName());
+        throw new Error('Only one @When allowed on ' + this.getClassName() + 'cannot add ' + functionName + ', ' + this.when.getName() + ' is already @When');
       }
     this.when = new TestMethodRegistryEntry(functionName, description);
   }
