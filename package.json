@@ -8,7 +8,11 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+
+    "tnComp": "tsc -p tsconfig.json",
+    "tnRun": "node dist/testRunner/runTests.js",
+    "tNxt": "tsc -p tsconfig.json && node dist/testRunner/runTests.js"
   },
   "private": true,
   "dependencies": {
