@@ -1,9 +1,10 @@
 import {Given, Spec, Then, When} from "./test-decorators";
-import {SpecRegistry} from "../specRegistry";
+import {SpecRegistry} from "../specRegistry/spec-registry";
+import {SpecRegistryError} from "../specRegistry/errors/errors";
 describe('TestDecorators.Spec', () => {
 
 
-  it('should register a Class with Spec-Decorator', () => {
+  it('should register a class with Spec-decorator', () => {
 
     let specName = 'to Test Spec';
     let specClassName = 'TestDecorators_Spec_Correct';
@@ -27,16 +28,33 @@ describe('TestDecorators.Spec', () => {
       class TestDecorators_Spec_ClassDouble {
       }
 
-    }).toThrow(new Error('TestDecorators_Spec_ClassDouble is already registered for Spec:ClassDouble1, can only be registered once, cannot register for Spec:ClassDouble2'));
+    }).toThrowError(SpecRegistryError, 'TestDecorators_Spec_ClassDouble is already registered for Spec:ClassDouble1, ' +
+      'can only be registered once, cannot register for Spec:ClassDouble2'
+    );
   });
 
   it('should refuse one SpecClass with two Spec Decorators', () => {
     expect(() => {
       @Spec('Spec_ClassWith2SpecDecorator1')
       @Spec('Spec_ClassWith2SpecDecorator2')
-      class Spec_ClassWith2SpecDecorator {
+      class TestDecorators_Spec_ClassWith2SpecDecorator {
       }
-    }).toThrow(new Error('Spec_ClassWith2SpecDecorator is already registered for Spec:Spec_ClassWith2SpecDecorator2, can only be registered once, cannot register for Spec:Spec_ClassWith2SpecDecorator1'))
+    }).toThrowError(SpecRegistryError,
+      'TestDecorators_Spec_ClassWith2SpecDecorator is already registered for Spec:Spec_ClassWith2SpecDecorator2, ' +
+      'can only be registered once, cannot register for Spec:Spec_ClassWith2SpecDecorator1'
+    );
+
+  });
+
+  it('should refuse classes with constructor-arguments', () => {
+    expect(() => {
+      @Spec('SpecClass with ConstructorArguments')
+      class TestDecorators_Spec_ConstructorArguments {
+        constructor(anArgument:any){}
+      }
+    }).toThrowError(SpecRegistryError,
+      'SpecClass TestDecorators_Spec_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+    );
 
   });
 
@@ -111,6 +129,27 @@ describe('TestDecorators.Given', () => {
     expect(methodEntry2.getDescription()).toEqual(methodDescription2);
   });
 
+  it('should refuse methods with arguments', () => {
+    expect(() => {
+      class TestDecorators_Given_MethodArguments{
+        @Given('A Method with Arguments') aMethodWithArguments(sth:any){}
+      }
+    }).toThrowError(SpecRegistryError,
+    '@Given-method TestDecorators_Given_MethodArguments.aMethodWithArguments has arguments, this is forbidden for @Given-methods'
+    );
+  });
+
+  it('should refuse classes with constructor-arguments', () => {
+    expect(() => {
+      class TestDecorators_Given_ConstructorArguments {
+        constructor(anArgument:any){}
+        @Given('Given of Class with Constructor-Arguments') justAMethod(){}
+      }
+    }).toThrowError(SpecRegistryError,
+      'SpecClass TestDecorators_Given_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+    );
+  });
+
 });
 
 describe('TestDecorators.When', () => {
@@ -169,11 +208,31 @@ describe('TestDecorators.When', () => {
         @When(methodDescription2)somethingElseHappens() {
         }
       }
-    }).toThrow(
-      new Error('Only one @When allowed on ' + className +
-        'cannot add ' + methodName2 + ', ' + methodName1 + ' is already @When')
+    }).toThrowError(SpecRegistryError,
+      'Only one @When allowed on ' + className + 'cannot add ' + methodName2 + ', ' + methodName1 + ' is already @When'
     );
 
+  });
+
+  it('should refuse methods with arguments', () => {
+    expect(() => {
+      class TestDecorators_When_MethodArguments{
+        @When('A Method with Arguments') aMethodWithArguments(sth:any){}
+      }
+    }).toThrowError(SpecRegistryError,
+      '@When-method TestDecorators_When_MethodArguments.aMethodWithArguments has arguments, this is forbidden for @When-methods'
+    );
+  });
+
+  it('should refuse classes with constructor-arguments', () => {
+    expect(() => {
+      class TestDecorators_When_ConstructorArguments {
+        constructor(anArgument:any){}
+        @When('When of Class with Constructor-Arguments') aWhenFunction(){}
+      }
+    }).toThrowError(SpecRegistryError,
+      'SpecClass TestDecorators_When_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+    );
   });
 
 });
@@ -247,6 +306,27 @@ describe('TestDecorators.Then', () => {
     let methodEntry2 = methodEntries[1];
     expect(methodEntry2.getName()).toEqual(methodName2);
     expect(methodEntry2.getDescription()).toEqual(methodDescription2);
+  });
+
+  it('should refuse methods with arguments', () => {
+    expect(() => {
+      class TestDecorators_Then_MethodArguments{
+        @Then('A Method with Arguments') aMethodWithArguments(sth:any){}
+      }
+    }).toThrowError(SpecRegistryError,
+      '@Then-method TestDecorators_Then_MethodArguments.aMethodWithArguments has arguments, this is forbidden for @Then-methods'
+    );
+  });
+
+  it('should refuse classes with constructor-arguments', () => {
+    expect(() => {
+      class TestDecorators_Then_ConstructorArguments {
+        constructor(anArgument:any){}
+        @Then('When of Class with Constructor-Arguments') aThenFunction(){}
+      }
+    }).toThrowError(SpecRegistryError,
+      'SpecClass TestDecorators_Then_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+    );
   });
 
 });

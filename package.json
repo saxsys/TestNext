@@ -12,7 +12,7 @@
 
     "tnComp": "tsc -p tsconfig.json",
     "tnRun": "node dist/testRunner/runTests.js",
-    "tNxt": "tsc -p tsconfig.json && node dist/testRunner/runTests.js"
+    "tNxt": "tsc -p tsconfig.json && node dist/testExec/execTests.js"
   },
   "private": true,
   "dependencies": {

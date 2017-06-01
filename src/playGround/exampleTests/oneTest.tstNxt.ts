@@ -1,4 +1,4 @@
-import {Given, Spec, Then, When} from "../../testRunner/testCaseRegistry/testDecorators/test-decorators";
+import {Given, Spec, Then, When} from "../../testDecorators/test-decorators";
 
 @Spec('a Spec of one Test') class OneTest{
   @Given('some Stuff is given') someGivenStuff(){}
