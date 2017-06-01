@@ -1,4 +1,5 @@
-import {SpecRegistry} from "./specRegistry";
+import {SpecRegistry} from "./spec-registry";
+import {SpecRegistryError} from "./errors/errors";
 
 class Spec1 {
   private num = 9;
@@ -161,9 +162,9 @@ describe('SpecRegistry.registerGivenForSpec', () => {
 
         SpecRegistry.registerGivenForSpec(specRegistryGiven_ClassNameDouble, functionName, functionDescription);
       }
-    ).toThrow(new Error(
+    ).toThrowError(SpecRegistryError,
       'SpecClass ' + classNameDoubleName + ' already exists, but is not same Class (for @Given ' + functionName + ')'
-    ));
+    );
   });
 
   it('should register the Given, while parameters are correct', () => {
@@ -224,17 +225,13 @@ describe('SpecRegistry.registerThenForSpec', () => {
   it('should refuse the Then, if no property with the Name exists on the SpecClass', () => {
     expect(() => {
       SpecRegistry.registerThenForSpec(specClass, nonExistPropName, description);
-    }).toThrow(
-      new Error(specClassName + '.' + nonExistPropName + ' does not exist.')
-    );
+    }).toThrowError(SpecRegistryError, specClassName + '.' + nonExistPropName + ' does not exist.');
   });
 
   it('should refuse the Then, if property with the Name exists on the SpecClass, but is not a function', () => {
     expect(() => {
       SpecRegistry.registerThenForSpec(specClass, numericPropertyName, description);
-    }).toThrow(
-      new Error(specClassName + '.' + numericPropertyName + ' is not a function.')
-    );
+    }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
   });
 
   it('should refuse to add a Then to a Class, which has the same Name, but is different', () => {
@@ -258,9 +255,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
 
         SpecRegistry.registerThenForSpec(specRegistryThen_ClassNameDouble, functionName, functionDescription);
       }
-    ).toThrow(new Error(
-      'SpecClass ' + classNameDoubleName + ' already exists, but is not same Class (for @Then ' + functionName + ')'
-    ));
+    ).toThrowError(SpecRegistryError, 'SpecClass ' + classNameDoubleName + ' already exists, but is not same Class (for @Then ' + functionName + ')');
   });
 
   it('should register the Then, while parameters are correct', () => {
@@ -321,17 +316,13 @@ describe('SpecRegistry.registerWhenForSpec', () => {
   it('should refuse the When, if no property with the Name exists on the SpecClass', () => {
     expect(() => {
       SpecRegistry.registerWhenForSpec(specClass, nonExistPropName, description);
-    }).toThrow(
-      new Error(specClassName + '.' + nonExistPropName + ' does not exist.')
-    );
+    }).toThrowError(SpecRegistryError, specClassName + '.' + nonExistPropName + ' does not exist.');
   });
 
   it('should refuse the When, if property with the Name exists on the SpecClassProperSpecDecorator, but is not a function', () => {
     expect(() => {
       SpecRegistry.registerWhenForSpec(specClass, numericPropertyName, description);
-    }).toThrow(
-      new Error(specClassName + '.' + numericPropertyName + ' is not a function.')
-    );
+    }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
   });
 
   it('should register the When, while parameters are correct', () => {
@@ -342,5 +333,3 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     expect(thenRegEntry.getDescription()).toEqual(description);
   });
 });
-
-

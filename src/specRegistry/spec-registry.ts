@@ -1,4 +1,5 @@
 import {SpecRegistryEntry} from "./specRegistryEntry/spec-registry-entry";
+import {SpecRegistryError} from "./errors/errors";
 var SPECCLASS_REGISTRY = new Map<string, SpecRegistryEntry>();
 
 export class SpecRegistry {
@@ -8,7 +9,7 @@ export class SpecRegistry {
     let registryEntry = SPECCLASS_REGISTRY.get(specClassName);
     if(registryEntry != null){
       if (registryEntry.getSpecName()!= null) {
-        throw new Error(specClassName + ' is already registered for Spec:' + registryEntry.getSpecName() + ', can only be registered once, cannot register for Spec:' + specName);
+        throw new SpecRegistryError(specClassName + ' is already registered for Spec:' + registryEntry.getSpecName() + ', can only be registered once, cannot register for Spec:' + specName, specClassName);
       }
         registryEntry.setSpecName(specName);
     } else {
@@ -26,7 +27,7 @@ export class SpecRegistry {
       SPECCLASS_REGISTRY.set(specClassName, specRegEntry);
     } else {
       if(specRegEntry.getClass().constructor != specClass.constructor)
-        throw new Error('SpecClass ' + specClassName + ' already exists, but is not same Class (for @Given ' + functionName + ')');
+        throw new SpecRegistryError('SpecClass ' + specClassName + ' already exists, but is not same Class (for @Given ' + functionName + ')', specClassName, functionName);
     }
 
     let savedClass = specRegEntry.getClass();
@@ -42,18 +43,12 @@ export class SpecRegistry {
       SPECCLASS_REGISTRY.set(specClassName, specRegEntry);
     } else {
       if(specRegEntry.getClass().constructor != specClass.constructor)
-        throw new Error('SpecClass ' + specClassName + ' already exists, but is not same Class (for @When ' + functionName + ')');
+        throw new SpecRegistryError('SpecClass ' + specClassName + ' already exists, but is not same Class (for @When ' + functionName + ')', specClassName, functionName);
     }
 
     let savedClass = specRegEntry.getClass();
     SpecRegistry.checkIfFunctionExistsOnClass(savedClass, functionName);
     specRegEntry.addWhen(functionName, description);
-    /*
-    let specRegEntry = SpecRegistry.getSpecBySpecClassNameException(specClassName);
-    let specClass = specRegEntry.getClass();
-    SpecRegistry.checkIfFunctionExistsOnClass(specClass, functionName);
-    specRegEntry.addWhen(functionName, description);
-    */
   }
 
   public static registerThenForSpec(specClass: any, functionName: string, description: string, execNumber?: number) {
@@ -64,22 +59,14 @@ export class SpecRegistry {
       SPECCLASS_REGISTRY.set(specClassName, specRegEntry);
     } else {
       if(specRegEntry.getClass().constructor != specClass.constructor)
-        throw new Error('SpecClass ' + specClassName + ' already exists, but is not same Class (for @Then ' + functionName + ')');
+        throw new SpecRegistryError('SpecClass ' + specClassName + ' already exists, but is not same Class (for @Then ' + functionName + ')', specClassName, functionName);
     }
 
     let savedClass = specRegEntry.getClass();
     SpecRegistry.checkIfFunctionExistsOnClass(savedClass, functionName);
     specRegEntry.addThen(functionName, description, execNumber);
   }
-/*
-  private static getSpecBySpecClassNameException(specClassName: string): SpecRegistryEntry {
-    let specName = TESTCLASS_SPEC.get(specClassName);
-    if (specName == null) throw new Error('Class ' + specClassName + ' is not registered as SpecRegistry');
-    let specRegEntry = SPECCLASS_REGISTRY.get(specName);
-    if (specRegEntry == null)throw new Error('There is no SpecRegEntry for SpecRegistry ' + specName + ', but Class ' + specClassName + 'is defined as SpecRegistry. This should not happen.');
-    return specRegEntry
-  }
-*/
+
   public static getSpecClassNames(): Array<String> {
     return Array.from(SPECCLASS_REGISTRY.keys());
   }
@@ -89,11 +76,12 @@ export class SpecRegistry {
   }
 
   private static checkIfFunctionExistsOnClass(specClass: any, functionName: string){
+    let className = specClass.constructor.name;
     if (specClass[functionName] == null) {
-      throw new Error(specClass.constructor.name + '.' + functionName + ' does not exist.');
+      throw new SpecRegistryError(className + '.' + functionName + ' does not exist.', className, functionName);
     }
     if (typeof specClass[functionName] != 'function') {
-      throw new Error(specClass.constructor.name + '.' + functionName + ' is not a function.');
+      throw new SpecRegistryError(className + '.' + functionName + ' is not a function.', className, functionName);
     }
   }
 

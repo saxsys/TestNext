@@ -1,12 +1,15 @@
+import {SpecMethodType} from "./spec-method-type";
 export class TestMethodRegistryEntry {
   private name: string;
   private description: string;
   private execNumber: number;
+  private methodType: SpecMethodType;
 
-  constructor(name: string, description: string, execNumber?: number) {
+  constructor(name: string, description: string, methodType:SpecMethodType, execNumber?: number) {
     this.name = name;
     this.description = description;
     this.execNumber = execNumber;
+    this.methodType = methodType;
   }
 
   getName(): string {
@@ -15,6 +18,10 @@ export class TestMethodRegistryEntry {
 
   getDescription(): string {
     return this.description;
+  }
+
+  getMethodType(): SpecMethodType{
+    return this.methodType;
   }
 
 }

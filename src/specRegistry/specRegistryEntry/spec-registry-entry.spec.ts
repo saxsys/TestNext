@@ -1,7 +1,9 @@
 /**
  * Created by paul.brandes on 24.05.2017.
  */
-import {SpecRegistryEntry} from "testRunner/testCaseRegistry/specRegistryEntry/spec-registry-entry";
+import {SpecRegistryEntry} from "specRegistry/specRegistryEntry/spec-registry-entry";
+import {SpecRegistryError} from "../errors/errors";
+import {SpecRegistry} from "../spec-registry";
 
 class ExampleSpecClass {
 
@@ -24,7 +26,8 @@ describe('SpecRegistryEntry', () => {
   });
 });
 
-describe('SpecRegistryEntry.given', () => {
+describe('SpecRegistryEntry.addGiven', () => {
+
 
   let testCaseEntry;
   const specClass = new ExampleSpecClass();
@@ -70,16 +73,19 @@ describe('SpecRegistryEntry.given', () => {
 
   it('should refuse multiple added "given" with same execNumber', () => {
     testCaseEntry.addGiven(givenName0, givenDescription0, 0);
-    expect(() => {testCaseEntry.addGiven(givenName1, givenDescription1, 0)})
-      .toThrow(new Error('Multiple @given, without ExecNumber, or it (0) already exists on ' +
-        specClassName + '.' + givenName1));
+    expect(() => {
+      testCaseEntry.addGiven(givenName1, givenDescription1, 0)
+    })
+      .toThrowError(SpecRegistryError,
+        'Multiple @given, without ExecNumber, or it (0) already exists on ' + specClassName + '.' + givenName1
+      );
 
   });
 
 
 });
 
-describe('SpecRegistryEntry.then', () => {
+describe('SpecRegistryEntry.addThen', () => {
 
   let testCaseEntry;
   const specClass = new ExampleSpecClass();
@@ -128,13 +134,13 @@ describe('SpecRegistryEntry.then', () => {
     expect(() => {
       testCaseEntry.addThen(thenName1, thenDescription1, 0)
     })
-      .toThrow(new Error('Multiple @then, without ExecNumber, or it (0) already exists on ' +
-        specClassName + '.' + thenName1));
-
+      .toThrowError(SpecRegistryError,
+        'Multiple @then, without ExecNumber, or it (0) already exists on ' + specClassName + '.' + thenName1
+      );
   });
 });
 
-describe('SpecRegistryEntry.when', () => {
+describe('SpecRegistryEntry.addWhen', () => {
 
   let testCaseEntry;
   const specClass = new ExampleSpecClass();
@@ -162,15 +168,72 @@ describe('SpecRegistryEntry.when', () => {
 
   it('should refuse multiple added "when" with same execNumber', () => {
     testCaseEntry.addWhen(whenName, whenDescription);
-    expect(() => {testCaseEntry.addWhen(whenName1, whenDescription1, 0)})
-      .toThrow(
-        new Error('Only one @When allowed on ' + specClassName +
-          'cannot add ' + whenName1 + ', ' + whenName + ' is already @When')
-        );
+    expect(() => {
+      testCaseEntry.addWhen(whenName1, whenDescription1, 0)
+    })
+      .toThrowError(SpecRegistryError,
+        'Only one @When allowed on ' + specClassName +
+        'cannot add ' + whenName1 + ', ' + whenName + ' is already @When'
+      );
 
   });
 
 
+});
 
+describe('SpecRegistryEntry.getGivenArray', () => {
+  let className = 'SpecRegistryEntry_GivenArray';
+  class SpecRegistryEntry_GivenArray{
+    method0(){};
+    method1(){};
+    method2(){};
+  }
+  let specClass;
 
+  beforeAll(() => {
+    specClass = new SpecRegistryEntry_GivenArray();
+  });
+
+  it('should return method-entries in order of execNumber, independent of adding order ', () => {
+    SpecRegistry.registerGivenForSpec(specClass, 'method2', 'specMethod2', 3);
+    SpecRegistry.registerGivenForSpec(specClass, 'method0', 'specMethod0', 0);
+    SpecRegistry.registerGivenForSpec(specClass, 'method1', 'specMethod1', 1);
+
+    let givenArray = SpecRegistry.getSpecByClassName(className).getGivenArray();
+    let namesInOrder = [];
+    givenArray.forEach((given) => {
+      namesInOrder.push(given.getName());
+    })
+
+    expect(namesInOrder).toEqual(['method0','method1', 'method2']);
+  });
+});
+
+describe('SpecRegistryEntry.getThenArray', () => {
+
+  let className = 'SpecRegistryEntry_ThenArray';
+  class SpecRegistryEntry_ThenArray{
+    method0(){};
+    method1(){};
+    method2(){};
+  }
+  let specClass;
+
+  beforeAll(() => {
+    specClass = new SpecRegistryEntry_ThenArray();
+  });
+
+  it('should return method-entries in order of execNumber, independent of adding order ', () => {
+    SpecRegistry.registerThenForSpec(specClass, 'method2', 'specMethod2', 3);
+    SpecRegistry.registerThenForSpec(specClass, 'method0', 'specMethod0', 0);
+    SpecRegistry.registerThenForSpec(specClass, 'method1', 'specMethod1', 1);
+
+    let thenArray = SpecRegistry.getSpecByClassName(className).getThenArray();
+    let namesInOrder = [];
+    thenArray.forEach((then) => {
+      namesInOrder.push(then.getName());
+    })
+
+    expect(namesInOrder).toEqual(['method0','method1', 'method2']);
+  });
 });
