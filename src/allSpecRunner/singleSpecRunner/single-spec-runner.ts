@@ -1,27 +1,28 @@
-import {ISpecExecutable, ISpecMethod} from "../specRegistry/specRegistryEntry/ISpec";
-import {ISuccessLogger} from "./success-Logger/ISuccessLogger";
+import {ISpecExecutable, ISpecMethod} from "../../specRegistry/specRegistryEntry/ISpec";
+import {ISpecRunLogger} from "../../spec-run-logger/interfaces";
 import {TestValidator} from "./testValidator/test-validator";
-import {AssertionError} from "../assert/assertion-Error";
+import {AssertionError} from "../../assert/assertion-Error";
 
-export class TestRunner {
+export class SingleSpecRunner {
 
   private spec: ISpecExecutable;
-  private successLogger: ISuccessLogger;
+  private successLogger: ISpecRunLogger;
 
-  constructor(spec:ISpecExecutable, successLogger: ISuccessLogger){
+  constructor(spec:ISpecExecutable, specLogger: ISpecRunLogger){
     TestValidator.validateTest(spec);
     this.spec = spec;
-    this.successLogger = successLogger;
+    this.successLogger = specLogger;
   }
 
-  getSuccessLogger(): ISuccessLogger{
+  getSuccessLogger(): ISpecRunLogger{
     return this.successLogger;
   }
 
-  public runSpec(){
+  public runSpec(): ISpecRunLogger{
     this.runGiven();
     this.runWhen();
     this.runThen();
+    return this.successLogger;
   }
 
   private runMethod(method: ISpecMethod){
@@ -32,14 +33,14 @@ export class TestRunner {
       execClass[method.getName()]();
     } catch (error) {
       if(error instanceof AssertionError) {
-        this.successLogger.logSuccess(this.spec.getClassName(), method.getName(), false, error);
+        this.successLogger.log(this.spec, method.getName(), false, error);
       } else {
         throw error;
       }
       return;
     }
 
-    this.successLogger.logSuccess(this.spec.getClassName(), method.getName(), true);
+    this.successLogger.log(this.spec, method.getName(), true);
   }
 
   private runGiven() {
@@ -60,5 +61,8 @@ export class TestRunner {
     this.runMethod(this.spec.getWhen())
   }
 
+  public getSpec(): ISpecExecutable{
+    return this.spec;
+  }
 
 }

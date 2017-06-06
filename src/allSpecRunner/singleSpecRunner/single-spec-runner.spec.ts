@@ -1,18 +1,18 @@
-import {Given, Spec, Then, When} from "../testDecorators/test-decorators";
-import {SpecRegistry} from "../specRegistry/spec-registry";
-import {TestRunner} from "./test-runner";
-import {SuccessLogger} from "./success-Logger/success-logger";
+import {Given, Spec, Then, When} from "../../testDecorators/test-decorators";
+import {SpecRegistry} from "../../specRegistry/spec-registry";
+import {SingleSpecRunner} from "./single-spec-runner";
+import {SpecRunLogger} from "../../spec-run-logger/spec-logger";
 import {SpecValidationError} from "./testValidator/spec-validation-error";
-import {AssertionError} from "../assert/assertion-Error";
-import {AssertProportion} from "../assert/assert-proportion";
+import {AssertionError} from "../../assert/assertion-Error";
+import {AssertProportion} from "../../assert/assert-proportion";
 import {isSuccess} from "@angular/http/src/http_utils";
 
-describe('testRunner.constructor', () => {
+describe('singleSpecRunner.constructor', () => {
   it('should refuse invalid Tests', () => {
-    let specClassName = 'TestRunner_constructor_InvalidTest';
+     let specClassName = 'SingleSpecRunner_constructor_InvalidTest';
     //The test has no Then Method
     @Spec('an invalid Test')
-    class TestRunner_constructor_InvalidTest {
+    class SingleSpecRunner_constructor_InvalidTest {
       private someValue;
       private otherValue;
 
@@ -27,18 +27,18 @@ describe('testRunner.constructor', () => {
 
     let specEntry = SpecRegistry.getSpecByClassName(specClassName);
 
-    let succLogger = new SuccessLogger();
+    let specLogger = new SpecRunLogger();
 
     expect(() => {
-      let testRunner = new TestRunner(specEntry, succLogger);
+      let singleSpecRunner = new SingleSpecRunner(specEntry, specLogger);
     }).toThrowError(SpecValidationError, 'There must be at lease one @Then in ' + specClassName);
   });
 
   it('should init with proper parameters', () => {
-    let specClassName = 'TestRunner_constructor_correct';
+    let specClassName = 'SingleSpecRunner_constructor_correct';
     //The test has no Then Method
     @Spec('an invalid Test')
-    class TestRunner_constructor_correct {
+    class SingleSpecRunner_constructor_correct {
       private someValue;
       private otherValue;
 
@@ -57,20 +57,21 @@ describe('testRunner.constructor', () => {
 
     let specEntry = SpecRegistry.getSpecByClassName(specClassName);
 
-    let succLogger = new SuccessLogger();
+    let specLogger = new SpecRunLogger();
 
-    let testRunner = new TestRunner(specEntry, succLogger);
-    expect(testRunner).not.toBeUndefined();
+    let singleSpecRunner = new SingleSpecRunner(specEntry, specLogger);
+    expect(singleSpecRunner).not.toBeUndefined();
   });
 });
 
-describe('testRunner.runSpec', () => {
+describe('singleSpecRunner.runSpec', () => {
 
   let specEntry;
-  let succLogger;
-  let testRunner;
+  let specLogger;
+  let singleSpecRunner;
+  let specLog;
 
-  let specClassName = 'TestRunner_runSpec';
+  let specClassName = 'SingleSpecRunner_runSpec';
   let methodNamesInOrder = ['given0', 'given1', 'theWhen', 'then0', 'then1'];
   let methodsWithoutError = ['given0', 'given2', 'theWhen', 'then0'];
   let methodsWithAssertError = ['then1'];
@@ -79,7 +80,7 @@ describe('testRunner.runSpec', () => {
   let anyAssertionError = new AssertionError(1, 2, AssertProportion.EQUAL, 'Number','otherNumber');
 
   @Spec('an invalid Test')
-  class TestRunner_runSpec {
+  class SingleSpecRunner_runSpec {
     public runOrder = [];
 
     @Then('then 0', 0) then0() {
@@ -106,9 +107,13 @@ describe('testRunner.runSpec', () => {
 
   beforeAll(() => {
     specEntry = SpecRegistry.getSpecByClassName(specClassName);
-    succLogger = new SuccessLogger();
-    testRunner = new TestRunner(specEntry, succLogger);
-    testRunner.runSpec();
+    specLogger = new SpecRunLogger();
+    singleSpecRunner = new SingleSpecRunner(specEntry, specLogger);
+    singleSpecRunner.runSpec();
+    specLog = specLogger.getSpecLogOf(specClassName);
+
+    expect(specLog).not.toBeNull();
+
   });
 
   it('should run all methods in Order', () => {
@@ -116,12 +121,12 @@ describe('testRunner.runSpec', () => {
   });
 
   it('should have logged for all', () => {
-    let logs = testRunner.getSuccessLogger().getLogs();
-    expect(logs.length).toEqual(5);
+    let methodLogs = specLog.getLogs();
+    expect(methodLogs.length).toEqual(5);
 
     let loggedFunctions = [];
     //get FunctionNames
-    logs.forEach((log)=>{loggedFunctions.push(log.getMethodName());});
+    methodLogs.forEach((mLog)=>{loggedFunctions.push(mLog.getMethodName());});
 
     methodNamesInOrder.forEach((methodName) => {
       expect(loggedFunctions).toContain(methodName);
@@ -129,20 +134,18 @@ describe('testRunner.runSpec', () => {
   });
 
   it('should log methods without Error as successful', () => {
-    succLogger.getLogs().forEach((log)=>{
+    specLog.getLogs().forEach((log)=>{
       if(methodsWithoutError.indexOf(log.getMethodName()) >-1) {
         expect(log.isSuccess()).toBeTruthy();
-        expect(log.getClassName()).toEqual(specClassName);
         expect(log.getError()).toBeUndefined();
       }
     });
   });
 
   it('should log methods with AssertionError as not successful and log the error', () => {
-    succLogger.getLogs().forEach((log)=>{
+    specLog.getLogs().forEach((log)=>{
       if(methodsWithAssertError.indexOf(log.getMethodName()) >-1) {
         expect(log.isSuccess()).toBeFalsy();
-        expect(log.getClassName()).toEqual(specClassName);
         expect(log.getError()).not.toBeUndefined();
         expect(log.getError()).toEqual(anyAssertionError);
       }
@@ -152,19 +155,19 @@ describe('testRunner.runSpec', () => {
   it('should stop executing the test, if an error is thrown (which is not an AssertionError', () => {
 
     @Spec('a test with Error')
-    class TestRunner_runSpec_WithRandomError {
+    class SingleSpecRunner_runSpec_WithRandomError {
       @Given('given')given() {
         throw randomError;
       }
       @When('when') when() {}
       @Then('then') then() {}
     }
-    let specClassName = 'TestRunner_runSpec_WithRandomError';
+    let specClassName = 'SingleSpecRunner_runSpec_WithRandomError';
     let specEntry = SpecRegistry.getSpecByClassName(specClassName);
-    let succLogger = new SuccessLogger();
-    let testRunner = new TestRunner(specEntry, succLogger);
+    let specLogger = new SpecRunLogger();
+    let singleSpecRunner = new SingleSpecRunner(specEntry, specLogger);
 
-    expect(() => {testRunner.runSpec()}).toThrow(randomError);
+    expect(() => {singleSpecRunner.runSpec()}).toThrow(randomError);
 
   });
 

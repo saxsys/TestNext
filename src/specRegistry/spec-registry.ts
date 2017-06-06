@@ -1,5 +1,6 @@
 import {SpecRegistryEntry} from "./specRegistryEntry/spec-registry-entry";
 import {SpecRegistryError} from "./errors/errors";
+import {ISpecExecutable} from "./specRegistryEntry/ISpec";
 var SPECCLASS_REGISTRY = new Map<string, SpecRegistryEntry>();
 
 export class SpecRegistry {
@@ -11,10 +12,10 @@ export class SpecRegistry {
       if (registryEntry.getSpecName()!= null) {
         throw new SpecRegistryError(specClassName + ' is already registered for Spec:' + registryEntry.getSpecName() + ', can only be registered once, cannot register for Spec:' + specName, specClassName);
       }
-        registryEntry.setSpecName(specName);
+        registryEntry.setDescription(specName);
     } else {
       let entry = new SpecRegistryEntry(specClass);
-      entry.setSpecName(specName);
+      entry.setDescription(specName);
       SPECCLASS_REGISTRY.set(specClassName, entry);
     }
   }
@@ -75,6 +76,10 @@ export class SpecRegistry {
     return SPECCLASS_REGISTRY.get(className);
   }
 
+  public static getRestryEntries(): Array<ISpecExecutable>{
+    return Array.from(SPECCLASS_REGISTRY.values());
+  }
+
   private static checkIfFunctionExistsOnClass(specClass: any, functionName: string){
     let className = specClass.constructor.name;
     if (specClass[functionName] == null) {
@@ -84,5 +89,6 @@ export class SpecRegistry {
       throw new SpecRegistryError(className + '.' + functionName + ' is not a function.', className, functionName);
     }
   }
+
 
 }

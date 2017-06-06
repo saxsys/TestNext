@@ -1,5 +1,5 @@
 
-import {ISpecExecutable} from "../../specRegistry/specRegistryEntry/ISpec";
+import {ISpecExecutable} from "../../../specRegistry/specRegistryEntry/ISpec";
 import {SpecValidationError} from "./spec-validation-error";
 
 

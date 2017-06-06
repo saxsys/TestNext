@@ -16,7 +16,7 @@ describe('SpecRegistryEntry', () => {
   const specName = 'A Class without Decorators';
   beforeEach(() => {
     testCaseEntry = new SpecRegistryEntry(specClass);
-    testCaseEntry.setSpecName(specName);
+    testCaseEntry.setDescription(specName);
   });
 
   it('should be constructed with proper parameters', () => {
@@ -40,7 +40,7 @@ describe('SpecRegistryEntry.addGiven', () => {
 
   beforeEach(() => {
     testCaseEntry = new SpecRegistryEntry(specClass);
-    testCaseEntry.setSpecName(specName);
+    testCaseEntry.setDescription(specName);
   });
 
   it('should accept one added "given" without execNumber as 0', () => {
@@ -98,7 +98,7 @@ describe('SpecRegistryEntry.addThen', () => {
 
   beforeEach(() => {
     testCaseEntry = new SpecRegistryEntry(specClass);
-    testCaseEntry.setSpecName(specName);
+    testCaseEntry.setDescription(specName);
   });
 
   it('should accept one added "then" without execNumber as 0', () => {
@@ -153,7 +153,7 @@ describe('SpecRegistryEntry.addWhen', () => {
 
   beforeEach(() => {
     testCaseEntry = new SpecRegistryEntry(specClass);
-    testCaseEntry.setSpecName(specName);
+    testCaseEntry.setDescription(specName);
   });
 
   it('should accept single "when"', () => {

@@ -1,4 +1,7 @@
 import {SpecRegistry} from '../src/specRegistry/spec-registry';
+import {AllSpecRunner} from "../src/allSpecRunner/all-spec-runner";
+import {SpecRunLogger} from "../src/spec-run-logger/spec-logger";
+import {SuccessLogBeautyfier} from "../src/spec-run-logger/spec-log-beautyfier";
 
 
 console.log('running a script works');
@@ -21,6 +24,15 @@ testFiles.forEach((file) => {
 });
 
 // TODO continue here with running tests
-console.log(SpecRegistry.getSpecClassNames());
+let specLogger = new SpecRunLogger();
+let specReg = SpecRegistry.getRestryEntries();
+console.log(specReg.length + ' specs to run');
+let allSpecRunner = new AllSpecRunner(specReg, specLogger);
+allSpecRunner.buildSingleSpecRunners();
+allSpecRunner.runSpecs();
+console.log(specLogger.getLogs().length + ' logs');
+specLogger.getLogs().forEach((specLog) => {
+  console.log(SuccessLogBeautyfier.SpecLogToString(specLog));
+});
 
 
