@@ -1,6 +1,7 @@
 import {AssertionError} from "./assertion-Error";
 import {AssertProportion} from "./assert-proportion";
-import {type} from "os";
+import * as _ from 'underscore';
+
 export class Assert {
   private value: any;
   private description: String;
@@ -24,7 +25,8 @@ export class Assert {
   }
 
   equals(comparator: any, descriptionComparator?: string) {
-    if (this.value !== comparator) {
+    let areEqual = _.isEqual(this.value, comparator);
+    if (!areEqual) {
       let outDescComp = (descriptionComparator == null ? '':descriptionComparator);
       let outDescVal = (this.description == null ? '':this.description);
       throw new AssertionError(this.value, comparator, AssertProportion.EQUAL, outDescVal, outDescComp);
@@ -32,57 +34,58 @@ export class Assert {
   }
 
   equalsNot(comparator: any, descriptionComparator?: string) {
-    if(this.value === comparator){
+    let areEqual = _.isEqual(this.value, comparator);
+    if(areEqual){
       let outDescComp = (descriptionComparator == null ? '':descriptionComparator);
       let outDescVal = (this.description == null ? '':this.description);
       throw new AssertionError(this.value, comparator, AssertProportion.NOT_EQUAL, outDescVal, outDescComp);
     }
   }
 
-  isGreaterThan(comparator: any, descriptionComparator?: string) {
+  isGreaterThan(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '':descriptionComparator);
     let outDescVal = (this.description == null ? '':this.description);
 
-    if(typeof this.value != "number" || typeof comparator != "number") {
-      let errorMsg = 'For a Greater-Than-Assertion both Values must be of type Number';
-      throw new AssertionError(this.value, comparator, AssertProportion.GREATER, outDescVal, outDescComp, errorMsg);
-    }
+    if(this.value == null || typeof this.value != "number"|| isNaN(this.value)  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.value, comparator, AssertProportion.GREATER, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
+
     if(this.value <= comparator)
       throw new AssertionError(this.value, comparator, AssertProportion.GREATER, outDescVal, outDescComp);
   }
 
-  isLessThan(comparator: any, descriptionComparator?: string) {
+  isLessThan(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '':descriptionComparator);
     let outDescVal = (this.description == null ? '':this.description);
 
-    if(typeof this.value != "number" || typeof comparator != "number") {
-      let errorMsg = 'For a Less-Than-Assertion both Values must be of type Number';
-      throw new AssertionError(this.value, comparator, AssertProportion.LESS, outDescVal, outDescComp, errorMsg);
-    }
+    if(this.value == null || typeof this.value != "number"|| isNaN(this.value)  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.value, comparator, AssertProportion.LESS, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
+
     if(this.value >= comparator)
       throw new AssertionError(this.value, comparator, AssertProportion.LESS, outDescVal, outDescComp);
   }
 
-  isGreaterOrEqual(comparator: any, descriptionComparator?: string) {
+  isGreaterOrEquals(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '':descriptionComparator);
     let outDescVal = (this.description == null ? '':this.description);
 
-    if(typeof this.value != "number" || typeof comparator != "number") {
-      let errorMsg = 'For a Greater-Or-Equal-Assertion both Values must be of type Number';
-      throw new AssertionError(this.value, comparator, AssertProportion.GREATER_OR_EQUAL, outDescVal, outDescComp, errorMsg);
-    }
+    if(this.value == null || typeof this.value != "number"|| isNaN(this.value)  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.value, comparator, AssertProportion.GREATER_OR_EQUAL, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
+
     if(this.value < comparator)
       throw new AssertionError(this.value, comparator, AssertProportion.GREATER_OR_EQUAL, outDescVal, outDescComp);
   }
 
-  isLessOrEqual(comparator: any, descriptionComparator?: string) {
+  isLessOrEquals(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '':descriptionComparator);
     let outDescVal = (this.description == null ? '':this.description);
 
-    if(typeof this.value != "number" || typeof comparator != "number") {
-      let errorMsg = 'For a Less-Or-Equal-Assertion both Values must be of type Number';
-      throw new AssertionError(this.value, comparator, AssertProportion.LESS_OR_EQUAL, outDescVal, outDescComp, errorMsg);
-    }
+    if(this.value == null || typeof this.value != "number"|| isNaN(this.value)  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.value, comparator, AssertProportion.LESS_OR_EQUAL, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
+
     if(this.value > comparator)
       throw new AssertionError(this.value, comparator, AssertProportion.LESS_OR_EQUAL, outDescVal, outDescComp);
   }
@@ -96,14 +99,14 @@ export class Assert {
         errorMsg += this.description;
       else
         errorMsg += 'value';
-      errorMsg+= ' sould be null, not ' + this.value;
+      errorMsg+= ' should be null, not ' + this.value;
       throw new AssertionError(this.value, null, AssertProportion.NULL, outDescVal, outDescComp, errorMsg);
     }
   }
 }
 
 class AssertNot{
-  public not:Assert;
+  private not:Assert;
 
   public getDescription():String {
     return this.not.getDescription();
@@ -117,58 +120,59 @@ class AssertNot{
     this.not = assert;
   }
 
-  equalsNot(comparator: any, descriptionComparator?: string) {
-    if(this.not.getValue() !== comparator) {
+  equals(comparator: any, descriptionComparator?: string) {
+    let areEqual = _.isEqual(this.not.getValue(), comparator);
+    if(areEqual) {
       let outDescComp = (descriptionComparator == null ? '':descriptionComparator);
-      let outDescVal = (this.not.getDescription() == null ? '':this.getDescription());
-      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.EQUAL, outDescVal, outDescComp);
+      let outDescVal = (this.not.getDescription() == null ? '':this.not.getDescription());
+      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_EQUAL, outDescVal, outDescComp);
     }
   }
 
-  isGreaterThan(comparator: any, descriptionComparator?: string) {
+  isGreaterThan(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '' : descriptionComparator);
-    let outDescVal = (this.not.getDescription() == null ? '' : this.getDescription());
+    let outDescVal = (this.not.getDescription() == null ? '' : this.not.getDescription());
 
-    if(typeof this.not.getValue() != "number" || typeof comparator != "number")
-      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.GREATER, outDescVal, outDescComp,
-        'For a Greater-Than-Assertion both Values must be of type Number');
+    if(this.not.getValue() == null || typeof this.not.getValue() != "number"|| isNaN(this.not.getValue())  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_GREATER, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
 
     if(this.not.getValue() > comparator)
       throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_GREATER, outDescVal, outDescComp);
 
   }
 
-  isLessThan(comparator: any, descriptionComparator?: string) {
+  isLessThan(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '' : descriptionComparator);
-    let outDescVal = (this.not.getDescription() == null ? '' : this.getDescription());
+    let outDescVal = (this.not.getDescription() == null ? '' : this.not.getDescription());
 
-    if(typeof this.not.getValue() != "number" || typeof comparator != "number")
-      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.GREATER, outDescVal, outDescComp,
-        'For a Less-Than-Assertion both Values must be of type Number');
+    if(this.not.getValue() == null || typeof this.not.getValue() != "number"|| isNaN(this.not.getValue())  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_LESS, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
 
     if(this.not.getValue() < comparator)
-      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_GREATER, outDescVal, outDescComp);
+      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_LESS, outDescVal, outDescComp);
   }
 
-  isGreaterOrEqual(comparator: any, descriptionComparator?: string) {
+  isGreaterOrEquals(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '' : descriptionComparator);
-    let outDescVal = (this.not.getDescription() == null ? '' : this.getDescription());
+    let outDescVal = (this.not.getDescription() == null ? '' : this.not.getDescription());
 
-    if(typeof this.not.getValue() != "number" || typeof comparator != "number")
-      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.GREATER, outDescVal, outDescComp,
-        'For a Greater-Than-Assertion both Values must be of type Number');
+    if(this.not.getValue() == null || typeof this.not.getValue() != "number"|| isNaN(this.not.getValue())  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_GREATER_OR_EQUAL, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
 
     if(this.not.getValue() >= comparator)
       throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_GREATER_OR_EQUAL, outDescVal, outDescComp);
   }
 
-  isLessOrEqual(comparator: any, descriptionComparator?: string) {
+  isLessOrEquals(comparator: number, descriptionComparator?: string) {
     let outDescComp = (descriptionComparator == null ? '' : descriptionComparator);
-    let outDescVal = (this.not.getDescription() == null ? '' : this.getDescription());
+    let outDescVal = (this.not.getDescription() == null ? '' : this.not.getDescription());
 
-    if(typeof this.not.getValue() != "number" || typeof comparator != "number")
-      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.GREATER, outDescVal, outDescComp,
-        'For a Greater-Than-Assertion both Values must be of type Number');
+    if(this.not.getValue() == null || typeof this.not.getValue() != "number"|| isNaN(this.not.getValue())  || comparator == null || isNaN(comparator) )
+      throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_LESS_OR_EQUAL, outDescVal, outDescComp,
+        'For a Comparing-Assertion both Values must be of type "number" and not null');
 
     if(this.not.getValue() <= comparator)
       throw new AssertionError(this.not.getValue(), comparator, AssertProportion.NOT_LESS_OR_EQUAL, outDescVal, outDescComp);
@@ -180,7 +184,7 @@ class AssertNot{
       let outDescVal = (this.not.getDescription() == null)? '':this.not.getDescription();
 
       let errorMsg = '';
-      errorMsg += (this.not.getDescription() != null)? this.getDescription():'value';
+      errorMsg += (this.not.getDescription() == null)? 'value':this.not.getDescription();
       errorMsg+= ' should not be null, is null';
 
       throw new AssertionError(this.not.getValue(), null, AssertProportion.NOT_NULL, outDescVal, outDescComp, errorMsg);

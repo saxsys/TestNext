@@ -12,7 +12,7 @@ export class AssertionError extends Error{
     if(message != null) {
       super(message.toString());
     } else {
-      super(valDescription + ' (' + value.toString() + ')  should be ' +
+      super(valDescription + '(' + value.toString() + ') should be ' +
         proportion.toString() + ' ' + compDescription + '(' + comparator.toString() +')'
       );
     }

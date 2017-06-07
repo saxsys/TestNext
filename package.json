@@ -9,7 +9,6 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-
     "tnComp": "tsc -p tsconfig.json",
     "tnRun": "node dist/testRunner/runTests.js",
     "tNxt": "tsc -p tsconfig.json && node dist/testExec/execTests.js"
@@ -24,8 +23,10 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
+    "@types/underscore": "^1.8.1",
     "core-js": "^2.4.1",
     "rxjs": "^5.1.0",
+    "underscore": "^1.8.3",
     "zone.js": "^0.8.4"
   },
   "devDependencies": {
