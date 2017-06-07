@@ -1,5 +1,5 @@
 import {SpecRegistry} from '../src/specRegistry/spec-registry';
-import {AllSpecRunner} from "../src/allSpecRunner/all-spec-runner";
+import {MultiSpecRunner} from "../src/multiSpecRunner/multi-spec-runner";
 import {SpecRunLogger} from "../src/spec-run-logger/spec-logger";
 import {SuccessLogBeautyfier} from "../src/spec-run-logger/spec-log-beautyfier";
 
@@ -27,7 +27,7 @@ testFiles.forEach((file) => {
 let specLogger = new SpecRunLogger();
 let specReg = SpecRegistry.getRestryEntries();
 console.log(specReg.length + ' specs to run');
-let allSpecRunner = new AllSpecRunner(specReg, specLogger);
+let allSpecRunner = new MultiSpecRunner(specReg, specLogger);
 allSpecRunner.buildSingleSpecRunners();
 allSpecRunner.runSpecs();
 console.log(specLogger.getLogs().length + ' logs');

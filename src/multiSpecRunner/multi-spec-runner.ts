@@ -1,7 +1,7 @@
 import {ISpecExecutable} from "../specRegistry/specRegistryEntry/ISpec";
 import {ISpecRunLogger} from "../spec-run-logger/interfaces";
 import {SingleSpecRunner} from "./singleSpecRunner/single-spec-runner";
-export class AllSpecRunner{
+export class MultiSpecRunner{
 
   private specs:Array<ISpecExecutable>;
   private logger:ISpecRunLogger;
