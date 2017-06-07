@@ -25,14 +25,29 @@ testFiles.forEach((file) => {
 
 // TODO continue here with running tests
 let specLogger = new SpecRunLogger();
-let specReg = SpecRegistry.getRestryEntries();
+let specReg = SpecRegistry.getRegistryEntries();
 console.log(specReg.length + ' specs to run');
 let allSpecRunner = new MultiSpecRunner(specReg, specLogger);
-allSpecRunner.buildSingleSpecRunners();
-allSpecRunner.runSpecs();
-console.log(specLogger.getLogs().length + ' logs');
-specLogger.getLogs().forEach((specLog) => {
-  console.log(SuccessLogBeautyfier.SpecLogToString(specLog));
-});
+
+  allSpecRunner.buildSingleSpecRunners();
+  let buildingErrors = allSpecRunner.getBuildingErrors();
+  if(buildingErrors.size >0) {
+    console.log('######################################\n' +
+                '####BUILDING-ERRORS: ' + buildingErrors.size + ' ###############\n');
+    buildingErrors.forEach((error)=>{
+      console.log(error.message);
+    });
+    console.log('######################################\n######################################');
+  }
+
+  allSpecRunner.runSpecs();
+
+  console.log(specLogger.getLogs().length + ' logs');
+  specLogger.getLogs().forEach((specLog) => {
+    console.log(SuccessLogBeautyfier.SpecLogToString(specLog));
+  });
+
+
+
 
 

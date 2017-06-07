@@ -35,3 +35,14 @@ import {Assert} from "../../assert/assert";
     Assert.that(this.count, 'count').equals(3);
   }
 }
+
+@Spec('Incorrect Test') class IncorrectTest{
+  count:number;
+
+  @When('no Given') thereisNoGiven(){
+    this.count = 3;
+  }
+  @Then('there should be an errpr') shouldError(){
+
+  }
+}
