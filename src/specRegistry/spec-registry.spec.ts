@@ -141,7 +141,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
     );
   });
 
-  it('should refuse to add a Given to a Class, which has the same Name, but is different', () => {
+  it('should refuse to add a Given for a new Class with existing name', () => {
     class SpecRegistryGiven_ClassNameDouble {
       private givenFunction() {
       }
@@ -163,7 +163,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
         SpecRegistry.registerGivenForSpec(specRegistryGiven_ClassNameDouble, functionName, functionDescription);
       }
     ).toThrowError(SpecRegistryError,
-      'SpecClass ' + classNameDoubleName + ' already exists, but is not same Class (for @Given ' + functionName + ')'
+      'SpecClass "' + classNameDoubleName + '" appears at least twice with the same Name, but different Implementations, this is forbidden',
     );
   });
 
@@ -234,7 +234,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
     }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
   });
 
-  it('should refuse to add a Then to a Class, which has the same Name, but is different', () => {
+  it('should refuse to add a Then for a new Class with existing name', () => {
     class SpecRegistryThen_ClassNameDouble {
       private thenFunction() {
       }
@@ -255,7 +255,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
 
         SpecRegistry.registerThenForSpec(specRegistryThen_ClassNameDouble, functionName, functionDescription);
       }
-    ).toThrowError(SpecRegistryError, 'SpecClass ' + classNameDoubleName + ' already exists, but is not same Class (for @Then ' + functionName + ')');
+    ).toThrowError(SpecRegistryError, 'SpecClass "' + classNameDoubleName + '" appears at least twice with the same Name, but different Implementations, this is forbidden');
   });
 
   it('should register the Then, while parameters are correct', () => {
@@ -319,10 +319,34 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     }).toThrowError(SpecRegistryError, specClassName + '.' + nonExistPropName + ' does not exist.');
   });
 
-  it('should refuse the When, if property with the Name exists on the SpecClassProperSpecDecorator, but is not a function', () => {
+  it('should refuse the When, if property with the Name exists on the SpecClass, but is not a function', () => {
     expect(() => {
       SpecRegistry.registerWhenForSpec(specClass, numericPropertyName, description);
     }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
+  });
+
+  it('should refuse to add a When for a new Class with existing name', () => {
+    class SpecRegistryWhen_ClassNameDouble {
+      private thenFunction() {
+      }
+    }
+    let specRegistryWhen_ClassNameDouble = new SpecRegistryWhen_ClassNameDouble();
+    let classNameDoubleName = 'SpecRegistryWhen_ClassNameDouble';
+    let doubleDescription = 'a Class occurring twice with the same Name';
+    let functionName = 'givenFunction';
+    let functionDescription = 'does something';
+
+    SpecRegistry.registerSpec(specRegistryWhen_ClassNameDouble, doubleDescription);
+    expect(() => {
+        class SpecRegistryWhen_ClassNameDouble {
+          private thenFunction() {
+          }
+        }
+        let specRegistryWhen_ClassNameDouble = new SpecRegistryWhen_ClassNameDouble();
+
+        SpecRegistry.registerWhenForSpec(specRegistryWhen_ClassNameDouble, functionName, functionDescription);
+      }
+    ).toThrowError(SpecRegistryError, 'SpecClass "' + classNameDoubleName + '" appears at least twice with the same Name, but different Implementations, this is forbidden');
   });
 
   it('should register the When, while parameters are correct', () => {
@@ -333,3 +357,53 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     expect(thenRegEntry.getDescription()).toEqual(description);
   });
 });
+
+describe('SpecRegistry.registerSpecForSubject', () => {
+  class SpecRegistrySubject_ExistingClass{}
+  let existSpecClass = new SpecRegistrySubject_ExistingClass();
+  let existSpecClassName = 'SpecRegistrySubject_ExistingClass';
+  let existSpecClassDescription = 'SpecRegistrySubject_ExistingClass';
+  let subjectName1 = 'subjectTest';
+  let specRegEntry;
+
+  beforeAll(()=>{
+    SpecRegistry.registerSpec(existSpecClass, existSpecClassDescription);
+    specRegEntry = SpecRegistry.getSpecByClassName(existSpecClassName);
+  });
+  it('should register subject for existing class and save into SpecRegistryEntry', () => {
+    SpecRegistry.registerSpecForSubject(existSpecClass, subjectName1);
+
+    let registeredSpecsForSubject = SpecRegistry.getSpecsForSubject(subjectName1);
+    expect(registeredSpecsForSubject).toContain(specRegEntry);
+    expect(specRegEntry.getSubjects()).toContain(subjectName1);
+  });
+
+  it('should register not existing class and its subject', () => {
+    class SpecRegistrySubject_NewClass{}
+    let newSpecClass = new SpecRegistrySubject_NewClass();
+    let newSpecClassName = 'SpecRegistrySubject_NewClass';
+    let newSpecClassDescription = 'SpecRegistrySubject_NewClass';
+    let subjectName2 = 'subjectTest2';
+
+    SpecRegistry.registerSpecForSubject(newSpecClass, subjectName2);
+    let specRegEntry = SpecRegistry.getSpecByClassName(newSpecClassName);
+    let registeredSpecsForSubject = SpecRegistry.getSpecsForSubject(subjectName2);
+
+    expect(specRegEntry).not.toBeNull();
+    expect(registeredSpecsForSubject).toContain(specRegEntry);
+    expect(specRegEntry.getSubjects()).toContain(subjectName2);
+  });
+
+  it('should refuse to register the Spec and Class, for a new Class with existing name', () => {
+    class SpecRegistrySubject_ExistingClass{}
+    let nameDuplicateClass = new SpecRegistrySubject_ExistingClass();
+    let subjectName2 = 'name Duplicate';
+
+    expect(() => {
+      SpecRegistry.registerSpecForSubject(nameDuplicateClass, subjectName2);
+    }).toThrowError(SpecRegistryError,
+      'SpecClass "' + existSpecClassName + '" appears at least twice with the same Name, but different Implementations, this is forbidden');
+  });
+
+});
+

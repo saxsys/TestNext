@@ -2,12 +2,12 @@ import {TestMethodRegistryEntry} from "../testMethodRegistryEntry/testMethod-reg
 import {ISpecExecutable, ISpecMethod} from './ISpec';
 import {SpecMethodType} from "../testMethodRegistryEntry/spec-method-type";
 import {SpecRegistryError} from "../errors/errors";
-import {log} from "util";
 
 
 export class SpecRegistryEntry implements ISpecExecutable{
   private specClass: any;
   private description: string;
+  private subjects = new Array<string>();
 
   private given = new Map<number, TestMethodRegistryEntry>(); // exec-Number, MethodName
   private when: TestMethodRegistryEntry;
@@ -19,6 +19,11 @@ export class SpecRegistryEntry implements ISpecExecutable{
 
   setDescription(specName: string) {
     this.description = specName
+  }
+
+  addSubject(subject:string){
+    if(!this.subjects.includes(subject))
+      this.subjects.push(subject);
   }
 
   addGiven(functionName: string, description: string, execNumber?: number) {
@@ -53,6 +58,10 @@ export class SpecRegistryEntry implements ISpecExecutable{
     if(this.description == null)
       return '';
     return this.description;
+  }
+
+  getSubjects():Array<string>{
+    return this.subjects;
   }
 
   getSpecName():string {
