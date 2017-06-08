@@ -9,9 +9,14 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+
     "tnComp": "tsc -p tsconfig.json",
-    "tnRun": "node dist/testRunner/runTests.js",
-    "tNxt": "tsc -p tsconfig.json && node dist/testExec/execTests.js"
+
+    "tNxt": "tsc -p tsconfig.json && node dist/testExec/execAllSpecs.js",
+    "tNxt:allSubjects": "tsc -p tsconfig.json && node dist/testExec/execAllSubject.js",
+    "tNxt:spec": "tsc -p tsconfig.json && node dist/testExec/execSingleSpec.js",
+    "tNxt:subject": "tsc -p tsconfig.json && node dist/testExec/execSingleSubject.js TestingTest"
+
   },
   "private": true,
   "dependencies": {
