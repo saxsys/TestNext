@@ -28,7 +28,7 @@ describe('SpecRegistry.registerSpec()', () => {
     expect(includedSpecs).toBeGreaterThanOrEqual(0);
   });
 
-  it('should accept twice Specs, with the same SpecName', () => {
+  it('should accept two Specs, with the same SpecName', () => {
 
     let existingSpecName = specName2;
     class SpecRegisterSpecNameDoulbleClass {
@@ -41,17 +41,43 @@ describe('SpecRegistry.registerSpec()', () => {
     expect(SpecRegistry.getSpecByClassName(SpecNameDubleClassName)).not.toBeUndefined();
   });
 
-  it('should refuse Added same SpecClassProperSpecDecorator twice', () => {
+  it('should refuse adding multiple SpecName for one SpecClass', () => {
     class SpecClassTestSpecRegAddedTwice {
     }
     let specClassTestSpecRegAddedTwice = new SpecClassTestSpecRegAddedTwice();
     SpecRegistry.registerSpec(specClassTestSpecRegAddedTwice, 'specNameTestSpecRegAddedTwice1');
     expect(() => {
       SpecRegistry.registerSpec(specClassTestSpecRegAddedTwice, 'specNameTestSpecRegAddedTwice2');
-    }).toThrow(
-      new Error('SpecClassTestSpecRegAddedTwice is already registered for Spec:specNameTestSpecRegAddedTwice1, can only be registered once, cannot register for Spec:specNameTestSpecRegAddedTwice2')
+    }).toThrowError(SpecRegistryError,
+      'SpecClass "SpecClassTestSpecRegAddedTwice" already got has Description: "specNameTestSpecRegAddedTwice1", ' +
+      'only one is possible, cannot add: "specNameTestSpecRegAddedTwice2"'
     );
   });
+
+  it('should refuse adding new class-name-duplicate', () => {
+    class SpecRegistrySpec_ClassNameDouble {
+      var:number;
+    }
+    let specRegistrySpec_ClassNameDouble = new SpecRegistrySpec_ClassNameDouble();
+    let classNameDoubleName = 'SpecRegistrySpec_ClassNameDouble';
+    let doubleDescription = 'a Class occurring twice with the same Name';
+    let functionName = 'givenFunction';
+    let functionDescription = 'does something';
+
+    SpecRegistry.registerSpec(specRegistrySpec_ClassNameDouble, doubleDescription);
+    expect(() => {
+        class SpecRegistrySpec_ClassNameDouble {
+          var:number;
+        }
+        let specRegistrySpec_ClassNameDouble = new SpecRegistrySpec_ClassNameDouble();
+
+        SpecRegistry.registerThenForSpec(specRegistrySpec_ClassNameDouble, functionName, functionDescription);
+      }
+    ).toThrowError(SpecRegistryError, 'A different Class with the Name "' + classNameDoubleName + '" is already registered, class-name-duplicates are forbidden');
+  });
+
+
+
 });
 
 describe('SpecRegistry.getSpecByName', () => {
@@ -163,7 +189,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
         SpecRegistry.registerGivenForSpec(specRegistryGiven_ClassNameDouble, functionName, functionDescription);
       }
     ).toThrowError(SpecRegistryError,
-      'SpecClass "' + classNameDoubleName + '" appears at least twice with the same Name, but different Implementations, this is forbidden',
+      'A different Class with the Name "' + classNameDoubleName + '" is already registered, class-name-duplicates are forbidden',
     );
   });
 
@@ -234,7 +260,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
     }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
   });
 
-  it('should refuse to add a Then for a new Class with existing name', () => {
+  it('should refuse to add a Then for a new class-name-duplicate', () => {
     class SpecRegistryThen_ClassNameDouble {
       private thenFunction() {
       }
@@ -255,7 +281,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
 
         SpecRegistry.registerThenForSpec(specRegistryThen_ClassNameDouble, functionName, functionDescription);
       }
-    ).toThrowError(SpecRegistryError, 'SpecClass "' + classNameDoubleName + '" appears at least twice with the same Name, but different Implementations, this is forbidden');
+    ).toThrowError(SpecRegistryError, 'A different Class with the Name "' + classNameDoubleName + '" is already registered, class-name-duplicates are forbidden');
   });
 
   it('should register the Then, while parameters are correct', () => {
@@ -325,7 +351,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
   });
 
-  it('should refuse to add a When for a new Class with existing name', () => {
+  it('should refuse to add a When for a new class-name-duplicate', () => {
     class SpecRegistryWhen_ClassNameDouble {
       private thenFunction() {
       }
@@ -346,7 +372,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
 
         SpecRegistry.registerWhenForSpec(specRegistryWhen_ClassNameDouble, functionName, functionDescription);
       }
-    ).toThrowError(SpecRegistryError, 'SpecClass "' + classNameDoubleName + '" appears at least twice with the same Name, but different Implementations, this is forbidden');
+    ).toThrowError(SpecRegistryError, 'A different Class with the Name "' + classNameDoubleName + '" is already registered, class-name-duplicates are forbidden');
   });
 
   it('should register the When, while parameters are correct', () => {
@@ -394,7 +420,7 @@ describe('SpecRegistry.registerSpecForSubject', () => {
     expect(specRegEntry.getSubjects()).toContain(subjectName2);
   });
 
-  it('should refuse to register the Spec and Class, for a new Class with existing name', () => {
+  it('should refuse to register the Spec and Class, for a new class-name-duplicate', () => {
     class SpecRegistrySubject_ExistingClass{}
     let nameDuplicateClass = new SpecRegistrySubject_ExistingClass();
     let subjectName2 = 'name Duplicate';
@@ -402,7 +428,7 @@ describe('SpecRegistry.registerSpecForSubject', () => {
     expect(() => {
       SpecRegistry.registerSpecForSubject(nameDuplicateClass, subjectName2);
     }).toThrowError(SpecRegistryError,
-      'SpecClass "' + existSpecClassName + '" appears at least twice with the same Name, but different Implementations, this is forbidden');
+      'A different Class with the Name "' + existSpecClassName + '" is already registered, class-name-duplicates are forbidden');
   });
 
 });

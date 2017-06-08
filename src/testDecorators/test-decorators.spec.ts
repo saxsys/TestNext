@@ -1,8 +1,7 @@
-import {Given, Spec, Then, When} from "./test-decorators";
+import {Given, Spec, Subject, Then, When} from "./test-decorators";
 import {SpecRegistry} from "../specRegistry/spec-registry";
 import {SpecRegistryError} from "../specRegistry/errors/errors";
 describe('TestDecorators.Spec', () => {
-
 
   it('should register a class with Spec-decorator', () => {
 
@@ -28,8 +27,9 @@ describe('TestDecorators.Spec', () => {
       class TestDecorators_Spec_ClassDouble {
       }
 
-    }).toThrowError(SpecRegistryError, 'TestDecorators_Spec_ClassDouble is already registered for Spec:ClassDouble1, ' +
-      'can only be registered once, cannot register for Spec:ClassDouble2'
+    }).toThrowError(SpecRegistryError,
+      'A different Class with the Name "TestDecorators_Spec_ClassDouble" is already registered, ' +
+      'class-name-duplicates are forbidden'
     );
   });
 
@@ -40,8 +40,8 @@ describe('TestDecorators.Spec', () => {
       class TestDecorators_Spec_ClassWith2SpecDecorator {
       }
     }).toThrowError(SpecRegistryError,
-      'TestDecorators_Spec_ClassWith2SpecDecorator is already registered for Spec:Spec_ClassWith2SpecDecorator2, ' +
-      'can only be registered once, cannot register for Spec:Spec_ClassWith2SpecDecorator1'
+      'SpecClass "TestDecorators_Spec_ClassWith2SpecDecorator" already got has Description: ' +
+      '"Spec_ClassWith2SpecDecorator2", only one is possible, cannot add: "Spec_ClassWith2SpecDecorator1"'
     );
 
   });
@@ -53,7 +53,7 @@ describe('TestDecorators.Spec', () => {
         constructor(anArgument:any){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass TestDecorators_Spec_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+      'SpecClass "TestDecorators_Spec_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
 
   });
@@ -135,7 +135,7 @@ describe('TestDecorators.Given', () => {
         @Given('A Method with Arguments') aMethodWithArguments(sth:any){}
       }
     }).toThrowError(SpecRegistryError,
-    '@Given-method TestDecorators_Given_MethodArguments.aMethodWithArguments has arguments, this is forbidden for @Given-methods'
+    '@Given-method "TestDecorators_Given_MethodArguments.aMethodWithArguments" has arguments, this is forbidden for @Given-methods'
     );
   });
 
@@ -146,7 +146,7 @@ describe('TestDecorators.Given', () => {
         @Given('Given of Class with Constructor-Arguments') justAMethod(){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass TestDecorators_Given_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+      'SpecClass "TestDecorators_Given_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
   });
 
@@ -220,7 +220,7 @@ describe('TestDecorators.When', () => {
         @When('A Method with Arguments') aMethodWithArguments(sth:any){}
       }
     }).toThrowError(SpecRegistryError,
-      '@When-method TestDecorators_When_MethodArguments.aMethodWithArguments has arguments, this is forbidden for @When-methods'
+      '@When-method "TestDecorators_When_MethodArguments.aMethodWithArguments" has arguments, this is forbidden for @When-methods'
     );
   });
 
@@ -231,7 +231,7 @@ describe('TestDecorators.When', () => {
         @When('When of Class with Constructor-Arguments') aWhenFunction(){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass TestDecorators_When_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+      'SpecClass "TestDecorators_When_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
   });
 
@@ -314,7 +314,7 @@ describe('TestDecorators.Then', () => {
         @Then('A Method with Arguments') aMethodWithArguments(sth:any){}
       }
     }).toThrowError(SpecRegistryError,
-      '@Then-method TestDecorators_Then_MethodArguments.aMethodWithArguments has arguments, this is forbidden for @Then-methods'
+      '@Then-method "TestDecorators_Then_MethodArguments.aMethodWithArguments" has arguments, this is forbidden for @Then-methods'
     );
   });
 
@@ -325,8 +325,115 @@ describe('TestDecorators.Then', () => {
         @Then('When of Class with Constructor-Arguments') aThenFunction(){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass TestDecorators_Then_ConstructorArguments has constructor-arguments, this is forbidden in Spec-classes'
+      'SpecClass "TestDecorators_Then_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
   });
+});
+
+describe('TestDecorators.Subject', () => {
+
+
+
+  it('should register one Subject for Spec', () => {
+    let specClassName = 'SpecDecorators_Subject_OneSubPerSpec';
+    let subjectName = 'TestDecorators.Subject.OneSubPerSpec';
+    @Spec('SpecDecorators_Subject_OneSubPerSpec')
+    @Subject(subjectName)
+    class SpecDecorators_Subject_OneSubPerSpec {
+      public val = 3;
+    }
+
+    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    expect(specEntry.getSubjects()).toContain(subjectName);
+    expect(SpecRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
+  });
+
+  it('should register multiple Subject for Spec', () => {
+    let specClassName = 'SpecDecorators_Subject_MultiSubPerSpec';
+    let subjectName1 = 'TestDecorators.Subject.MultiSubPerSpec.1';
+    let subjectName2 = 'TestDecorators.Subject.MultiSubPerSpec.2';
+    @Spec('SpecDecorators_Subject_MultiSubPerSpec')
+    @Subject(subjectName1)
+    @Subject(subjectName2)
+    class SpecDecorators_Subject_MultiSubPerSpec {
+      public val = 3;
+    }
+
+    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    expect(specEntry.getSubjects()).toContain(subjectName1, subjectName2);
+    expect(SpecRegistry.getSpecsForSubject(subjectName1)).toContain(specEntry);
+    expect(SpecRegistry.getSpecsForSubject(subjectName2)).toContain(specEntry);
+  });
+
+  it('should register one Subject once for Spec, even if called multiple times', () => {
+    let specClassName = 'SpecDecorators_Subject_SubDuplOnOneSpec';
+    let subjectName1 = 'TestDecorators.Subject.SubDuplOnOneSpec';
+
+    @Spec('SpecDecorators_Subject_SubDuplOnOneSpec')
+    @Subject(subjectName1)
+    @Subject(subjectName1)
+    class SpecDecorators_Subject_SubDuplOnOneSpec {
+      public val = 3;
+    }
+
+    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    expect(specEntry.getSubjects().length).toBe(1);
+    expect(specEntry.getSubjects()).toContain(subjectName1);
+    expect(SpecRegistry.getSpecsForSubject(subjectName1).length).toBe(1);
+    expect(SpecRegistry.getSpecsForSubject(subjectName1)).toContain(specEntry);
+  });
+
+  it('should register Subject for classes with all Methods', () => {
+    let specClassName = 'SpecDecorators_Subject_CompleteSpecClass';
+    let subjectName = 'TestDecorators.Subject.CompleteSpecClass';
+
+    @Spec('CompleteSpecClass')
+    @Subject(subjectName)
+    class SpecDecorators_Subject_CompleteSpecClass{
+      @Given('a given') aGiven(){}
+      @When('the when') theWhen(){}
+      @Then('a then') aThen(){}
+    }
+
+    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    expect(specEntry).not.toBeNull();
+    expect(specEntry.getSubjects()).toContain(subjectName);
+    expect(SpecRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
+
+  });
+
+  it('should register a SpecClass, when not done yet an register then Subject', () => {
+    let specClassName = 'SpecDecorators_Subject_ForClassNotDeclSpec';
+    let subjectName = 'TestDecorators.Subject.ForClassNotDeclSpec';
+
+    @Subject(subjectName)
+    class SpecDecorators_Subject_ForClassNotDeclSpec {
+      public val = 3;
+    }
+
+    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    expect(specEntry).not.toBeNull();
+    expect(specEntry.getSubjects()).toContain(subjectName);
+    expect(SpecRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
+  });
+
+  it('should throw SpecRegostryError, when unregistered SpecClass has construtor-arguments', () => {
+    let specClassName = 'SpecDecorators_Subject_ConstructorArguments';
+    let subjectName = 'TestDecorators.Subject.ConstructorArguments';
+
+    expect(()=> {
+      @Subject(subjectName)
+      class SpecDecorators_Subject_ConstructorArguments {
+        constructor(argument: number) {
+        }
+      }
+    }).toThrowError(SpecRegistryError, 'SpecClass "' + specClassName +'" has constructor-arguments, this is forbidden in Spec-classes');
+  });
+
+
+
+
+
+
 
 });

@@ -1,9 +1,11 @@
-import {Given, Spec, Then, When} from "../../testDecorators/test-decorators";
+import {Given, Spec, Subject, Then, When} from "../../testDecorators/test-decorators";
 import {AssertionError} from "../../assert/assertion-Error";
 import {AssertProportion} from "../../assert/assert-proportion";
 import {Assert} from "../../assert/assert";
 
-@Spec('a Spec of one Test') class OneTest{
+@Spec('a Spec of one Test')
+@Subject('TestingTest')
+class OneTest{
   @Given('some Stuff is given',0) someGivenStuff(){}
   @Given('it is this Way around',1) moreSetStuff(){}
   @When('something is triggered') triggerStuff(){}
@@ -15,7 +17,10 @@ import {Assert} from "../../assert/assert";
 }
 
 
-@Spec('Second Test') class SecondTest{
+@Spec('Second Test')
+@Subject('TestingTest')
+@Subject('other TestingTest')
+class SecondTest{
   count:number;
   increment:number;
 
@@ -36,7 +41,9 @@ import {Assert} from "../../assert/assert";
   }
 }
 
-@Spec('Incorrect Test') class IncorrectTest{
+@Spec('Incorrect Test')
+@Subject('Doomed to be incorrect')
+class IncorrectTest{
   count:number;
 
   @When('no Given') thereisNoGiven(){

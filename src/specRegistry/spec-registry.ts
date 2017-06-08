@@ -8,17 +8,14 @@ export class SpecRegistry {
 
   public static registerSpec(specClass: any, specName: string) {
     let specClassName = specClass.constructor.name;
-    let registryEntry = SPECCLASS_REGISTRY.get(specClassName);
-    if(registryEntry != null){
-      if (registryEntry.getSpecName()!= null) {
-        throw new SpecRegistryError(specClassName + ' is already registered for Spec:' + registryEntry.getSpecName() + ', can only be registered once, cannot register for Spec:' + specName, specClassName);
-      }
-        registryEntry.setDescription(specName);
-    } else {
-      let entry = new SpecRegistryEntry(specClass);
-      entry.setDescription(specName);
-      SPECCLASS_REGISTRY.set(specClassName, entry);
-    }
+
+    let registryEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
+
+    if (registryEntry.getSpecName()!= null)
+      throw new SpecRegistryError('SpecClass "' + specClassName + '" already got has Description: "' + registryEntry.getSpecName() + '", only one is possible, cannot add: "' + specName + '"', specClassName);
+
+    registryEntry.setDescription(specName);
+
   }
 
   public static registerSpecForSubject(specClass:any , subject:string ){
@@ -58,8 +55,14 @@ export class SpecRegistry {
     specRegEntry.addThen(functionName, description, execNumber);
   }
 
+
+
   public static getSpecClassNames(): Array<String> {
     return Array.from(SPECCLASS_REGISTRY.keys());
+  }
+
+  public static getSubjects():Array<string>{
+    return Array.from(SUBJECT_SPECCLASSNAMES.keys());
   }
 
   public static getSpecByClassName(className: string): SpecRegistryEntry {
@@ -94,7 +97,7 @@ export class SpecRegistry {
       SPECCLASS_REGISTRY.set(specClassName, specRegEntry);
     } else {
       if(specRegEntry.getClass().constructor != specClass.constructor){
-        throw new SpecRegistryError('SpecClass "' + specClassName + '" appears at least twice with the same Name, but different Implementations, this is forbidden', specClassName);
+        throw new SpecRegistryError('A different Class with the Name "' + specClassName + '" is already registered, class-name-duplicates are forbidden', specClassName);
       }
     }
     return specRegEntry;

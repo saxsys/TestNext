@@ -2,7 +2,7 @@ import {ISpecRunLog, ISpecMethodRunLog} from "./interfaces";
 import {ISpecExecutable, ISpecMethod} from "../specRegistry/specRegistryEntry/ISpec";
 export class SuccessLogBeautyfier {
 
-  private static paddingSymb = '  '
+  private static paddingSymb = ' ';
 
   public static specMethodLogToString(specMethodLog: ISpecMethodRunLog, paddingNumber?: number): string {
     if(paddingNumber == null) paddingNumber = 0;
@@ -10,6 +10,7 @@ export class SuccessLogBeautyfier {
     for (let i = 0; i < paddingNumber; i++) {
       padding += SuccessLogBeautyfier.paddingSymb;
     }
+
     let str = '';
     str += padding + (specMethodLog.isSuccess() ? 'SUCCESS: ' : 'FAILED : ') + SuccessLogBeautyfier.specMethodToString(specMethodLog.getSpecMethod(), 0);
     if(specMethodLog.getError() != null)
@@ -22,7 +23,7 @@ export class SuccessLogBeautyfier {
   public static specMethodToString(specMethod: ISpecMethod, paddingNumber?: number): string {
     if(paddingNumber == null) paddingNumber = 0;
     let padding = '';
-    for (var i = 0; i < paddingNumber; i++) {
+    for (let i = 0; i < paddingNumber; i++) {
       padding += SuccessLogBeautyfier.paddingSymb;
     }
 
@@ -32,7 +33,7 @@ export class SuccessLogBeautyfier {
   public static SpecLogToString(specLog:ISpecRunLog, paddingNumber?: number):string{
     if(paddingNumber == null) paddingNumber = 0;
     let padding = '';
-    for (var i = 0; i < paddingNumber; i++) {
+    for (let i = 0; i < paddingNumber; i++) {
       padding += SuccessLogBeautyfier.paddingSymb;
     }
 
