@@ -12,17 +12,17 @@ class ExampleSpecClass {
 describe('SpecRegistryEntry', () => {
 
   let testCaseEntry;
-  const specClass = new ExampleSpecClass();
+  const specClassConstructor = ExampleSpecClass.prototype.constructor;
   const specName = 'A Class without Decorators';
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass);
+    testCaseEntry = new SpecRegistryEntry(specClassConstructor);
     testCaseEntry.setDescription(specName);
   });
 
   it('should be constructed with proper parameters', () => {
     expect(testCaseEntry).toBeDefined();
     expect(testCaseEntry.getSpecName()).toEqual(specName);
-    expect(testCaseEntry.getClass()).toEqual(specClass);
+    expect(testCaseEntry.getClassConstructor()).toEqual(specClassConstructor);
   });
 });
 
@@ -30,7 +30,7 @@ describe('SpecRegistryEntry.addGiven', () => {
 
 
   let testCaseEntry;
-  const specClass = new ExampleSpecClass();
+  const specClass = ExampleSpecClass.prototype.constructor;
   const specClassName = 'ExampleSpecClass';
   const specName = 'A Class without Decorators';
   const givenName0 = 'valueSetter';
@@ -88,7 +88,7 @@ describe('SpecRegistryEntry.addGiven', () => {
 describe('SpecRegistryEntry.addThen', () => {
 
   let testCaseEntry;
-  const specClass = new ExampleSpecClass();
+  const specClassConstructor = ExampleSpecClass.prototype.constructor;
   const specClassName = 'ExampleSpecClass';
   const specName = 'A Class without Decorators';
   const thenName0 = 'ValueChanged';
@@ -97,7 +97,7 @@ describe('SpecRegistryEntry.addThen', () => {
   const thenDescription1 = 'an other Value was changed';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass);
+    testCaseEntry = new SpecRegistryEntry(specClassConstructor);
     testCaseEntry.setDescription(specName);
   });
 
@@ -143,7 +143,7 @@ describe('SpecRegistryEntry.addThen', () => {
 describe('SpecRegistryEntry.addWhen', () => {
 
   let testCaseEntry;
-  const specClass = new ExampleSpecClass();
+  const specClassConstructor = ExampleSpecClass.prototype.constructor;
   const specClassName = 'ExampleSpecClass';
   const specName = 'A Class without Decorators';
   const whenName = 'ValueChanged';
@@ -152,7 +152,7 @@ describe('SpecRegistryEntry.addWhen', () => {
   const whenDescription1 = 'da special Situation happened';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass);
+    testCaseEntry = new SpecRegistryEntry(specClassConstructor);
     testCaseEntry.setDescription(specName);
   });
 
@@ -188,16 +188,14 @@ describe('SpecRegistryEntry.getGivenArray', () => {
     method1(){};
     method2(){};
   }
-  let specClass;
+  let specClassConstructor;
 
-  beforeAll(() => {
-    specClass = new SpecRegistryEntry_GivenArray();
-  });
+  specClassConstructor = SpecRegistryEntry_GivenArray.prototype.constructor;
 
   it('should return method-entries in order of execNumber, independent of adding order ', () => {
-    SpecRegistry.registerGivenForSpec(specClass, 'method2', 'specMethod2', 3);
-    SpecRegistry.registerGivenForSpec(specClass, 'method0', 'specMethod0', 0);
-    SpecRegistry.registerGivenForSpec(specClass, 'method1', 'specMethod1', 1);
+    SpecRegistry.registerGivenForSpec(specClassConstructor, 'method2', 'specMethod2', 3);
+    SpecRegistry.registerGivenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
+    SpecRegistry.registerGivenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
 
     let givenArray = SpecRegistry.getSpecByClassName(className).getGivenArray();
     let namesInOrder = [];
@@ -217,16 +215,12 @@ describe('SpecRegistryEntry.getThenArray', () => {
     method1(){};
     method2(){};
   }
-  let specClass;
-
-  beforeAll(() => {
-    specClass = new SpecRegistryEntry_ThenArray();
-  });
+  let specClassConstructor = SpecRegistryEntry_ThenArray.prototype.constructor;
 
   it('should return method-entries in order of execNumber, independent of adding order ', () => {
-    SpecRegistry.registerThenForSpec(specClass, 'method2', 'specMethod2', 3);
-    SpecRegistry.registerThenForSpec(specClass, 'method0', 'specMethod0', 0);
-    SpecRegistry.registerThenForSpec(specClass, 'method1', 'specMethod1', 1);
+    SpecRegistry.registerThenForSpec(specClassConstructor, 'method2', 'specMethod2', 3);
+    SpecRegistry.registerThenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
+    SpecRegistry.registerThenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
 
     let thenArray = SpecRegistry.getSpecByClassName(className).getThenArray();
     let namesInOrder = [];

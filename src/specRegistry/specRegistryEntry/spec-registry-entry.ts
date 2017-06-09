@@ -5,7 +5,7 @@ import {SpecRegistryError} from "../errors/errors";
 
 
 export class SpecRegistryEntry implements ISpecExecutable{
-  private specClass: any;
+  private specClassConstructor: any;
   private description: string;
   private subjects = new Array<string>();
 
@@ -13,8 +13,8 @@ export class SpecRegistryEntry implements ISpecExecutable{
   private when: TestMethodRegistryEntry;
   private then = new Map<number, TestMethodRegistryEntry>(); // exec-Number, MethodName
 
-  constructor(specClass: any) {
-    this.specClass = specClass;
+  constructor(specClassConstructor: Function) {
+    this.specClassConstructor = specClassConstructor;
   }
 
   setDescription(specName: string) {
@@ -70,12 +70,21 @@ export class SpecRegistryEntry implements ISpecExecutable{
 
   getClassName():string {
 
-    return this.specClass.constructor.name;
+    return this.specClassConstructor.name;
   }
 
-  getClass():any {
-    return this.specClass;
+  getClassConstructor():Function {
+    return this.specClassConstructor;
   }
+
+  getNewSpecObject(): any{
+    if(this.specClassConstructor == null)
+      throw new SpecRegistryError('Class of ' + this.getClassName() + 'is not set', this.getClassName());
+    if(this.specClassConstructor.length > 0)
+      throw new SpecRegistryError('Class of "' + this.getClassName() + '" has constructor-arguments, this is forbidden', this.getClassName());
+
+    return new this.specClassConstructor;
+  };
 
   getGivenArray(): Array<ISpecMethod> {
     let keys = Array.from(this.given.keys()).sort();

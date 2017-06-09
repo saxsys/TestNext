@@ -7,11 +7,14 @@ export class SingleSpecRunner {
 
   private spec: ISpecExecutable;
   private successLogger: ISpecRunLogger;
+  private specObject:any;
 
   constructor(spec:ISpecExecutable, specLogger: ISpecRunLogger){
     TestValidator.validateTest(spec);
     this.spec = spec;
     this.successLogger = specLogger;
+
+    this.specObject =  spec.getNewSpecObject();
   }
 
   getSuccessLogger(): ISpecRunLogger{
@@ -26,7 +29,7 @@ export class SingleSpecRunner {
   }
 
   private runMethod(method: ISpecMethod){
-    let execClass = this.spec.getClass();
+    let execClass = this.specObject;
     if(execClass[method.getName()] == null)
       throw Error('test-Runner method ' + method.getName() + ' not found on Class ' + this.spec.getClassName());
     try {
@@ -63,6 +66,10 @@ export class SingleSpecRunner {
 
   public getSpec(): ISpecExecutable{
     return this.spec;
+  }
+
+  public getUsedSpecObject():any{
+    return this.specObject;
   }
 
 }

@@ -6,10 +6,10 @@ let SUBJECT_SPECCLASSNAMES = new Map<string, Array<string>>();
 
 export class SpecRegistry {
 
-  public static registerSpec(specClass: any, specName: string) {
-    let specClassName = specClass.constructor.name;
+  public static registerSpec(specClassConstructor: Function, specName: string) {
+    let specClassName = specClassConstructor.name;
 
-    let registryEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
+    let registryEntry = SpecRegistry.getOrRegisterSpecClass(specClassConstructor);
 
     if (registryEntry.getSpecName()!= null)
       throw new SpecRegistryError('SpecClass "' + specClassName + '" already got has Description: "' + registryEntry.getSpecName() + '", only one is possible, cannot add: "' + specName + '"', specClassName);
@@ -18,11 +18,11 @@ export class SpecRegistry {
 
   }
 
-  public static registerSpecForSubject(specClass:any , subject:string ){
-    let specClassName = specClass.constructor.name;
+  public static registerSpecForSubject(specClassConstructor:Function , subject:string ){
+    let specClassName = specClassConstructor.name;
 
     //write subject into Spec
-    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
+    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClassConstructor);
     specRegEntry.addSubject(subject);
 
     //write Spec into Subject List
@@ -36,22 +36,19 @@ export class SpecRegistry {
     subjClasses.push(specClassName);
   }
 
-  public static registerGivenForSpec(specClass: any, functionName: string, description: string, execNumber?: number) {
+  public static registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
 
-    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
-    SpecRegistry.checkIfFunctionExistsOnClass(specRegEntry.getClass(), functionName);
+    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClassConstructor);
     specRegEntry.addGiven(functionName, description, execNumber);
   }
 
-  public static registerWhenForSpec(specClass: any, functionName: string, description: string) {
+  public static registerWhenForSpec(specClass: Function, functionName: string, description: string) {
     let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
-    SpecRegistry.checkIfFunctionExistsOnClass(specRegEntry.getClass(), functionName);
     specRegEntry.addWhen(functionName, description);
   }
 
-  public static registerThenForSpec(specClass: any, functionName: string, description: string, execNumber?: number) {
+  public static registerThenForSpec(specClass: Function, functionName: string, description: string, execNumber?: number) {
     let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
-    SpecRegistry.checkIfFunctionExistsOnClass(specRegEntry.getClass(), functionName);
     specRegEntry.addThen(functionName, description, execNumber);
   }
 
@@ -88,30 +85,18 @@ export class SpecRegistry {
 
   }
 
-  private static getOrRegisterSpecClass(specClass): SpecRegistryEntry{
-    let specClassName = specClass.constructor.name;
+  private static getOrRegisterSpecClass(specClassConstructor:Function): SpecRegistryEntry{
+    let specClassName = specClassConstructor.name;
 
     let specRegEntry = SPECCLASS_REGISTRY.get(specClassName);
     if(specRegEntry == null) {
-      specRegEntry = new SpecRegistryEntry(specClass);
+      specRegEntry = new SpecRegistryEntry(specClassConstructor);
       SPECCLASS_REGISTRY.set(specClassName, specRegEntry);
     } else {
-      if(specRegEntry.getClass().constructor != specClass.constructor){
+      if(specRegEntry.getClassConstructor() != specClassConstructor){
         throw new SpecRegistryError('A different Class with the Name "' + specClassName + '" is already registered, class-name-duplicates are forbidden', specClassName);
       }
     }
     return specRegEntry;
   }
-
-  private static checkIfFunctionExistsOnClass(specClass: any, functionName: string){
-    let className = specClass.constructor.name;
-    if (specClass[functionName] == null) {
-      throw new SpecRegistryError(className + '.' + functionName + ' does not exist.', className, functionName);
-    }
-    if (typeof specClass[functionName] != 'function') {
-      throw new SpecRegistryError(className + '.' + functionName + ' is not a function.', className, functionName);
-    }
-  }
-
-
 }

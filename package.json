@@ -15,7 +15,7 @@
     "tNxt": "tsc -p tsconfig.json && node dist/testExec/execAllSpecs.js",
     "tNxt:allSubjects": "tsc -p tsconfig.json && node dist/testExec/execAllSubject.js",
     "tNxt:spec": "tsc -p tsconfig.json && node dist/testExec/execSingleSpec.js",
-    "tNxt:subject": "tsc -p tsconfig.json && node dist/testExec/execSingleSubject.js TestingTest"
+    "tNxt:subject": "tsc -p tsconfig.json && node dist/testExec/execSingleSubject.js"
 
   },
   "private": true,

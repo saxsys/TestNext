@@ -3,13 +3,15 @@ import {SpecMethodType} from "../testMethodRegistryEntry/spec-method-type";
 export interface ISpecExecutable{
   getDescription():string
   getClassName():string;
-  getClass():any;
+  getClassConstructor():Function;
+  getNewSpecObject(): any;
   getGivenArray(): Array<ISpecMethod>;
   getGiven(methodName:string):ISpecMethod;
   getThenArray(): Array<ISpecMethod>;
   getThen(methodName:string):ISpecMethod;
   getWhen(): ISpecMethod;
   getMethod(methodName:string):ISpecMethod;
+
 
 }
 

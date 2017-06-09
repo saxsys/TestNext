@@ -117,7 +117,8 @@ describe('singleSpecRunner.runSpec', () => {
   });
 
   it('should run all methods in Order', () => {
-    expect(specEntry.getClass().runOrder).toEqual(methodNamesInOrder);
+
+    expect(singleSpecRunner.getUsedSpecObject().runOrder).toEqual(methodNamesInOrder);
   });
 
   it('should have logged for all', () => {
@@ -170,6 +171,8 @@ describe('singleSpecRunner.runSpec', () => {
     expect(() => {singleSpecRunner.runSpec()}).toThrow(randomError);
 
   });
+
+
 
 
 
