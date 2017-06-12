@@ -1,11 +1,10 @@
 import {Given, Spec, Then, When} from "../testDecorators/test-decorators";
-import {SpecRegistry} from "../specRegistry/spec-registry";
+import {specRegistry} from "../specRegistry/spec-registry-storage";
 import {SpecRunner} from "./spec-runner";
 import {SpecReporter} from "../spec-run-reporter/spec-reporter";
 import {SpecValidationError} from "./specValidator/spec-validation-error";
 import {AssertionError} from "../assert/assertion-Error";
 import {AssertProportion} from "../assert/assert-proportion";
-import {isSuccess} from "@angular/http/src/http_utils";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {
@@ -29,7 +28,7 @@ describe('specRunner.constructor', () => {
       }
     }
 
-    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecByClassName(specClassName);
 
     let specLogger = new SpecReporter();
 
@@ -49,7 +48,6 @@ describe('specRunner.runSpec', () => {
   let methodNamesInOrder = ['given0', 'given1', 'theWhen', 'then0', 'then1'];
   let methodsWithoutError = ['given0', 'given2', 'theWhen', 'then0'];
   let methodsWithAssertError = ['then1'];
-  let methodsWithOtherError = [];
   let randomError = new Error('Random Error');
   let anyAssertionError = new AssertionError(1, 2, AssertProportion.EQUAL, 'Number','otherNumber');
 
@@ -80,7 +78,7 @@ describe('specRunner.runSpec', () => {
   }
 
   beforeAll(() => {
-    specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    specEntry = specRegistry.getSpecByClassName(specClassName);
     specReporter = new SpecReporter();
     specRunner = new SpecRunner(specEntry, specReporter);
     specReport = specRunner.runSpec();
@@ -106,7 +104,7 @@ describe('specRunner.runSpec', () => {
       }
     }
 
-    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecByClassName(specClassName);
     let specLogger = new SpecReporter();
     let specRunner = new SpecRunner(specEntry, specLogger);
     let report = specRunner.runSpec();
@@ -166,7 +164,7 @@ describe('specRunner.runSpec', () => {
       @Then('then') then() {}
     }
     let specClassName = 'SpecRunner_runSpec_WithRandomError';
-    let specEntry = SpecRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecByClassName(specClassName);
     let specLogger = new SpecReporter();
     let specRunner = new SpecRunner(specEntry, specLogger);
 

@@ -1,6 +1,6 @@
 import {SpecReporter} from "../spec-run-reporter/spec-reporter";
 import {SpecReportBeautyfier} from "../spec-run-reporter/spec-report-beautyfier";
-import {SpecRegistry} from "../specRegistry/spec-registry";
+import {specRegistry} from "../specRegistry/spec-registry-storage";
 import {SpecRunner} from "../specRunner/spec-runner";
 import {ISpecReport} from "../spec-run-reporter/spec-report-interfaces";
 
@@ -15,7 +15,7 @@ export class SpecExecChooser{
   static execAllSpecs(){
 
 
-    let specReg = SpecRegistry.getRegistryEntries();
+    let specReg = specRegistry.getRegistryEntries();
     let specReporter = new SpecReporter();
 
     specReg.forEach((spec) => {
@@ -28,11 +28,11 @@ export class SpecExecChooser{
   static execBySubjects() {
 
     let specReporter = new SpecReporter();
-    let subjects = SpecRegistry.getSubjects();
+    let subjects = specRegistry.getSubjects();
 
     subjects.forEach((subject) => {
       console.log(this.topicHeading + subject + this.resetStyle);
-      let subjectSpecs = SpecRegistry.getSpecsForSubject(subject);
+      let subjectSpecs = specRegistry.getSpecsForSubject(subject);
       subjectSpecs.forEach((spec) => {
         let existSpecReport = specReporter.getSpecReportOf(spec.getClassName());
         if(existSpecReport != null){
@@ -47,7 +47,7 @@ export class SpecExecChooser{
 
     });
 
-    let specWithoutSubject = SpecRegistry.getSpecsWithoutSubject();
+    let specWithoutSubject = specRegistry.getSpecsWithoutSubject();
     if(specWithoutSubject.length > 0)
       console.log(this.topicHeading + '#Without Subject' + this.resetStyle);
       specWithoutSubject.forEach((spec) => {
@@ -60,10 +60,10 @@ export class SpecExecChooser{
 
   static execSubject(subject: string){
     console.log(this.topicHeading + subject + this.resetStyle);
-    let specs = SpecRegistry.getSpecsForSubject(subject);
+    let specs = specRegistry.getSpecsForSubject(subject);
     if(specs == null){
       console.log(this.validErrorColor + 'no Subject with Name "' + subject + '" found \n' +
-        'we got: ' + SpecRegistry.getSubjects() + this.resetStyle
+        'we got: ' + specRegistry.getSubjects() + this.resetStyle
       );
       return;
     }
@@ -77,10 +77,10 @@ export class SpecExecChooser{
   }
 
   static execSpec(className:string){
-    let spec = SpecRegistry.getSpecByClassName(className);
+    let spec = specRegistry.getSpecByClassName(className);
     if(spec == null ){
       console.log( this.validErrorColor +'no SpecClasses with Name "' + className + '" found \n' +
-        'we got: ' + SpecRegistry.getSpecClassNames() + this.resetStyle
+        'we got: ' + specRegistry.getSpecClassNames() + this.resetStyle
       );
       return;
     }

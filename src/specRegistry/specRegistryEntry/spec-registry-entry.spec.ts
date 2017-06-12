@@ -182,6 +182,7 @@ describe('SpecRegistryEntry.addWhen', () => {
 });
 
 describe('SpecRegistryEntry.getGivenArray', () => {
+  let specRegistry = new SpecRegistry();
   let className = 'SpecRegistryEntry_GivenArray';
   class SpecRegistryEntry_GivenArray{
     method0(){};
@@ -193,22 +194,22 @@ describe('SpecRegistryEntry.getGivenArray', () => {
   specClassConstructor = SpecRegistryEntry_GivenArray.prototype.constructor;
 
   it('should return method-entries in order of execNumber, independent of adding order ', () => {
-    SpecRegistry.registerGivenForSpec(specClassConstructor, 'method2', 'specMethod2', 3);
-    SpecRegistry.registerGivenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
-    SpecRegistry.registerGivenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
+    specRegistry.registerGivenForSpec(specClassConstructor, 'method2', 'specMethod2', 3);
+    specRegistry.registerGivenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
+    specRegistry.registerGivenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
 
-    let givenArray = SpecRegistry.getSpecByClassName(className).getGivenArray();
+    let givenArray = specRegistry.getSpecByClassName(className).getGivenArray();
     let namesInOrder = [];
     givenArray.forEach((given) => {
       namesInOrder.push(given.getName());
-    })
+    });
 
     expect(namesInOrder).toEqual(['method0','method1', 'method2']);
   });
 });
 
 describe('SpecRegistryEntry.getThenArray', () => {
-
+  let specRegistry = new SpecRegistry();
   let className = 'SpecRegistryEntry_ThenArray';
   class SpecRegistryEntry_ThenArray{
     method0(){};
@@ -218,15 +219,15 @@ describe('SpecRegistryEntry.getThenArray', () => {
   let specClassConstructor = SpecRegistryEntry_ThenArray.prototype.constructor;
 
   it('should return method-entries in order of execNumber, independent of adding order ', () => {
-    SpecRegistry.registerThenForSpec(specClassConstructor, 'method2', 'specMethod2', 3);
-    SpecRegistry.registerThenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
-    SpecRegistry.registerThenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
+    specRegistry.registerThenForSpec(specClassConstructor, 'method2', 'specMethod2', 3);
+    specRegistry.registerThenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
+    specRegistry.registerThenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
 
-    let thenArray = SpecRegistry.getSpecByClassName(className).getThenArray();
+    let thenArray = specRegistry.getSpecByClassName(className).getThenArray();
     let namesInOrder = [];
     thenArray.forEach((then) => {
       namesInOrder.push(then.getName());
-    })
+    });
 
     expect(namesInOrder).toEqual(['method0','method1', 'method2']);
   });

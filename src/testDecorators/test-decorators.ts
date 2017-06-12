@@ -1,4 +1,4 @@
-import {SpecRegistry} from "../specRegistry/spec-registry";
+import {specRegistry} from "../specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../specRegistry/errors/errors";
 import construct = Reflect.construct;
 
@@ -12,12 +12,12 @@ export function Spec(testCaseName: string) {
         constructor.name, 'constructor'
       );
 
-    SpecRegistry.registerSpec(specClass, testCaseName);
+    specRegistry.registerSpec(specClass, testCaseName);
   }
 }
 
 export function Given(description: string, execNumber?: number) {
-  return (target: any, key: string, descriptor: any) => {
+  return (target: any, key: string) => {
     let constructor = target.constructor;
     let className = constructor.name;
     if(constructor.length > 0)
@@ -26,12 +26,12 @@ export function Given(description: string, execNumber?: number) {
       );
 
 
-    SpecRegistry.registerGivenForSpec(constructor, key, description, execNumber);
+    specRegistry.registerGivenForSpec(constructor, key, description, execNumber);
   }
 }
 
 export function When(description: string) {
-  return (target: any, key: string, descriptor: any) => {
+  return (target: any, key: string) => {
     let constructor = target.constructor;
     let className = constructor.name;
     if(constructor.length > 0)
@@ -40,12 +40,12 @@ export function When(description: string) {
         className, key
       );
 
-    SpecRegistry.registerWhenForSpec(constructor, key, description);
+    specRegistry.registerWhenForSpec(constructor, key, description);
   }
 }
 
 export function Then(description: string, execNumber?: number) {
-  return (target: any, key: string, descriptor: any) => {
+  return (target: any, key: string) => {
     let constructor = target.constructor;
     let className = constructor.name;
     if(constructor.length > 0)
@@ -54,7 +54,7 @@ export function Then(description: string, execNumber?: number) {
         className, key
       );
 
-    SpecRegistry.registerThenForSpec(constructor, key, description, execNumber);
+    specRegistry.registerThenForSpec(constructor, key, description, execNumber);
   }
 }
 
@@ -67,6 +67,6 @@ export function Subject(description: string) {
         constructor.name, 'constructor'
       );
 
-    SpecRegistry.registerSpecForSubject(constructor, description);
+    specRegistry.registerSpecForSubject(constructor, description);
   }
 }

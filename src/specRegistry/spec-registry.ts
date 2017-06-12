@@ -3,16 +3,16 @@ import {SpecRegistryError} from "./errors/errors";
 import {ISpecExecutable} from "./specRegistryEntry/ISpec";
 import * as _ from "underscore";
 
-
-let SPECCLASS_REGISTRY = new Map<string, SpecRegistryEntry>();
-let SUBJECT_SPECCLASSNAMES = new Map<string, Array<string>>();
-
 export class SpecRegistry {
 
-  public static registerSpec(specClassConstructor: Function, specName: string) {
+  private specClasses = new Map<string, SpecRegistryEntry>();
+  private subject_specNames = new Map<string, Array<string>>();
+
+
+  public registerSpec(specClassConstructor: Function, specName: string) {
     let specClassName = specClassConstructor.name;
 
-    let registryEntry = SpecRegistry.getOrRegisterSpecClass(specClassConstructor);
+    let registryEntry = this.getOrRegisterSpecClass(specClassConstructor);
 
     if (registryEntry.getSpecName()!= null)
       throw new SpecRegistryError('SpecClass "' + specClassName + '" already got has Description: "' + registryEntry.getSpecName() + '", only one is possible, cannot add: "' + specName + '"', specClassName);
@@ -21,94 +21,94 @@ export class SpecRegistry {
 
   }
 
-  public static registerSpecForSubject(specClassConstructor:Function , subject:string ){
+  public registerSpecForSubject(specClassConstructor:Function , subject:string ){
     let specClassName = specClassConstructor.name;
 
     //write subject into Spec
-    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClassConstructor);
+    let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
     specRegEntry.addSubject(subject);
 
     //write Spec into Subject List
-    let subjClasses = SUBJECT_SPECCLASSNAMES.get(subject);
+    let subjClasses = this.subject_specNames.get(subject);
     if(subjClasses == null){
-      subjClasses = new Array<string>();
-      SUBJECT_SPECCLASSNAMES.set(subject, subjClasses);
+      subjClasses = [];
+      this.subject_specNames.set(subject, subjClasses);
     } else if(subjClasses.includes(specClassName)){
         return;
     }
     subjClasses.push(specClassName);
   }
 
-  public static registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
+  public registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
 
-    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClassConstructor);
+    let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
     specRegEntry.addGiven(functionName, description, execNumber);
   }
 
-  public static registerWhenForSpec(specClass: Function, functionName: string, description: string) {
-    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
+  public registerWhenForSpec(specClass: Function, functionName: string, description: string) {
+    let specRegEntry = this.getOrRegisterSpecClass(specClass);
     specRegEntry.addWhen(functionName, description);
   }
 
-  public static registerThenForSpec(specClass: Function, functionName: string, description: string, execNumber?: number) {
-    let specRegEntry = SpecRegistry.getOrRegisterSpecClass(specClass);
+  public registerThenForSpec(specClass: Function, functionName: string, description: string, execNumber?: number) {
+    let specRegEntry = this.getOrRegisterSpecClass(specClass);
     specRegEntry.addThen(functionName, description, execNumber);
   }
 
 
 
-  public static getSpecClassNames(): Array<String> {
-    return Array.from(SPECCLASS_REGISTRY.keys());
+  public getSpecClassNames(): Array<String> {
+    return Array.from(this.specClasses.keys());
   }
 
-  public static getSubjects():Array<string>{
-    return Array.from(SUBJECT_SPECCLASSNAMES.keys());
+  public getSubjects():Array<string>{
+    return Array.from(this.subject_specNames.keys());
   }
 
-  public static getSpecByClassName(className: string): SpecRegistryEntry {
-    return SPECCLASS_REGISTRY.get(className);
+  public getSpecByClassName(className: string): SpecRegistryEntry {
+    return this.specClasses.get(className);
   }
 
-  public static getRegistryEntries(): Array<ISpecExecutable>{
-    return Array.from(SPECCLASS_REGISTRY.values());
+  public getRegistryEntries(): Array<ISpecExecutable>{
+    return Array.from(this.specClasses.values());
   }
 
-  public static getSpecsForSubject(subject:string):Array<SpecRegistryEntry>{
+  public getSpecsForSubject(subject:string):Array<SpecRegistryEntry>{
     let specs = new Array<SpecRegistryEntry>();
-    let classNames = SUBJECT_SPECCLASSNAMES.get(subject);
+    let classNames = this.subject_specNames.get(subject);
 
     if(classNames == null)
       return specs;
 
     classNames.forEach((className) => {
-      specs.push(SpecRegistry.getSpecByClassName(className));
+      specs.push(this.getSpecByClassName(className));
     });
 
     return specs;
 
   }
 
-  public static getSpecsWithoutSubject():Array<SpecRegistryEntry>{
-    let allRemainingSpecNames = Array.from(SPECCLASS_REGISTRY.keys());
+  public getSpecsWithoutSubject():Array<SpecRegistryEntry>{
+    let allRemainingSpecNames = Array.from(this.specClasses.keys());
 
-    SUBJECT_SPECCLASSNAMES.forEach((specs) => {
+    this.subject_specNames.forEach((specs) => {
       allRemainingSpecNames = _.difference(allRemainingSpecNames, specs);
     });
 
     let specsWithoutSubject = new Array<SpecRegistryEntry>();
     allRemainingSpecNames.forEach((specName) => {
-      specsWithoutSubject.push(SPECCLASS_REGISTRY.get(specName));
+      specsWithoutSubject.push(this.specClasses.get(specName));
     });
     return specsWithoutSubject;
   }
 
-  private static getOrRegisterSpecClass(specClassConstructor:Function): SpecRegistryEntry{
+  private getOrRegisterSpecClass(specClassConstructor:Function): SpecRegistryEntry{
     let specClassName = specClassConstructor.name;
 
-    let specRegEntry = SPECCLASS_REGISTRY.get(specClassName);
+    let specRegEntry = this.specClasses.get(specClassName);
     if(specRegEntry == null) {
       specRegEntry = new SpecRegistryEntry(specClassConstructor);
-      SPECCLASS_REGISTRY.set(specClassName, specRegEntry);
+      this.specClasses.set(specClassName, specRegEntry);
     } else {
       if(specRegEntry.getClassConstructor() != specClassConstructor){
         throw new SpecRegistryError('A different Class with the Name "' + specClassName + '" is already registered, class-name-duplicates are forbidden', specClassName);
