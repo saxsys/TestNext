@@ -1,7 +1,8 @@
-import {SpecReporter} from "../spec-run-logger/spec-reporter";
-import {SpecReportBeautyfier} from "../spec-run-logger/spec-report-beautyfier";
+import {SpecReporter} from "../spec-run-reporter/spec-reporter";
+import {SpecReportBeautyfier} from "../spec-run-reporter/spec-report-beautyfier";
 import {SpecRegistry} from "../specRegistry/spec-registry";
 import {SpecRunner} from "../specRunner/spec-runner";
+import {ISpecReport} from "../spec-run-reporter/spec-report-interfaces";
 
 export class SpecExecChooser{
 
@@ -20,25 +21,41 @@ export class SpecExecChooser{
     specReg.forEach((spec) => {
       let specRunner = new SpecRunner(spec, specReporter);
       let specReport = specRunner.runSpec();
-
-      let reportString = SpecReportBeautyfier.SpecReportToString(specReport);
-
-      if(specReport.isInvalidSpec())
-        console.log(this.validErrorColor + reportString + this.resetStyle);
-      else if (specReport.isRunFailed())
-        console.log(this.failedRunColor + reportString + this.resetStyle);
-      else
-        console.log(this.successColor + reportString);
+      SpecExecChooser.printSpecReport(specReport);
     });
   }
 
   static execBySubjects() {
-    let SpecLogger = new SpecReporter();
+
+    let specReporter = new SpecReporter();
     let subjects = SpecRegistry.getSubjects();
 
     subjects.forEach((subject) => {
-      SpecExecChooser.execSubject(subject);
+      console.log(this.topicHeading + subject + this.resetStyle);
+      let subjectSpecs = SpecRegistry.getSpecsForSubject(subject);
+      subjectSpecs.forEach((spec) => {
+        let existSpecReport = specReporter.getSpecReportOf(spec.getClassName());
+        if(existSpecReport != null){
+          SpecExecChooser.printSpecReport(existSpecReport, 3);
+
+        } else {
+          let specRunner = new SpecRunner(spec, specReporter);
+          let specReport = specRunner.runSpec();
+          SpecExecChooser.printSpecReport(specReport, 3);
+        }
+      });
+
     });
+
+    let specWithoutSubject = SpecRegistry.getSpecsWithoutSubject();
+    if(specWithoutSubject.length > 0)
+      console.log(this.topicHeading + '#Without Subject' + this.resetStyle);
+      specWithoutSubject.forEach((spec) => {
+        let specRunner = new SpecRunner(spec, specReporter);
+        let specReport = specRunner.runSpec();
+        SpecExecChooser.printSpecReport(specReport, 3);
+      });
+
   }
 
   static execSubject(subject: string){
@@ -55,14 +72,7 @@ export class SpecExecChooser{
     specs.forEach((spec) => {
       let specRunner = new SpecRunner(spec, specLogger);
       let specReport = specRunner.runSpec();
-      let reportString = SpecReportBeautyfier.SpecReportToString(specReport, 3);
-
-      if(specReport.isInvalidSpec())
-        console.log( this.validErrorColor +reportString + this.resetStyle);
-      else if (specReport.isRunFailed())
-        console.log( this.failedRunColor +reportString + this.resetStyle);
-      else
-        console.log(this.successColor + reportString + this.resetStyle);
+      SpecExecChooser.printSpecReport(specReport, 3);
     });
   }
 
@@ -89,6 +99,16 @@ export class SpecExecChooser{
       console.log(this.successColor + reportString + this.resetStyle);
   }
 
+  private static printSpecReport(specReport:ISpecReport, paddingNumber?: number){
+    if(paddingNumber == null) paddingNumber = 0;
+    let reportString = SpecReportBeautyfier.SpecReportToString(specReport, paddingNumber);
 
+    if(specReport.isInvalidSpec())
+      console.log( this.validErrorColor +reportString + this.resetStyle);
+    else if (specReport.isRunFailed())
+      console.log( this.failedRunColor +reportString + this.resetStyle);
+    else
+      console.log(this.successColor + reportString + this.resetStyle);
+  }
 
 }

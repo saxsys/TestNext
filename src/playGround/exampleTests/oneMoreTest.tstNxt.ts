@@ -24,3 +24,13 @@ class SecondTest{
     Assert.that(this.count, 'count').equals(3);
   }
 }
+
+
+class SpecWithoutSpec{
+  @Given('I have something') haveSth(){
+  }
+  @When('i do nothing') nothingIs(){
+  }
+  @Then('nothing should happen') happensNothing(){
+  }
+}

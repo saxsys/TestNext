@@ -1,6 +1,9 @@
 import {SpecRegistryEntry} from "./specRegistryEntry/spec-registry-entry";
 import {SpecRegistryError} from "./errors/errors";
 import {ISpecExecutable} from "./specRegistryEntry/ISpec";
+import * as _ from "underscore";
+
+
 let SPECCLASS_REGISTRY = new Map<string, SpecRegistryEntry>();
 let SUBJECT_SPECCLASSNAMES = new Map<string, Array<string>>();
 
@@ -83,6 +86,20 @@ export class SpecRegistry {
 
     return specs;
 
+  }
+
+  public static getSpecsWithoutSubject():Array<SpecRegistryEntry>{
+    let allRemainingSpecNames = Array.from(SPECCLASS_REGISTRY.keys());
+
+    SUBJECT_SPECCLASSNAMES.forEach((specs) => {
+      allRemainingSpecNames = _.difference(allRemainingSpecNames, specs);
+    });
+
+    let specsWithoutSubject = new Array<SpecRegistryEntry>();
+    allRemainingSpecNames.forEach((specName) => {
+      specsWithoutSubject.push(SPECCLASS_REGISTRY.get(specName));
+    });
+    return specsWithoutSubject;
   }
 
   private static getOrRegisterSpecClass(specClassConstructor:Function): SpecRegistryEntry{

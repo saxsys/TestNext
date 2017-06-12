@@ -1,5 +1,5 @@
 import {ISpecExecutable, ISpecMethod} from "../specRegistry/specRegistryEntry/ISpec";
-import {ISpecReporter, ISpecReport} from "../spec-run-logger/spec-report-interfaces";
+import {ISpecReporter, ISpecReport} from "../spec-run-reporter/spec-report-interfaces";
 import {TestValidator} from "./specValidator/spec-validator";
 import {AssertionError} from "../assert/assertion-Error";
 import {SpecValidationError} from "./specValidator/spec-validation-error";

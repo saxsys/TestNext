@@ -423,6 +423,26 @@ describe('SpecRegistry.registerSpecForSubject', () => {
     }).toThrowError(SpecRegistryError,
       'A different Class with the Name "' + existSpecClassName + '" is already registered, class-name-duplicates are forbidden');
   });
-
 });
 
+describe('SpecRegistry.getSpecsWithoutSubject', ()=>{
+ it('should return Specs, which do not have a Subject', () => {
+   class SpecRegistry_getSpecWithoutSubject_ClassWithoutSubject{}
+   let classWithoutSubject = SpecRegistry_getSpecWithoutSubject_ClassWithoutSubject.prototype.constructor;
+   let classWithoutSubjectName = 'SpecRegistry_getSpecWithoutSubject_ClassWithoutSubject';
+   class SpecRegistry_getSpecWithoutSubject_ClassWithSubject{}
+   let classWithSubject = SpecRegistry_getSpecWithoutSubject_ClassWithSubject.prototype.constructor;
+   let classWithSubjectName = 'SpecRegistry_getSpecWithoutSubject_ClassWithSubject';
+   SpecRegistry.registerSpec(classWithoutSubject, classWithoutSubjectName);
+   SpecRegistry.registerSpecForSubject(classWithSubject, classWithSubjectName);
+   SpecRegistry.registerSpecForSubject(classWithSubject, 'Subject opposite to NoSubject');
+
+   let entryWithoutSubject = SpecRegistry.getSpecByClassName(classWithoutSubjectName);
+   let entryWithSubject = SpecRegistry.getSpecByClassName(classWithSubjectName);
+   let specsWithoutSubject = SpecRegistry.getSpecsWithoutSubject();
+   expect(specsWithoutSubject).toContain(entryWithoutSubject);
+   expect(specsWithoutSubject).not.toContain(entryWithSubject);
+
+
+  });
+});

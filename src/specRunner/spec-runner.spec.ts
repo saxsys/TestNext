@@ -1,7 +1,7 @@
 import {Given, Spec, Then, When} from "../testDecorators/test-decorators";
 import {SpecRegistry} from "../specRegistry/spec-registry";
 import {SpecRunner} from "./spec-runner";
-import {SpecReporter} from "../spec-run-logger/spec-reporter";
+import {SpecReporter} from "../spec-run-reporter/spec-reporter";
 import {SpecValidationError} from "./specValidator/spec-validation-error";
 import {AssertionError} from "../assert/assertion-Error";
 import {AssertProportion} from "../assert/assert-proportion";
