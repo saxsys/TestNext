@@ -12,7 +12,6 @@ class OneTest{
   @Then('something should have happened', 0) checkHappened(){}
   @Then('influenced this', 1) checkOtherHappened(){
     //throw new AssertionError(1, 2, AssertProportion.EQUAL, 'a Number', 'other Number');
-    Assert.that(1, 'a number').equals(2, 'anotherNumber');
   }
 }
 
@@ -25,7 +24,7 @@ class IncorrectTest{
   @When('no Given') thereisNoGiven(){
     this.count = 3;
   }
-  @Then('there should be an errpr') shouldError(){
+  @Then('there should be an err0r') shouldError(){
 
   }
 }

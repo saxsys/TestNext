@@ -133,6 +133,14 @@ export class SpecRegistryEntry implements ISpecExecutable{
     return this.when;
   }
 
+  getMethods():Array<ISpecMethod>{
+    let methods = new Array<ISpecMethod>();
+    methods.concat(this.getGivenArray());
+    methods.push(this.getWhen());
+    methods.concat(this.getThenArray());
+    return methods;
+  }
+
   getMethod(methodName: string):ISpecMethod{
     let method;
 

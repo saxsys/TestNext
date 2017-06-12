@@ -1,40 +1,39 @@
-import {SpecRunLogger} from "../spec-run-logger/spec-logger";
-import {MultiSpecRunner} from "../multiSpecRunner/multi-spec-runner";
-import {SuccessLogBeautyfier} from "../spec-run-logger/spec-log-beautyfier";
+import {SpecReporter} from "../spec-run-logger/spec-reporter";
+import {SpecReportBeautyfier} from "../spec-run-logger/spec-report-beautyfier";
 import {SpecRegistry} from "../specRegistry/spec-registry";
-import {SingleSpecRunner} from "../multiSpecRunner/singleSpecRunner/single-spec-runner";
+import {SpecRunner} from "../specRunner/spec-runner";
 
 export class SpecExecChooser{
+
+  private static successColor = '\x1b[1;32m';
+  private static validErrorColor = '\x1b[1;33m';
+  private static failedRunColor = '\x1b[1;31m';
+  private static resetStyle = '\x1b[0m';
+  private static topicHeading = '\x1b[47m\x1b[30m';
+
   static execAllSpecs(){
 
+
     let specReg = SpecRegistry.getRegistryEntries();
-    let specLogger = new SpecRunLogger();
-    let specRunner = new MultiSpecRunner(specReg, specLogger);
-    specRunner.buildSingleSpecRunners();
+    let specReporter = new SpecReporter();
 
-    console.log(specReg.length + ' specs to run');
+    specReg.forEach((spec) => {
+      let specRunner = new SpecRunner(spec, specReporter);
+      let specReport = specRunner.runSpec();
 
-    //Print Building Errors
-    let buildingErrors = specRunner.getBuildingErrors();
-    if(buildingErrors.size >0) {
-      console.log(' ____________________________________\n' +
-        '| BUILDING-ERRORS: ' + buildingErrors.size + '                 |\n');
-      buildingErrors.forEach((error)=>{
-        console.log('| ' + error.message);
-      });
-      console.log('\n|____________________________________|\n');
-    }
+      let reportString = SpecReportBeautyfier.SpecReportToString(specReport);
 
-    specRunner.runSpecs();
-
-    //Print
-    console.log(specLogger.getLogs().length + ' logs');
-    specLogger.getLogs().forEach((specLog) => {
-      console.log(SuccessLogBeautyfier.SpecLogToString(specLog));
+      if(specReport.isInvalidSpec())
+        console.log(this.validErrorColor + reportString + this.resetStyle);
+      else if (specReport.isRunFailed())
+        console.log(this.failedRunColor + reportString + this.resetStyle);
+      else
+        console.log(this.successColor + reportString);
     });
   }
 
   static execBySubjects() {
+    let SpecLogger = new SpecReporter();
     let subjects = SpecRegistry.getSubjects();
 
     subjects.forEach((subject) => {
@@ -43,57 +42,51 @@ export class SpecExecChooser{
   }
 
   static execSubject(subject: string){
-    console.log('---------------------------------------');
-    console.log(subject);
+    console.log(this.topicHeading + subject + this.resetStyle);
     let specs = SpecRegistry.getSpecsForSubject(subject);
-    let specLogger = new SpecRunLogger();
-    let specRunner = new MultiSpecRunner(specs, specLogger);
-    specRunner.buildSingleSpecRunners();
-
-    let buildingErrors = specRunner.getBuildingErrors();
-    if(buildingErrors.size >0) {
-      console.log('    ____________________________________\n' +
-        '   | BUILDING-ERRORS: ' + buildingErrors.size + '                 |\n');
-      buildingErrors.forEach((error)=>{
-        console.log('   | ' + error.message);
-      });
-      console.log('\n   |____________________________________|\n');
+    if(specs == null){
+      console.log(this.validErrorColor + 'no Subject with Name "' + subject + '" found \n' +
+        'we got: ' + SpecRegistry.getSubjects() + this.resetStyle
+      );
+      return;
     }
 
-    specRunner.runSpecs();
-    specLogger.getLogs().forEach((specLog) => {
-      console.log(SuccessLogBeautyfier.SpecLogToString(specLog, 3));
+    let specLogger = new SpecReporter();
+    specs.forEach((spec) => {
+      let specRunner = new SpecRunner(spec, specLogger);
+      let specReport = specRunner.runSpec();
+      let reportString = SpecReportBeautyfier.SpecReportToString(specReport, 3);
+
+      if(specReport.isInvalidSpec())
+        console.log( this.validErrorColor +reportString + this.resetStyle);
+      else if (specReport.isRunFailed())
+        console.log( this.failedRunColor +reportString + this.resetStyle);
+      else
+        console.log(this.successColor + reportString + this.resetStyle);
     });
   }
 
   static execSpec(className:string){
     let spec = SpecRegistry.getSpecByClassName(className);
     if(spec == null ){
-      console.log('no SpecClasses with Name "' + className + '" found \n' +
-      'we got: ' + SpecRegistry.getSpecClassNames()
+      console.log( this.validErrorColor +'no SpecClasses with Name "' + className + '" found \n' +
+        'we got: ' + SpecRegistry.getSpecClassNames() + this.resetStyle
       );
       return;
     }
 
-    let specLogger = new SpecRunLogger();
-    let specRunner;
-    try {
-      specRunner = new SingleSpecRunner(spec, specLogger);
-    } catch (error){
-      console.log(  '____________________________________\n' +
-                    '| BUILDING-ERROR                    |\n');
-      console.log(  '| ' + error.message + '');
-      console.log('\n|___________________________________|\n');
-      return;
-    }
+    let specReporter = new SpecReporter();
+    let specRunner = new SpecRunner(spec, specReporter);
+    let specReport = specRunner.runSpec();
 
-    //Print Building Errors
-    specRunner.runSpec();
+    let reportString = SpecReportBeautyfier.SpecReportToString(specReport);
 
-    //Print
-    specLogger.getLogs().forEach((specLog) => {
-      console.log(SuccessLogBeautyfier.SpecLogToString(specLog));
-    });
+    if(specReport.isInvalidSpec())
+      console.log( this.validErrorColor +reportString + this.resetStyle);
+    else if (specReport.isRunFailed())
+      console.log( this.failedRunColor +reportString + this.resetStyle);
+    else
+      console.log(this.successColor + reportString + this.resetStyle);
   }
 
 

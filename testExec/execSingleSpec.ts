@@ -14,7 +14,7 @@ glob.sync('./dist/src/**/*.tstNxt.js').forEach(function (file) {
 
 //load all test-files, Spec-Classes are getting registered
 testFiles.forEach((file) => {
-  //console.log(file);
+  //console.reportRun(file);
   require(file);
 });
 

@@ -10,6 +10,7 @@ export interface ISpecExecutable{
   getThenArray(): Array<ISpecMethod>;
   getThen(methodName:string):ISpecMethod;
   getWhen(): ISpecMethod;
+  getMethods():Array<ISpecMethod>;
   getMethod(methodName:string):ISpecMethod;
 
 

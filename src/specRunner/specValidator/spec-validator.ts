@@ -1,13 +1,18 @@
-import {ISpecExecutable} from "../../../specRegistry/specRegistryEntry/ISpec";
+import {ISpecExecutable} from "../../specRegistry/specRegistryEntry/ISpec";
 import {SpecValidationError} from "./spec-validation-error";
 
 
 export class TestValidator {
 
-  public static validateTest(spec: ISpecExecutable,) {
+  public static validate(spec: ISpecExecutable){
 
-    let specObject = spec.getNewSpecObject();
+    let specObject;
 
+    try {
+      specObject = spec.getNewSpecObject();
+    } catch(error){
+      throw new SpecValidationError(error.message);
+    }
     if (spec.getWhen() == null)
       throw new SpecValidationError('@When of ' + spec.getClassName() + 'is not set');
     let whenMethod = specObject[spec.getWhen().getName()];
@@ -29,7 +34,6 @@ export class TestValidator {
       if (method == null || typeof method != 'function')
         throw new SpecValidationError('On "' + spec.getClassName() + '" @Then function "' + specMethod.getName() + '" does not exist');
     });
-
   };
 }
 
