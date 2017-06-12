@@ -1,6 +1,14 @@
 import {SpecExecChooser} from "../src/specExecChooser/spec-exec-chooser";
 
-const glob = require('glob'), path = require('path');
+const glob = require('glob');
+const path = require('path');
+
+let showFailedOnlyArg = process.argv[2];
+
+let showFailedOnly = false;
+if(showFailedOnlyArg == 'true')
+  showFailedOnly = true;
+
 let testFiles = [];
 
 //load all testfiles
@@ -16,7 +24,7 @@ testFiles.forEach((file) => {
   require(file);
 });
 
-SpecExecChooser.execAllSpecs();
+SpecExecChooser.execAllSpecs(showFailedOnly);
 
 
 

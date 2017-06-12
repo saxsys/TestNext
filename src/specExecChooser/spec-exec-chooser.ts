@@ -12,7 +12,7 @@ export class SpecExecChooser{
   private static resetStyle = '\x1b[0m';
   private static topicHeading = '\x1b[47m\x1b[30m';
 
-  static execAllSpecs(){
+  static execAllSpecs(showFailedOnly?:boolean){
 
 
     let specReg = specRegistry.getRegistryEntries();
@@ -21,11 +21,11 @@ export class SpecExecChooser{
     specReg.forEach((spec) => {
       let specRunner = new SpecRunner(spec, specReporter);
       let specReport = specRunner.runSpec();
-      SpecExecChooser.printSpecReport(specReport);
+      SpecExecChooser.printSpecReport(specReport,0,showFailedOnly);
     });
   }
 
-  static execBySubjects() {
+  static execBySubjects(showFailedOnly?:boolean) {
 
     let specReporter = new SpecReporter();
     let subjects = specRegistry.getSubjects();
@@ -36,12 +36,12 @@ export class SpecExecChooser{
       subjectSpecs.forEach((spec) => {
         let existSpecReport = specReporter.getSpecReportOf(spec.getClassName());
         if(existSpecReport != null){
-          SpecExecChooser.printSpecReport(existSpecReport, 3);
+          SpecExecChooser.printSpecReport(existSpecReport, 3, showFailedOnly);
 
         } else {
           let specRunner = new SpecRunner(spec, specReporter);
           let specReport = specRunner.runSpec();
-          SpecExecChooser.printSpecReport(specReport, 3);
+          SpecExecChooser.printSpecReport(specReport, 3, showFailedOnly);
         }
       });
 
@@ -53,12 +53,12 @@ export class SpecExecChooser{
       specWithoutSubject.forEach((spec) => {
         let specRunner = new SpecRunner(spec, specReporter);
         let specReport = specRunner.runSpec();
-        SpecExecChooser.printSpecReport(specReport, 3);
+        SpecExecChooser.printSpecReport(specReport, 3, showFailedOnly);
       });
 
   }
 
-  static execSubject(subject: string){
+  static execSubject(subject: string, showFailedOnly?:boolean){
     console.log(this.topicHeading + subject + this.resetStyle);
     let specs = specRegistry.getSpecsForSubject(subject);
     if(specs == null){
@@ -72,11 +72,11 @@ export class SpecExecChooser{
     specs.forEach((spec) => {
       let specRunner = new SpecRunner(spec, specLogger);
       let specReport = specRunner.runSpec();
-      SpecExecChooser.printSpecReport(specReport, 3);
+      SpecExecChooser.printSpecReport(specReport, 3, showFailedOnly);
     });
   }
 
-  static execSpec(className:string){
+  static execSpec(className:string, showFailedOnly?:boolean){
     let spec = specRegistry.getSpecByClassName(className);
     if(spec == null ){
       console.log( this.validErrorColor +'no SpecClasses with Name "' + className + '" found \n' +
@@ -89,25 +89,20 @@ export class SpecExecChooser{
     let specRunner = new SpecRunner(spec, specReporter);
     let specReport = specRunner.runSpec();
 
-    let reportString = SpecReportBeautyfier.SpecReportToString(specReport);
-
-    if(specReport.isInvalidSpec())
-      console.log( this.validErrorColor +reportString + this.resetStyle);
-    else if (specReport.isRunFailed())
-      console.log( this.failedRunColor +reportString + this.resetStyle);
-    else
-      console.log(this.successColor + reportString + this.resetStyle);
+    SpecExecChooser.printSpecReport(specReport, 0, showFailedOnly);
   }
 
-  private static printSpecReport(specReport:ISpecReport, paddingNumber?: number){
+  private static printSpecReport(specReport:ISpecReport, paddingNumber?: number, showFailedOnly?:boolean){
     if(paddingNumber == null) paddingNumber = 0;
+    if(showFailedOnly == null) showFailedOnly = false;
+
     let reportString = SpecReportBeautyfier.SpecReportToString(specReport, paddingNumber);
 
     if(specReport.isInvalidSpec())
-      console.log( this.validErrorColor +reportString + this.resetStyle);
+      console.log(this.validErrorColor + reportString + this.resetStyle);
     else if (specReport.isRunFailed())
-      console.log( this.failedRunColor +reportString + this.resetStyle);
-    else
+      console.log(this.failedRunColor + reportString + this.resetStyle);
+    else if(!showFailedOnly)
       console.log(this.successColor + reportString + this.resetStyle);
   }
 
