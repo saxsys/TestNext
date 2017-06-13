@@ -1,35 +1,35 @@
 /**
  * Created by paul.brandes on 24.05.2017.
  */
-import {SpecRegistryEntry} from "specRegistry/specRegistryEntry/spec-registry-entry";
-import {SpecRegistryError} from "../errors/errors";
-import {SpecRegistry} from "../spec-registry";
+import {Spec} from "spec/spec";
+import {SpecRegistryError} from "../specRegistry/errors/errors";
+import {SpecRegistry} from "../specRegistry/spec-registry";
 
 class ExampleSpecClass {
 
 }
 
-describe('SpecRegistryEntry', () => {
+describe('Spec', () => {
 
-  let testCaseEntry;
+  let spec;
   const specClassConstructor = ExampleSpecClass.prototype.constructor;
   const specName = 'A Class without Decorators';
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClassConstructor);
-    testCaseEntry.setDescription(specName);
+    spec = new Spec(specClassConstructor);
+    spec.setDescription(specName);
   });
 
   it('should be constructed with proper parameters', () => {
-    expect(testCaseEntry).toBeDefined();
-    expect(testCaseEntry.getSpecName()).toEqual(specName);
-    expect(testCaseEntry.getClassConstructor()).toEqual(specClassConstructor);
+    expect(spec).toBeDefined();
+    expect(spec.getSpecName()).toEqual(specName);
+    expect(spec.getClassConstructor()).toEqual(specClassConstructor);
   });
 });
 
-describe('SpecRegistryEntry.addGiven', () => {
+describe('Spec.addGiven', () => {
 
 
-  let testCaseEntry;
+  let spec;
   const specClass = ExampleSpecClass.prototype.constructor;
   const specClassName = 'ExampleSpecClass';
   const specName = 'A Class without Decorators';
@@ -39,14 +39,14 @@ describe('SpecRegistryEntry.addGiven', () => {
   const givenDescription1 = 'an other Value is getting set';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClass);
-    testCaseEntry.setDescription(specName);
+    spec = new Spec(specClass);
+    spec.setDescription(specName);
   });
 
   it('should accept one added "given" without execNumber as 0', () => {
 
-    testCaseEntry.addGiven(givenName0, givenDescription0);
-    let givenArray = testCaseEntry.getGivenArray();
+    spec.addGiven(givenName0, givenDescription0);
+    let givenArray = spec.getOwnGiven();
     expect(givenArray.length).toEqual(1);
 
     let givenValue = givenArray[0];
@@ -55,8 +55,8 @@ describe('SpecRegistryEntry.addGiven', () => {
   });
 
   it('should accept one added "given" with execNumber', () => {
-    testCaseEntry.addGiven(givenName0, givenDescription0, 0);
-    let givenArray = testCaseEntry.getGivenArray();
+    spec.addGiven(givenName0, givenDescription0, 0);
+    let givenArray = spec.getOwnGiven();
     expect(givenArray.length).toEqual(1);
 
     let givenValue = givenArray[0];
@@ -65,16 +65,16 @@ describe('SpecRegistryEntry.addGiven', () => {
   });
 
   it('should accept multiple added "given" with different execNumber', () => {
-    testCaseEntry.addGiven(givenName0, givenDescription0, 0);
-    testCaseEntry.addGiven(givenName1, givenDescription1, 1);
-    let givenArray = testCaseEntry.getGivenArray();
+    spec.addGiven(givenName0, givenDescription0, 0);
+    spec.addGiven(givenName1, givenDescription1, 1);
+    let givenArray = spec.getOwnGiven();
     expect(givenArray.length).toEqual(2);
   });
 
   it('should refuse multiple added "given" with same execNumber', () => {
-    testCaseEntry.addGiven(givenName0, givenDescription0, 0);
+    spec.addGiven(givenName0, givenDescription0, 0);
     expect(() => {
-      testCaseEntry.addGiven(givenName1, givenDescription1, 0)
+      spec.addGiven(givenName1, givenDescription1, 0)
     })
       .toThrowError(SpecRegistryError,
         'Multiple @given, without ExecNumber, or it (0) already exists on ' + specClassName + '.' + givenName1
@@ -85,9 +85,9 @@ describe('SpecRegistryEntry.addGiven', () => {
 
 });
 
-describe('SpecRegistryEntry.addThen', () => {
+describe('Spec.addThen', () => {
 
-  let testCaseEntry;
+  let spec;
   const specClassConstructor = ExampleSpecClass.prototype.constructor;
   const specClassName = 'ExampleSpecClass';
   const specName = 'A Class without Decorators';
@@ -97,14 +97,14 @@ describe('SpecRegistryEntry.addThen', () => {
   const thenDescription1 = 'an other Value was changed';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClassConstructor);
-    testCaseEntry.setDescription(specName);
+    spec = new Spec(specClassConstructor);
+    spec.setDescription(specName);
   });
 
   it('should accept one added "then" without execNumber as 0', () => {
 
-    testCaseEntry.addThen(thenName0, thenDescription0);
-    let thenArray = testCaseEntry.getThenArray();
+    spec.addThen(thenName0, thenDescription0);
+    let thenArray = spec.getOwnThen();
     expect(thenArray.length).toEqual(1);
 
     let thenValue = thenArray[0];
@@ -113,8 +113,8 @@ describe('SpecRegistryEntry.addThen', () => {
   });
 
   it('should accept one added "then" with execNumber', () => {
-    testCaseEntry.addThen(thenName0, thenDescription0, 0);
-    let thenArray = testCaseEntry.getThenArray();
+    spec.addThen(thenName0, thenDescription0, 0);
+    let thenArray = spec.getOwnThen();
     expect(thenArray.length).toEqual(1);
 
     let thenValue = thenArray[0];
@@ -123,16 +123,16 @@ describe('SpecRegistryEntry.addThen', () => {
   });
 
   it('should accept multiple added "then" with different execNumber', () => {
-    testCaseEntry.addThen(thenName0, thenDescription0, 0);
-    testCaseEntry.addThen(thenName1, thenDescription1, 1);
-    let thenArray = testCaseEntry.getThenArray();
+    spec.addThen(thenName0, thenDescription0, 0);
+    spec.addThen(thenName1, thenDescription1, 1);
+    let thenArray = spec.getOwnThen();
     expect(thenArray.length).toEqual(2);
   });
 
   it('should refuse multiple added "then" with same execNumber', () => {
-    testCaseEntry.addThen(thenName0, thenDescription0, 0);
+    spec.addThen(thenName0, thenDescription0, 0);
     expect(() => {
-      testCaseEntry.addThen(thenName1, thenDescription1, 0)
+      spec.addThen(thenName1, thenDescription1, 0)
     })
       .toThrowError(SpecRegistryError,
         'Multiple @then, without ExecNumber, or it (0) already exists on ' + specClassName + '.' + thenName1
@@ -140,9 +140,9 @@ describe('SpecRegistryEntry.addThen', () => {
   });
 });
 
-describe('SpecRegistryEntry.addWhen', () => {
+describe('Spec.addWhen', () => {
 
-  let testCaseEntry;
+  let spec;
   const specClassConstructor = ExampleSpecClass.prototype.constructor;
   const specClassName = 'ExampleSpecClass';
   const specName = 'A Class without Decorators';
@@ -152,14 +152,14 @@ describe('SpecRegistryEntry.addWhen', () => {
   const whenDescription1 = 'da special Situation happened';
 
   beforeEach(() => {
-    testCaseEntry = new SpecRegistryEntry(specClassConstructor);
-    testCaseEntry.setDescription(specName);
+    spec = new Spec(specClassConstructor);
+    spec.setDescription(specName);
   });
 
   it('should accept single "when"', () => {
 
-    testCaseEntry.addWhen(whenName, whenDescription);
-    let whenEntry = testCaseEntry.getWhen();
+    spec.addWhen(whenName, whenDescription);
+    let whenEntry = spec.getOwnWhen();
 
 
     expect(whenEntry.getName()).toEqual(whenName);
@@ -167,9 +167,9 @@ describe('SpecRegistryEntry.addWhen', () => {
   });
 
   it('should refuse multiple added "when" with same execNumber', () => {
-    testCaseEntry.addWhen(whenName, whenDescription);
+    spec.addWhen(whenName, whenDescription);
     expect(() => {
-      testCaseEntry.addWhen(whenName1, whenDescription1, 0)
+      spec.addWhen(whenName1, whenDescription1, 0)
     })
       .toThrowError(SpecRegistryError,
         'Only one @When allowed on ' + specClassName +
@@ -181,7 +181,7 @@ describe('SpecRegistryEntry.addWhen', () => {
 
 });
 
-describe('SpecRegistryEntry.getGivenArray', () => {
+describe('Spec.getOwnGiven', () => {
   let specRegistry = new SpecRegistry();
   let className = 'SpecRegistryEntry_GivenArray';
   class SpecRegistryEntry_GivenArray{
@@ -198,7 +198,7 @@ describe('SpecRegistryEntry.getGivenArray', () => {
     specRegistry.registerGivenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
     specRegistry.registerGivenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
 
-    let givenArray = specRegistry.getSpecByClassName(className).getGivenArray();
+    let givenArray = specRegistry.getSpecByClassName(className).getOwnGiven();
     let namesInOrder = [];
     givenArray.forEach((given) => {
       namesInOrder.push(given.getName());
@@ -208,7 +208,7 @@ describe('SpecRegistryEntry.getGivenArray', () => {
   });
 });
 
-describe('SpecRegistryEntry.getThenArray', () => {
+describe('Spec.getOwnThen', () => {
   let specRegistry = new SpecRegistry();
   let className = 'SpecRegistryEntry_ThenArray';
   class SpecRegistryEntry_ThenArray{
@@ -223,7 +223,7 @@ describe('SpecRegistryEntry.getThenArray', () => {
     specRegistry.registerThenForSpec(specClassConstructor, 'method0', 'specMethod0', 0);
     specRegistry.registerThenForSpec(specClassConstructor, 'method1', 'specMethod1', 1);
 
-    let thenArray = specRegistry.getSpecByClassName(className).getThenArray();
+    let thenArray = specRegistry.getSpecByClassName(className).getOwnThen();
     let namesInOrder = [];
     thenArray.forEach((then) => {
       namesInOrder.push(then.getName());

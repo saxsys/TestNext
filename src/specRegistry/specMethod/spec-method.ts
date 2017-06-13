@@ -1,5 +1,5 @@
 import {SpecMethodType} from "./spec-method-type";
-export class TestMethodRegistryEntry {
+export class SpecMethod {
   private name: string;
   private description: string;
   private execNumber: number;

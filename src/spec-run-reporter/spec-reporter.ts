@@ -1,21 +1,21 @@
 import {ISpecReport, ISpecReporter, ISpecMethodRunReport} from "./spec-report-interfaces";
-import {ISpecExecutable, ISpecMethod} from "../specRegistry/specRegistryEntry/ISpec";
-import {SpecMethodType} from "../specRegistry/testMethodRegistryEntry/spec-method-type";
+import {ISpec, ISpecMethod} from "../spec/ISpec";
+import {SpecMethodType} from "../specRegistry/specMethod/spec-method-type";
 import {SpecValidationError} from "../specRunner/specValidator/spec-validation-error";
 export class SpecReporter implements ISpecReporter {
 
   private specReports = new Map<String, SpecReport>();
 
-  reportRun(spec: ISpecExecutable, methodName: string, success: boolean, error?: Error) {
+  reportRun(spec: ISpec, methodName: string, success: boolean, error?: Error) {
     let specReport = this.getOrCreateSpecReport(spec);
-    let specMethod = spec.getMethod(methodName);
+    let specMethod = spec.getOwnMethod(methodName);
     if (specMethod == null) {
       throw new Error('SpecMethod ' + methodName + ' does not exist in SpecRegistry' + spec.getClassName());
     }
     specReport.reportRun(specMethod, success, error);
   }
 
-  reportValidationError(spec: ISpecExecutable, error: SpecValidationError) {
+  reportValidationError(spec: ISpec, error: SpecValidationError) {
     let specReport = this.getOrCreateSpecReport(spec);
     specReport.reportValidationError(error);
   }
@@ -28,7 +28,7 @@ export class SpecReporter implements ISpecReporter {
     return this.specReports.get(className);
   }
 
-  public getOrCreateSpecReport(spec: ISpecExecutable): ISpecReport {
+  public getOrCreateSpecReport(spec: ISpec): ISpecReport {
     let specReport = this.specReports.get(spec.getClassName());
     if (specReport != null && specReport.getSpec() != spec)
       throw new Error('SpecReporter cannot reportRun two classes with same Name');
@@ -44,11 +44,11 @@ export class SpecReporter implements ISpecReporter {
 
 class SpecReport implements ISpecReport {
 
-  private spec: ISpecExecutable;
+  private spec: ISpec;
   private methodReports = new Array<ISpecMethodRunReport>();
   private valdidationErrors = new Array<SpecValidationError>();
 
-  constructor(spec: ISpecExecutable) {
+  constructor(spec: ISpec) {
     this.spec = spec;
   }
 
@@ -64,7 +64,7 @@ class SpecReport implements ISpecReport {
     this.methodReports.push(report);
   }
 
-  getSpec(): ISpecExecutable {
+  getSpec(): ISpec {
     return this.spec;
   }
 

@@ -1,27 +1,27 @@
-import {SpecRegistryEntry} from "./specRegistryEntry/spec-registry-entry";
+import {Spec} from "../spec/spec";
 import {SpecRegistryError} from "./errors/errors";
-import {ISpecExecutable} from "./specRegistryEntry/ISpec";
+import {ISpec} from "../spec/ISpec";
 import * as _ from "underscore";
 
 export class SpecRegistry {
 
-  private specClasses = new Map<string, SpecRegistryEntry>();
+  private specClasses = new Map<string, Spec>();
   private subject_specNames = new Map<string, Array<string>>();
 
 
-  public registerSpec(specClassConstructor: Function, specName: string) {
+  registerSpec(specClassConstructor: Function, specName: string) {
     let specClassName = specClassConstructor.name;
 
     let registryEntry = this.getOrRegisterSpecClass(specClassConstructor);
 
     if (registryEntry.getSpecName()!= null)
-      throw new SpecRegistryError('SpecClass "' + specClassName + '" already got has Description: "' + registryEntry.getSpecName() + '", only one is possible, cannot add: "' + specName + '"', specClassName);
+      throw new SpecRegistryError('Spec "' + specClassName + '" already got has Description: "' + registryEntry.getSpecName() + '", only one is possible, cannot add: "' + specName + '"', specClassName);
 
     registryEntry.setDescription(specName);
 
   }
 
-  public registerSpecForSubject(specClassConstructor:Function , subject:string ){
+  registerSpecForSubject(specClassConstructor:Function , subject:string ){
     let specClassName = specClassConstructor.name;
 
     //write subject into Spec
@@ -39,42 +39,42 @@ export class SpecRegistry {
     subjClasses.push(specClassName);
   }
 
-  public registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
+  registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
 
     let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
     specRegEntry.addGiven(functionName, description, execNumber);
   }
 
-  public registerWhenForSpec(specClass: Function, functionName: string, description: string) {
+  registerWhenForSpec(specClass: Function, functionName: string, description: string) {
     let specRegEntry = this.getOrRegisterSpecClass(specClass);
     specRegEntry.addWhen(functionName, description);
   }
 
-  public registerThenForSpec(specClass: Function, functionName: string, description: string, execNumber?: number) {
+  registerThenForSpec(specClass: Function, functionName: string, description: string, execNumber?: number) {
     let specRegEntry = this.getOrRegisterSpecClass(specClass);
     specRegEntry.addThen(functionName, description, execNumber);
   }
 
 
 
-  public getSpecClassNames(): Array<String> {
+  getSpecClassNames(): Array<String> {
     return Array.from(this.specClasses.keys());
   }
 
-  public getSubjects():Array<string>{
+  getSubjects():Array<string>{
     return Array.from(this.subject_specNames.keys());
   }
 
-  public getSpecByClassName(className: string): SpecRegistryEntry {
+  getSpecByClassName(className: string): Spec {
     return this.specClasses.get(className);
   }
 
-  public getRegistryEntries(): Array<ISpecExecutable>{
+  getAllSpec(): Array<ISpec>{
     return Array.from(this.specClasses.values());
   }
 
-  public getSpecsForSubject(subject:string):Array<SpecRegistryEntry>{
-    let specs = new Array<SpecRegistryEntry>();
+  getSpecsForSubject(subject:string):Array<Spec>{
+    let specs = new Array<Spec>();
     let classNames = this.subject_specNames.get(subject);
 
     if(classNames == null)
@@ -88,26 +88,44 @@ export class SpecRegistry {
 
   }
 
-  public getSpecsWithoutSubject():Array<SpecRegistryEntry>{
+  getSpecsWithoutSubject():Array<Spec>{
     let allRemainingSpecNames = Array.from(this.specClasses.keys());
 
     this.subject_specNames.forEach((specs) => {
       allRemainingSpecNames = _.difference(allRemainingSpecNames, specs);
     });
 
-    let specsWithoutSubject = new Array<SpecRegistryEntry>();
+    let specsWithoutSubject = new Array<Spec>();
     allRemainingSpecNames.forEach((specName) => {
       specsWithoutSubject.push(this.specClasses.get(specName));
     });
     return specsWithoutSubject;
   }
 
-  private getOrRegisterSpecClass(specClassConstructor:Function): SpecRegistryEntry{
+  getExecutableSpec():Array<ISpec>{
+    let executableSpecs = new Array<ISpec>();
+    Array.from(this.specClasses.values()).forEach((spec) => {
+      if(spec.isExecutableSpec())
+        executableSpecs.push(spec);
+    });
+    return executableSpecs;
+  }
+
+  private getOrRegisterSpecClass(specClassConstructor:Function): Spec{
     let specClassName = specClassConstructor.name;
 
     let specRegEntry = this.specClasses.get(specClassName);
     if(specRegEntry == null) {
-      specRegEntry = new SpecRegistryEntry(specClassConstructor);
+
+      //getParentSpec, if existing
+      // TODO check if there is a better way to get Parent-Class Name
+      let parentSpec = null;
+      let prototype = specClassConstructor.prototype;
+      if(prototype.__proto__.constructor.name != 'Object') {
+        parentSpec = this.getOrRegisterSpecClass(prototype.__proto__.constructor);
+      }
+
+      specRegEntry = new Spec(specClassConstructor, parentSpec);
       this.specClasses.set(specClassName, specRegEntry);
     } else {
       if(specRegEntry.getClassConstructor() != specClassConstructor){
@@ -116,4 +134,5 @@ export class SpecRegistry {
     }
     return specRegEntry;
   }
+
 }

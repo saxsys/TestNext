@@ -11,11 +11,12 @@ export class SpecExecChooser{
   private static failedRunColor = '\x1b[1;31m';
   private static resetStyle = '\x1b[0m';
   private static topicHeading = '\x1b[47m\x1b[30m';
+  private static notExecuted = '\x1b[0;37';
 
   static execAllSpecs(showFailedOnly?:boolean){
 
 
-    let specReg = specRegistry.getRegistryEntries();
+    let specReg = specRegistry.getExecutableSpec();
     let specReporter = new SpecReporter();
 
     specReg.forEach((spec) => {

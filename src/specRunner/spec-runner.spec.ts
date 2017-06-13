@@ -51,7 +51,7 @@ describe('specRunner.runSpec', () => {
   let randomError = new Error('Random Error');
   let anyAssertionError = new AssertionError(1, 2, AssertProportion.EQUAL, 'Number','otherNumber');
 
-  @Spec('an invalid Test')
+  @Spec('a valid Test')
   class SpecRunner_runSpec {
     public runOrder = [];
 
@@ -108,7 +108,6 @@ describe('specRunner.runSpec', () => {
     let specLogger = new SpecReporter();
     let specRunner = new SpecRunner(specEntry, specLogger);
     let report = specRunner.runSpec();
-    console.log(report.getValidationErrors());
     expect(report.getValidationErrors()).toContain(
       new SpecValidationError('There must be at lease one @Then in ' +  specClassName)
     );
@@ -177,4 +176,37 @@ describe('specRunner.runSpec', () => {
     let newReport = specRunner.runSpec(newReporter);
     expect(newReport.getReports()).toEqual(specReport.getReports());
   });
+
+  it('should execute also the Inherited Methods', ()=> {
+    let specClassName_parent = 'SpecRunner_execInheritated_parent';
+    let specClassName_child = 'SpecRunner_execInheritated_child';
+
+
+    class SpecRunner_execInheritated_parent {
+      public runOrder = [];
+      @Given('given 0') given0() {
+        this.runOrder.push('given0');
+      }
+      @When('the When') theWhen() {
+        this.runOrder.push('theWhen');
+      }
+      @Then('then 0') then0() {
+        this.runOrder.push('then0');
+      }
+    }
+
+    @Spec('a inherited Then')
+    class SpecRunner_execInheritated_child extends SpecRunner_execInheritated_parent {
+    }
+
+    //let specParent = specRegistry.getSpecByClassName(specClassName_parent);
+    let specChild = specRegistry.getSpecByClassName(specClassName_child);
+    let newReporter = new SpecReporter();
+    let specRunner = new SpecRunner(specEntry, specReporter);
+    let newReport = specRunner.runSpec(newReporter);
+
+    expect(specRunner.getUsedSpecObject().runOrder).toContain('given0');
+    expect(specRunner.getUsedSpecObject().runOrder).toContain('theWhen');
+    expect(specRunner.getUsedSpecObject().runOrder).toContain('then0');
+  })
 });

@@ -8,7 +8,7 @@ export function Spec(testCaseName: string) {
     let specClass = constructor;
     if(constructor.length > 0)
       throw new SpecRegistryError(
-        'SpecClass "' + constructor.name +'" has constructor-arguments, this is forbidden in Spec-classes',
+        'Spec "' + constructor.name +'" has constructor-arguments, this is forbidden in Spec-classes',
         constructor.name, 'constructor'
       );
 
@@ -22,7 +22,7 @@ export function Given(description: string, execNumber?: number) {
     let className = constructor.name;
     if(constructor.length > 0)
       throw new SpecRegistryError(
-        'SpecClass "' + className + '" has constructor-arguments, this is forbidden in Spec-classes', className, key
+        'Spec "' + className + '" has constructor-arguments, this is forbidden in Spec-classes', className, key
       );
 
 
@@ -36,7 +36,7 @@ export function When(description: string) {
     let className = constructor.name;
     if(constructor.length > 0)
       throw new SpecRegistryError(
-        'SpecClass "' + className +'" has constructor-arguments, this is forbidden in Spec-classes',
+        'Spec "' + className +'" has constructor-arguments, this is forbidden in Spec-classes',
         className, key
       );
 
@@ -50,7 +50,7 @@ export function Then(description: string, execNumber?: number) {
     let className = constructor.name;
     if(constructor.length > 0)
       throw new SpecRegistryError(
-        'SpecClass "' + className +'" has constructor-arguments, this is forbidden in Spec-classes',
+        'Spec "' + className +'" has constructor-arguments, this is forbidden in Spec-classes',
         className, key
       );
 
@@ -63,7 +63,7 @@ export function Subject(description: string) {
 
     if(constructor.length > 0)
       throw new SpecRegistryError(
-        'SpecClass "' + constructor.name +'" has constructor-arguments, this is forbidden in Spec-classes',
+        'Spec "' + constructor.name +'" has constructor-arguments, this is forbidden in Spec-classes',
         constructor.name, 'constructor'
       );
 

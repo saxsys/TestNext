@@ -31,7 +31,7 @@ describe('SpecRegistry.registerSpec()', () => {
     expect(specRegistry.getSpecByClassName(specNameDoubleClassName)).not.toBeUndefined();
   });
 
-  it('should refuse adding multiple SpecName for one SpecClass', () => {
+  it('should refuse adding multiple SpecName for one Spec', () => {
     class SpecClassTestSpecRegAddedTwice {
     }
     let specClassTestSpecRegAddedTwice = SpecClassTestSpecRegAddedTwice.prototype.constructor;
@@ -39,7 +39,7 @@ describe('SpecRegistry.registerSpec()', () => {
     expect(() => {
       specRegistry.registerSpec(specClassTestSpecRegAddedTwice, 'specNameTestSpecRegAddedTwice2');
     }).toThrowError(SpecRegistryError,
-      'SpecClass "SpecClassTestSpecRegAddedTwice" already got has Description: "specNameTestSpecRegAddedTwice1", ' +
+      'Spec "SpecClassTestSpecRegAddedTwice" already got has Description: "specNameTestSpecRegAddedTwice1", ' +
       'only one is possible, cannot add: "specNameTestSpecRegAddedTwice2"'
     );
   });
@@ -82,7 +82,7 @@ describe('SpecRegistry.getSpecByName', () => {
   beforeAll(() => {
     specRegistry.registerSpec(specClassConstructor, specName)
   });
-  it('should return correct SpecRegistryEntry for existing specClassName', () => {
+  it('should return correct Spec for existing specClassName', () => {
     let thirdTCaseRegEntry = specRegistry.getSpecByClassName(specClassName);
     expect(thirdTCaseRegEntry.getSpecName()).toEqual(specName);
     expect(thirdTCaseRegEntry.getClassConstructor()).toEqual(specClassConstructor);
@@ -136,14 +136,14 @@ describe('SpecRegistry.registerGivenForSpec', () => {
     expect(entry).not.toBeUndefined();
     expect(entry.getSpecName()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(notYetRegisteredClass);
-    let givenEntry = entry.getGivenArray()[0];
+    let givenEntry = entry.getOwnGiven()[0];
     expect(givenEntry.getName()).toEqual(notYetRegisteredGivenName);
     expect(givenEntry.getDescription()).toEqual(givenDescription);
 
 
   });
 
-  xit('should refuse the Given, if no property with the Name exists on the SpecClass', () => {
+  xit('should refuse the Given, if no property with the Name exists on the Spec', () => {
     expect(() => {
       specRegistry.registerGivenForSpec(specClassConstructor, nonExistPropName, givenDescription);
     }).toThrow(
@@ -151,7 +151,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
     );
   });
 
-  xit('should refuse the Given, if property with the Name exists on the SpecClass, but is not a function', () => {
+  xit('should refuse the Given, if property with the Name exists on the Spec, but is not a function', () => {
     expect(() => {
       specRegistry.registerGivenForSpec(specClassConstructor, numericPropertyName, givenDescription);
     }).toThrow(
@@ -188,7 +188,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
   it('should register the Given, while parameters are correct', () => {
     specRegistry.registerGivenForSpec(specClassConstructor, givenFunctionName, givenDescription, givenExecNumber);
     let specRegEntry = specRegistry.getSpecByClassName(specClassName);
-    let givenRegEntry = specRegEntry.getGivenArray()[givenExecNumber];
+    let givenRegEntry = specRegEntry.getOwnGiven()[givenExecNumber];
     expect(givenRegEntry.getName()).toEqual(givenFunctionName);
     expect(givenRegEntry.getDescription()).toEqual(givenDescription);
   });
@@ -237,18 +237,18 @@ describe('SpecRegistry.registerThenForSpec', () => {
     expect(specEntry).not.toBeUndefined();
     expect(specEntry.getSpecName()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
-    let thenEntry = specEntry.getThenArray()[0];
+    let thenEntry = specEntry.getOwnThen()[0];
     expect(thenEntry.getName()).toEqual(notYetRegisteredFunctionName);
     expect(thenEntry.getDescription()).toEqual(description);
   });
 
-  xit('should refuse the Then, if no property with the Name exists on the SpecClass', () => {
+  xit('should refuse the Then, if no property with the Name exists on the Spec', () => {
     expect(() => {
       specRegistry.registerThenForSpec(specClassConstructor, nonExistPropName, description);
     }).toThrowError(SpecRegistryError, specClassName + '.' + nonExistPropName + ' does not exist.');
   });
 
-  xit('should refuse the Then, if property with the Name exists on the SpecClass, but is not a function', () => {
+  xit('should refuse the Then, if property with the Name exists on the Spec, but is not a function', () => {
     expect(() => {
       specRegistry.registerThenForSpec(specClassConstructor, numericPropertyName, description);
     }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
@@ -281,7 +281,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
   it('should register the Then, while parameters are correct', () => {
     specRegistry.registerThenForSpec(specClassConstructor, functionName, description, execNumber);
     let specRegEntry = specRegistry.getSpecByClassName(specClassName);
-    let thenRegEntry = specRegEntry.getThenArray()[execNumber];
+    let thenRegEntry = specRegEntry.getOwnThen()[execNumber];
     expect(thenRegEntry.getName()).toEqual(functionName);
     expect(thenRegEntry.getDescription()).toEqual(description);
   });
@@ -327,18 +327,18 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     expect(specEntry).not.toBeUndefined();
     expect(specEntry.getSpecName()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
-    let whenEntry = specEntry.getWhen();
+    let whenEntry = specEntry.getOwnWhen();
     expect(whenEntry.getName()).toEqual(notYetRegisteredFunctionName);
     expect(whenEntry.getDescription()).toEqual(description);
   });
 
-  xit('should refuse the When, if no property with the Name exists on the SpecClass', () => {
+  xit('should refuse the When, if no property with the Name exists on the Spec', () => {
     expect(() => {
       specRegistry.registerWhenForSpec(specClassConstructor, nonExistPropName, description);
     }).toThrowError(SpecRegistryError, specClassName + '.' + nonExistPropName + ' does not exist.');
   });
 
-  xit('should refuse the When, if property with the Name exists on the SpecClass, but is not a function', () => {
+  xit('should refuse the When, if property with the Name exists on the Spec, but is not a function', () => {
     expect(() => {
       specRegistry.registerWhenForSpec(specClassConstructor, numericPropertyName, description);
     }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
@@ -371,7 +371,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
   it('should register the When, while parameters are correct', () => {
     specRegistry.registerWhenForSpec(specClassConstructor, functionName, description);
     let specRegEntry = specRegistry.getSpecByClassName(specClassName);
-    let thenRegEntry = specRegEntry.getWhen();
+    let thenRegEntry = specRegEntry.getOwnWhen();
     expect(thenRegEntry.getName()).toEqual(functionName);
     expect(thenRegEntry.getDescription()).toEqual(description);
   });
@@ -391,7 +391,7 @@ describe('SpecRegistry.registerSpecForSubject', () => {
     specRegistry.registerSpec(existSpecClass, existSpecClassDescription);
     specRegEntry = specRegistry.getSpecByClassName(existSpecClassName);
   });
-  it('should register subject for existing class and save into SpecRegistryEntry', () => {
+  it('should register subject for existing class and save into Spec', () => {
     specRegistry.registerSpecForSubject(existSpecClass, subjectName1);
 
     let registeredSpecsForSubject = specRegistry.getSpecsForSubject(subjectName1);
@@ -451,4 +451,78 @@ describe('SpecRegistry.getSpecsWithoutSubject', () => {
 
 
   });
+});
+
+describe('SpecRegistry.getAllSpec', () => {
+  let specReg = new SpecRegistry();
+  class SpecRegistry_getAllSpec_SpecAddedWithDescription {}
+  let spec_AddedWithDescription = SpecRegistry_getAllSpec_SpecAddedWithDescription.prototype.constructor;
+
+  class SpecRegistry_getAllSpec_SpecAddedWithoutDescription {
+    public aClassMethod(){}
+  }
+  let spec_AddedWithoutDescription = SpecRegistry_getAllSpec_SpecAddedWithoutDescription.prototype.constructor;
+
+  let entryWithDescr;
+  let entryWithoutDescr;
+  let gotAllSpecs;
+
+  beforeAll(() => {
+    //Add Spec with Description, will be accepted as Executable
+    specReg.registerSpec(spec_AddedWithDescription, 'someDescription');
+    //Add Spec by RegisterGiven, without SpecDescription, will not be accepted as Executable
+    specReg.registerGivenForSpec(spec_AddedWithoutDescription, 'aClassMethod', 'methodDescription');
+
+    entryWithDescr = specReg.getSpecByClassName('SpecRegistry_getAllSpec_SpecAddedWithDescription');
+    entryWithoutDescr = specReg.getSpecByClassName('SpecRegistry_getAllSpec_SpecAddedWithoutDescription');
+    expect(entryWithDescr).not.toBeNull();
+    expect(entryWithoutDescr).not.toBeNull();
+    gotAllSpecs = specReg.getAllSpec();
+  });
+
+  it('should return all Specs, also Specs with SpecDescription (= Executable)', () => {
+    expect(gotAllSpecs).toContain(entryWithDescr);
+  });
+  it('should return all Specs, also Specs without SpecDescription (= notExecutable)', () => {
+    expect(gotAllSpecs).toContain(entryWithoutDescr);
+  });
+
+});
+
+describe('SpecRegistry.getExecutableSpec', () => {
+  let specReg = new SpecRegistry();
+  class SpecRegistry_getExecutableSpec_SpecAddedWithDescription {}
+  let spec_AddedWithDescription = SpecRegistry_getExecutableSpec_SpecAddedWithDescription.prototype.constructor;
+
+  class SpecRegistry_getExecutableSpec_SpecAddedWithoutDescription {
+    public aClassMethod(){}
+  }
+  let spec_AddedWithoutDescription = SpecRegistry_getExecutableSpec_SpecAddedWithoutDescription.prototype.constructor;
+
+  let entryWithDescr;
+  let entryWithoutDescr;
+  let gotExecSpecs;
+
+  beforeAll(() => {
+    //Add Spec with Description, will be accepted as Executable
+    specReg.registerSpec(spec_AddedWithDescription, 'someDescription');
+    //Add Spec by RegisterGiven, without SpecDescription, will not be accepted as Executable
+    specReg.registerGivenForSpec(spec_AddedWithoutDescription, 'aClassMethod', 'methodDescription');
+
+    entryWithDescr = specReg.getSpecByClassName('SpecRegistry_getExecutableSpec_SpecAddedWithDescription');
+    entryWithoutDescr = specReg.getSpecByClassName('SpecRegistry_getExecutableSpec_SpecAddedWithoutDescription');
+    expect(entryWithDescr).not.toBeNull();
+    expect(entryWithoutDescr).not.toBeNull();
+
+    gotExecSpecs = specReg.getExecutableSpec();
+  });
+
+  it('should return executable Specs Specs with SpecDescription (= Executable)', () => {
+    expect(gotExecSpecs).toContain(entryWithDescr);
+  });
+  it('should return exectuable Specs only, not Specs without SpecDescription (= notExecutable)', () => {
+    expect(gotExecSpecs).not.toContain(entryWithoutDescr);
+  });
+
+
 });

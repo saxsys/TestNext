@@ -1,6 +1,8 @@
 import {Given, Spec, Subject, Then, When} from "./test-decorators";
 import {specRegistry} from "../specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../specRegistry/errors/errors";
+import {Assert} from "../assert/assert";
+import {SpecRegistry} from "../specRegistry/spec-registry";
 describe('TestDecorators.Spec', () => {
 
   it('should register a class with Spec-decorator', () => {
@@ -33,14 +35,14 @@ describe('TestDecorators.Spec', () => {
     );
   });
 
-  it('should refuse one SpecClass with two Spec Decorators', () => {
+  it('should refuse one Spec with two Spec Decorators', () => {
     expect(() => {
       @Spec('Spec_ClassWith2SpecDecorator1')
       @Spec('Spec_ClassWith2SpecDecorator2')
       class TestDecorators_Spec_ClassWith2SpecDecorator {
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass "TestDecorators_Spec_ClassWith2SpecDecorator" already got has Description: ' +
+      'Spec "TestDecorators_Spec_ClassWith2SpecDecorator" already got has Description: ' +
       '"Spec_ClassWith2SpecDecorator2", only one is possible, cannot add: "Spec_ClassWith2SpecDecorator1"'
     );
 
@@ -48,12 +50,12 @@ describe('TestDecorators.Spec', () => {
 
   xit('should refuse classes with constructor-arguments', () => {
     expect(() => {
-      @Spec('SpecClass with ConstructorArguments')
+      @Spec('Spec with ConstructorArguments')
       class TestDecorators_Spec_ConstructorArguments {
         constructor(anArgument:any){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass "TestDecorators_Spec_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
+      'Spec "TestDecorators_Spec_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
 
   });
@@ -76,7 +78,7 @@ describe('TestDecorators.Given', () => {
       }
     }
     let specRegEntry = specRegistry.getSpecByClassName(className);
-    let methodRegEntry = specRegEntry.getGivenArray()[0];
+    let methodRegEntry = specRegEntry.getOwnGiven()[0];
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
   });
@@ -94,7 +96,7 @@ describe('TestDecorators.Given', () => {
     let entry = specRegistry.getSpecByClassName(className);
     expect(entry.getSpecName()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(givenClassConstructor);
-    let givenEntry = entry.getGivenArray()[0];
+    let givenEntry = entry.getOwnGiven()[0];
     expect(givenEntry.getDescription()).toEqual(methodDescription);
     expect(givenEntry.getName()).toEqual(methodName);
   });
@@ -117,7 +119,7 @@ describe('TestDecorators.Given', () => {
     }
 
     let regEntry = specRegistry.getSpecByClassName(className);
-    let methodEntries = regEntry.getGivenArray();
+    let methodEntries = regEntry.getOwnGiven();
     expect(methodEntries.length).toBe(2);
 
     let methodEntry1 = methodEntries[0];
@@ -146,7 +148,7 @@ describe('TestDecorators.Given', () => {
         @Given('Given of Class with Constructor-Arguments') justAMethod(){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass "TestDecorators_Given_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
+      'Spec "TestDecorators_Given_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
   });
 
@@ -167,7 +169,7 @@ describe('TestDecorators.When', () => {
       }
     }
     let specRegEntry = specRegistry.getSpecByClassName(className);
-    let methodRegEntry = specRegEntry.getWhen();
+    let methodRegEntry = specRegEntry.getOwnWhen();
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
   });
@@ -186,7 +188,7 @@ describe('TestDecorators.When', () => {
     expect(entry.getSpecName()).toBeUndefined();
 
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
-    let methodEntry = entry.getWhen();
+    let methodEntry = entry.getOwnWhen();
     expect(methodEntry.getDescription()).toEqual(methodDescription);
     expect(methodEntry.getName()).toEqual(methodName);
   });
@@ -232,7 +234,7 @@ describe('TestDecorators.When', () => {
         @When('When of Class with Constructor-Arguments') aWhenFunction(){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass "TestDecorators_When_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
+      'Spec "TestDecorators_When_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
   });
 
@@ -255,7 +257,7 @@ describe('TestDecorators.Then', () => {
     }
 
     let specRegEntry = specRegistry.getSpecByClassName(className);
-    let methodRegEntry = specRegEntry.getThenArray()[0];
+    let methodRegEntry = specRegEntry.getOwnThen()[0];
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
   });
@@ -274,7 +276,7 @@ describe('TestDecorators.Then', () => {
     let entry = specRegistry.getSpecByClassName(className);
     expect(entry.getSpecName()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
-    let methodEntry = entry.getThenArray()[0];
+    let methodEntry = entry.getOwnThen()[0];
     expect(methodEntry.getDescription()).toEqual(methodDescription);
     expect(methodEntry.getName()).toEqual(methodName);
   });
@@ -297,7 +299,7 @@ describe('TestDecorators.Then', () => {
     }
 
     let regEntry = specRegistry.getSpecByClassName(className);
-    let methodEntries = regEntry.getThenArray();
+    let methodEntries = regEntry.getOwnThen();
     expect(methodEntries.length).toBe(2);
 
     let methodEntry1 = methodEntries[0];
@@ -326,7 +328,7 @@ describe('TestDecorators.Then', () => {
         @Then('When of Class with Constructor-Arguments') aThenFunction(){}
       }
     }).toThrowError(SpecRegistryError,
-      'SpecClass "TestDecorators_Then_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
+      'Spec "TestDecorators_Then_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
   });
 });
@@ -403,7 +405,7 @@ describe('TestDecorators.Subject', () => {
 
   });
 
-  it('should register a SpecClass, when not done yet an register then Subject', () => {
+  it('should register a Spec, when not done yet an register then Subject', () => {
     let specClassName = 'SpecDecorators_Subject_ForClassNotDeclSpec';
     let subjectName = 'TestDecorators.Subject.ForClassNotDeclSpec';
 
@@ -418,7 +420,7 @@ describe('TestDecorators.Subject', () => {
     expect(specRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
   });
 
-  it('should throw SpecRegostryError, when unregistered SpecClass has construtor-arguments', () => {
+  it('should throw SpecRegostryError, when unregistered Spec has construtor-arguments', () => {
     let specClassName = 'SpecDecorators_Subject_ConstructorArguments';
     let subjectName = 'TestDecorators.Subject.ConstructorArguments';
 
@@ -428,13 +430,52 @@ describe('TestDecorators.Subject', () => {
         constructor(argument: number) {
         }
       }
-    }).toThrowError(SpecRegistryError, 'SpecClass "' + specClassName +'" has constructor-arguments, this is forbidden in Spec-classes');
+    }).toThrowError(SpecRegistryError, 'Spec "' + specClassName +'" has constructor-arguments, this is forbidden in Spec-classes');
   });
 
+});
 
 
+describe('TestDecorators.parentSpec', () => {
+  class TestDecorators_ParentSpec_ParentSpecClass{
+    protected valueToInherit = 0;
+    @Given('valueToInherit gets set',0) setValueToInherit(){
+      this.valueToInherit = 1;
+    }
+
+  }
+
+  @Spec('Given-Inheritance')
+  class TestDecorators_parentSpec_ChildSpecClass extends TestDecorators_ParentSpec_ParentSpecClass{
+    @When('I extend a Parent Class') extendClass(){
+
+    }
+    @Then('Given of parent should have been exectuted') givenShouldBeExecuted(){
+      Assert.that(this.valueToInherit).equals(1);
+    }
+  }
+
+  let regEntryParent;
+  let regEntryChild;
 
 
+  beforeAll(() => {
+    regEntryParent = specRegistry.getSpecByClassName('TestDecorators_ParentSpec_ParentSpecClass');
+    regEntryChild = specRegistry.getSpecByClassName('TestDecorators_parentSpec_ChildSpecClass');
+  });
 
+  it('should be possible to get the Parent', () => {
+    expect(regEntryParent).not.toBeNull();
+    expect(regEntryChild).not.toBeNull();
+    expect(regEntryChild.getParentSpec()).toEqual(regEntryParent);
+  });
+
+  it('should be possible to get all Given, from Parent and Child', () => {
+    let allGivenFromChild = regEntryChild.getGiven();
+    let ownGivenFromParent = regEntryParent.getOwnGiven();
+    expect(allGivenFromChild.length).toEqual(1);
+    expect(ownGivenFromParent.length).toEqual(1);
+    expect(allGivenFromChild[0]).toEqual(ownGivenFromParent[0]);
+  });
 
 });

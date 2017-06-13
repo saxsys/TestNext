@@ -1,5 +1,5 @@
 import {ISpecReport, ISpecMethodRunReport} from "./spec-report-interfaces";
-import {ISpecExecutable, ISpecMethod} from "../specRegistry/specRegistryEntry/ISpec";
+import {ISpec, ISpecMethod} from "../spec/ISpec";
 import {SpecValidationError} from "../specRunner/specValidator/spec-validation-error";
 export class SpecReportBeautyfier {
 
@@ -44,7 +44,7 @@ export class SpecReportBeautyfier {
     return padding + specMethod.getMethodType().toString() + ' ' + specMethod.getDescription() + ' (' + specMethod.getName() + ')';
   }
 
-  private static specDescriptionToString(spec: ISpecExecutable):string{
+  private static specDescriptionToString(spec: ISpec):string{
     if(spec.getDescription() !== ''){
       return spec.getDescription() + ' (' + spec.getClassName() + ')';
     } else {

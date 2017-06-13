@@ -1,16 +1,16 @@
-import {ISpecExecutable, ISpecMethod} from "../specRegistry/specRegistryEntry/ISpec";
+import {ISpec, ISpecMethod} from "../spec/ISpec";
 import {ISpecReporter, ISpecReport} from "../spec-run-reporter/spec-report-interfaces";
-import {TestValidator} from "./specValidator/spec-validator";
+import {SpecValidator} from "./specValidator/spec-validator";
 import {AssertionError} from "../assert/assertion-Error";
 import {SpecValidationError} from "./specValidator/spec-validation-error";
 
 export class SpecRunner {
 
-  private spec: ISpecExecutable;
+  private spec: ISpec;
   private specReport: ISpecReport;
   private specObject:any;
 
-  constructor(spec:ISpecExecutable, specReporter: ISpecReporter){
+  constructor(spec:ISpec, specReporter: ISpecReporter){
     this.spec = spec;
     this.specReport = specReporter.getOrCreateSpecReport(spec);
   }
@@ -19,6 +19,10 @@ export class SpecRunner {
     if(otherReporter != null){
       this.specReport = otherReporter.getOrCreateSpecReport(this.spec)
     }
+
+    if(!this.spec.isExecutableSpec())
+      return this.specReport;
+
     let validity = this.validateSpec();
     if(!validity) {
       this.specObject = null;
@@ -33,7 +37,7 @@ export class SpecRunner {
 
   private validateSpec():boolean{
     try{
-      TestValidator.validate(this.spec);
+      SpecValidator.validate(this.spec);
     } catch (error){
       if(error instanceof SpecValidationError) {
         this.specReport.reportValidationError(error);
@@ -46,14 +50,14 @@ export class SpecRunner {
   }
 
   private runGiven() {
-    let methodArray = this.spec.getGivenArray();
+    let methodArray = this.spec.getGiven();
     methodArray.forEach((method: ISpecMethod) => {
       this.runMethod(method);
     });
   }
 
   private runThen() {
-    let methodArray = this.spec.getThenArray();
+    let methodArray = this.spec.getThen();
     methodArray.forEach((method: ISpecMethod) => {
       this.runMethod(method);
     });
@@ -85,7 +89,7 @@ export class SpecRunner {
     return this.specReport;
   }
 
-  getSpec(): ISpecExecutable{
+  getSpec(): ISpec{
     return this.spec;
   }
 

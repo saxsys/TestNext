@@ -1,4 +1,4 @@
-import {SpecMethodType} from "../specRegistry/testMethodRegistryEntry/spec-method-type";
+import {SpecMethodType} from "../specRegistry/specMethod/spec-method-type";
 import {AssertProportion} from "./assert-proportion";
 export class AssertionError extends Error{
 
