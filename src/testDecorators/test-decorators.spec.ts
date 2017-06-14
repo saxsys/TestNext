@@ -1,8 +1,9 @@
-import {Given, Spec, Subject, Then, When} from "./test-decorators";
+import {Given, Ignore, Spec, Subject, Then, When} from "./test-decorators";
 import {specRegistry} from "../specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../specRegistry/errors/errors";
 import {Assert} from "../assert/assert";
-import {SpecRegistry} from "../specRegistry/spec-registry";
+
+
 describe('TestDecorators.Spec', () => {
 
   it('should register a class with Spec-decorator', () => {
@@ -420,7 +421,7 @@ describe('TestDecorators.Subject', () => {
     expect(specRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
   });
 
-  it('should throw SpecRegostryError, when unregistered Spec has construtor-arguments', () => {
+  xit('should throw SpecRegostryError, when unregistered Spec has construtor-arguments', () => {
     let specClassName = 'SpecDecorators_Subject_ConstructorArguments';
     let subjectName = 'TestDecorators.Subject.ConstructorArguments';
 
@@ -434,6 +435,72 @@ describe('TestDecorators.Subject', () => {
   });
 
 });
+
+describe('TestDecorators.Ignore', () => {
+
+  it('should not be ignored by default', () => {
+
+    let className = 'TestDecorators_Ignored_NotIgnored';
+    let specName = 'specClassDecoratorIgnoredNotIgnored';
+
+    @Spec(specName)
+    class TestDecorators_Ignored_NotIgnored {}
+
+    let specRegEntry = specRegistry.getSpecByClassName(className);
+
+    expect(specRegEntry.isIgnored()).toBeFalsy();
+    expect(specRegEntry.getIgnoreReason()).toEqual('');
+  });
+
+  it('should set Ignored for the Spec', () => {
+
+    let className = 'TestDecorators_Ignored_Correct';
+    let specName = 'specClassDecoratorIgnoredCorrect';
+    let ignoreReason = 'simply not possible';
+
+    @Ignore(ignoreReason)
+    @Spec(specName)
+    class TestDecorators_Ignored_Correct {}
+
+    let specRegEntry = specRegistry.getSpecByClassName(className);
+
+    expect(specRegEntry.isIgnored()).toBeTruthy();
+    expect(specRegEntry.getIgnoreReason()).toEqual(ignoreReason);
+  });
+
+  xit('should register the Ignored without the Class being registered as @Spec', () => {
+
+    let className = 'TestDecorators_Ignored_NoSpec';
+    let specName = 'specClassDecoratorIgnoredNoSpec';
+    let ignoreReason = 'simply not possible';
+
+    @Ignore(ignoreReason)
+    class TestDecorators_Ignored_NoSpec {}
+
+    let specRegEntry = specRegistry.getSpecByClassName(className);
+
+    expect(specRegEntry.getIgnoreReason()).toEqual(ignoreReason);
+  });
+
+  xit('should be able to handle multiple Ignored, use one', () => {
+    let className = 'TestDecorators_Ignored_MultiIgnore';
+    let specName = 'specClassDecoratorIgnoredCorrect';
+    let ignoreReason1 = 'simply not possible';
+    let ignoreReason2 = 'so many Reasons';
+
+    @Ignore(ignoreReason1)
+    @Ignore(ignoreReason2)
+    @Spec(specName)
+    class TestDecorators_Ignored_MultiIgnore {}
+
+    let specRegEntry = specRegistry.getSpecByClassName(className);
+
+    expect(specRegEntry.isIgnored()).toBeTruthy();
+    expect([ignoreReason1, ignoreReason2]).toContain(specRegEntry.getIgnoreReason());
+  });
+
+});
+
 
 
 describe('TestDecorators.parentSpec', () => {

@@ -1,8 +1,8 @@
-import {SpecReporter} from "../spec-run-reporter/spec-reporter";
-import {SpecReportBeautyfier} from "../spec-run-reporter/spec-report-beautyfier";
+import {SpecReporter} from "../specRunReporter/spec-reporter";
+import {SpecReportBeautyfier} from "../specRunReporter/spec-report-beautyfier";
 import {specRegistry} from "../specRegistry/spec-registry-storage";
 import {SpecRunner} from "../specRunner/spec-runner";
-import {ISpecReport} from "../spec-run-reporter/spec-report-interfaces";
+import {ISpecReport} from "../specRunReporter/spec-report-interfaces";
 
 export class SpecExecChooser{
 
@@ -11,12 +11,12 @@ export class SpecExecChooser{
   private static failedRunColor = '\x1b[1;31m';
   private static resetStyle = '\x1b[0m';
   private static topicHeading = '\x1b[47m\x1b[30m';
-  private static notExecuted = '\x1b[0;37';
+  private static notExecutedColor = '\x1b[0;37m';
 
   static execAllSpecs(showFailedOnly?:boolean){
 
 
-    let specReg = specRegistry.getExecutableSpec();
+    let specReg = specRegistry.getExecutableSpecs();
     let specReporter = new SpecReporter();
 
     specReg.forEach((spec) => {
@@ -98,8 +98,9 @@ export class SpecExecChooser{
     if(showFailedOnly == null) showFailedOnly = false;
 
     let reportString = SpecReportBeautyfier.SpecReportToString(specReport, paddingNumber);
-
-    if(specReport.isInvalidSpec())
+    if(specReport.isIgnored() || !specReport.isExecutable())
+      console.log(this.notExecutedColor + reportString + this.resetStyle);
+    else if(specReport.isInvalidSpec())
       console.log(this.validErrorColor + reportString + this.resetStyle);
     else if (specReport.isRunFailed())
       console.log(this.failedRunColor + reportString + this.resetStyle);

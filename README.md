@@ -1,6 +1,6 @@
 # TestNext
-Test-Framework zur Anwendung auf verschiedenen Abstraktionsstufen, basierend auf Angular/Typescript.
-
+Test-Framework zur Anwendung auf verschiedenen Abstraktionsstufen, basierend auf Angular/TypeScript.
+Test-framework for the usage on different levels of abstraction, in Angular/TypeScript
 ## How-To
 ### Write Specs
 * With TestNext Specs are written as classes

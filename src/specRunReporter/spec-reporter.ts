@@ -6,6 +6,7 @@ export class SpecReporter implements ISpecReporter {
 
   private specReports = new Map<String, SpecReport>();
 
+  /*
   reportRun(spec: ISpec, methodName: string, success: boolean, error?: Error) {
     let specReport = this.getOrCreateSpecReport(spec);
     let specMethod = spec.getOwnMethod(methodName);
@@ -19,6 +20,7 @@ export class SpecReporter implements ISpecReporter {
     let specReport = this.getOrCreateSpecReport(spec);
     specReport.reportValidationError(error);
   }
+*/
 
   getReports(): Array<ISpecReport> {
     return Array.from(this.specReports.values());
@@ -47,6 +49,8 @@ class SpecReport implements ISpecReport {
   private spec: ISpec;
   private methodReports = new Array<ISpecMethodRunReport>();
   private valdidationErrors = new Array<SpecValidationError>();
+  private ignoredReason: String = null;
+  private executable = true;
 
   constructor(spec: ISpec) {
     this.spec = spec;
@@ -60,8 +64,15 @@ class SpecReport implements ISpecReport {
     this.valdidationErrors.push(error);
   }
 
-  private addReport(report: ISpecMethodRunReport) {
-    this.methodReports.push(report);
+  setIgnored(reason:string){
+    this.ignoredReason = reason
+  }
+
+  setNotExecutable(value?:boolean){
+    if(value == null)
+      this.executable = false;
+    if(value == false)
+      this.executable = true;
   }
 
   getSpec(): ISpec {
@@ -102,6 +113,23 @@ class SpecReport implements ISpecReport {
     return this.valdidationErrors.length > 0;
   }
 
+  isIgnored():boolean{
+    if(this.ignoredReason == null)
+      return false;
+    else
+      return true;
+  }
+
+  getIgnoreReason():string{
+    if(this.ignoredReason == null)
+      return '';
+    else
+      return this.ignoredReason.toString();
+  }
+
+  isExecutable():boolean{
+    return this.executable;
+  }
 }
 
 

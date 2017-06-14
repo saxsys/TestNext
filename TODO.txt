@@ -1,1 +1,4 @@
 // TODO What happens if an inherited Method gets overwritten
+// TODO can Class-Decorators be used on Methods and the other Way around?
+
+// TODO Assert To Be One Of

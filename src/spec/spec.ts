@@ -2,21 +2,20 @@ import {SpecMethod} from "../specRegistry/specMethod/spec-method";
 import {ISpec, ISpecMethod} from './ISpec';
 import {SpecMethodType} from "../specRegistry/specMethod/spec-method-type";
 import {SpecRegistryError} from "../specRegistry/errors/errors";
-import {specRegistry} from "../specRegistry/spec-registry-storage";
 
 
 export class Spec implements ISpec{
   private specClassConstructor: any;
   private specDescription: string;
   private subjects = new Array<string>();
-  //private ignored:boolean;
+  private ignored: boolean = false;
+  private ignoreReason: string = '';
 
   private parentName: ISpec;
 
   private given = new Map<number, SpecMethod>(); // exec-Number, MethodName
   private when: SpecMethod;
-  private then = new Map<number, SpecMethod>(); // exec-Number, MethodName
-
+  private then = new Map<number, SpecMethod>();
 
   constructor(specClassConstructor: Function, parentSpec?:ISpec) {
     this.specClassConstructor = specClassConstructor;
@@ -30,6 +29,11 @@ export class Spec implements ISpec{
   addSubject(subject:string){
     if(!this.subjects.includes(subject))
       this.subjects.push(subject);
+  }
+
+  setIgnored(reason:string){
+    this.ignored = true;
+    this.ignoreReason = reason;
   }
 
   addGiven(functionName: string, description: string, execNumber?: number) {
@@ -60,6 +64,7 @@ export class Spec implements ISpec{
     this.when = new SpecMethod(functionName, description, SpecMethodType.WHEN);
   }
 
+
   getDescription():string{
     if(this.specDescription == null)
       return '';
@@ -74,6 +79,14 @@ export class Spec implements ISpec{
     return this.specDescription;
   }
 
+  getIgnoreReason():string{
+    return this.ignoreReason;
+  }
+
+  getParentSpec(): ISpec{
+    return this.parentName;
+  }
+
   getClassName():string {
 
     return this.specClassConstructor.name;
@@ -81,10 +94,6 @@ export class Spec implements ISpec{
 
   getClassConstructor():Function {
     return this.specClassConstructor;
-  }
-
-  getParentSpec(): ISpec{
-    return this.parentName;
   }
 
   getNewSpecObject(): any{
@@ -95,6 +104,7 @@ export class Spec implements ISpec{
 
     return new this.specClassConstructor;
   };
+
 
   getOwnGiven(): Array<ISpecMethod> {
     let keys = Array.from(this.given.keys()).sort();
@@ -199,6 +209,9 @@ export class Spec implements ISpec{
     return true;
   }
 
+  isIgnored():boolean{
+    return this.ignored;
+  }
 
 }
 

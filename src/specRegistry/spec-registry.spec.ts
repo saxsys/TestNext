@@ -453,7 +453,7 @@ describe('SpecRegistry.getSpecsWithoutSubject', () => {
   });
 });
 
-describe('SpecRegistry.getAllSpec', () => {
+describe('SpecRegistry.getAllSpecs', () => {
   let specReg = new SpecRegistry();
   class SpecRegistry_getAllSpec_SpecAddedWithDescription {}
   let spec_AddedWithDescription = SpecRegistry_getAllSpec_SpecAddedWithDescription.prototype.constructor;
@@ -477,7 +477,7 @@ describe('SpecRegistry.getAllSpec', () => {
     entryWithoutDescr = specReg.getSpecByClassName('SpecRegistry_getAllSpec_SpecAddedWithoutDescription');
     expect(entryWithDescr).not.toBeNull();
     expect(entryWithoutDescr).not.toBeNull();
-    gotAllSpecs = specReg.getAllSpec();
+    gotAllSpecs = specReg.getAllSpecs();
   });
 
   it('should return all Specs, also Specs with SpecDescription (= Executable)', () => {
@@ -489,7 +489,7 @@ describe('SpecRegistry.getAllSpec', () => {
 
 });
 
-describe('SpecRegistry.getExecutableSpec', () => {
+describe('SpecRegistry.getExecutableSpecs', () => {
   let specReg = new SpecRegistry();
   class SpecRegistry_getExecutableSpec_SpecAddedWithDescription {}
   let spec_AddedWithDescription = SpecRegistry_getExecutableSpec_SpecAddedWithDescription.prototype.constructor;
@@ -514,7 +514,7 @@ describe('SpecRegistry.getExecutableSpec', () => {
     expect(entryWithDescr).not.toBeNull();
     expect(entryWithoutDescr).not.toBeNull();
 
-    gotExecSpecs = specReg.getExecutableSpec();
+    gotExecSpecs = specReg.getExecutableSpecs();
   });
 
   it('should return executable Specs Specs with SpecDescription (= Executable)', () => {
@@ -525,4 +525,44 @@ describe('SpecRegistry.getExecutableSpec', () => {
   });
 
 
+});
+
+describe('SpecRegistry.registerSpecAsIgnored', ()=>{
+  let specReg = new SpecRegistry();
+
+  it('should not be ignored by default', () => {
+    class SpecRegistry_registerIgnored_defaultNotIgnored{}
+    let specClassName = 'SpecRegistry_registerIgnored_defaultNotIgnored';
+    let specClassCoonstructor = SpecRegistry_registerIgnored_defaultNotIgnored.prototype.constructor;
+    specReg.registerSpec(specClassCoonstructor, 'existing Spec');
+
+    let spec = specReg.getSpecByClassName(specClassName);
+    expect(spec).not.toBeNull();
+    expect(spec.isIgnored()).toBeFalsy();
+  });
+
+  it('should set existing Spec as Ignored', () => {
+    class SpecRegistry_registerIgnored_existSpec{}
+    let specClassName = 'SpecRegistry_registerIgnored_existSpec';
+    let specClassConstructor = SpecRegistry_registerIgnored_existSpec.prototype.constructor;
+    let ignoreReason = 'I Could not handle it anymore';
+    specReg.registerSpec(specClassConstructor, 'existing Spec');
+    specReg.registerSpecAsIgnored(specClassConstructor, ignoreReason);
+
+    let spec = specReg.getSpecByClassName(specClassName);
+    expect(spec).not.toBeNull();
+    expect(spec.isIgnored()).toBeTruthy();
+  });
+
+  it('should register new Spec and set as Ignored', () => {
+    class SpecRegistry_registerIgnored_newSpec{}
+    let specClassName = 'SpecRegistry_registerIgnored_newSpec';
+    let specClassConstructor = SpecRegistry_registerIgnored_newSpec.prototype.constructor;
+    let ignoreReason = 'I Could not handle it anymore';
+    specReg.registerSpecAsIgnored(specClassConstructor, ignoreReason);
+
+    let spec = specReg.getSpecByClassName(specClassName);
+    expect(spec).not.toBeNull();
+    expect(spec.isIgnored()).toBeTruthy();
+  });
 });

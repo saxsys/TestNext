@@ -1,5 +1,5 @@
 import {ISpec, ISpecMethod} from "../spec/ISpec";
-import {ISpecReporter, ISpecReport} from "../spec-run-reporter/spec-report-interfaces";
+import {ISpecReporter, ISpecReport} from "../specRunReporter/spec-report-interfaces";
 import {SpecValidator} from "./specValidator/spec-validator";
 import {AssertionError} from "../assert/assertion-Error";
 import {SpecValidationError} from "./specValidator/spec-validation-error";
@@ -19,10 +19,14 @@ export class SpecRunner {
     if(otherReporter != null){
       this.specReport = otherReporter.getOrCreateSpecReport(this.spec)
     }
-
-    if(!this.spec.isExecutableSpec())
+    if(this.spec.isIgnored()) {
+      this.specReport.setIgnored(this.spec.getIgnoreReason());
       return this.specReport;
-
+    }
+    if(!this.spec.isExecutableSpec()) {
+     this.specReport.setNotExecutable();
+      return this.specReport;
+    }
     let validity = this.validateSpec();
     if(!validity) {
       this.specObject = null;

@@ -1,7 +1,7 @@
-import {Given, Spec, Then, When} from "../testDecorators/test-decorators";
+import {Given, Ignore, Spec, Then, When} from "../testDecorators/test-decorators";
 import {specRegistry} from "../specRegistry/spec-registry-storage";
 import {SpecRunner} from "./spec-runner";
-import {SpecReporter} from "../spec-run-reporter/spec-reporter";
+import {SpecReporter} from "../specRunReporter/spec-reporter";
 import {SpecValidationError} from "./specValidator/spec-validation-error";
 import {AssertionError} from "../assert/assertion-Error";
 import {AssertProportion} from "../assert/assert-proportion";
@@ -178,9 +178,7 @@ describe('specRunner.runSpec', () => {
   });
 
   it('should execute also the Inherited Methods', ()=> {
-    let specClassName_parent = 'SpecRunner_execInheritated_parent';
     let specClassName_child = 'SpecRunner_execInheritated_child';
-
 
     class SpecRunner_execInheritated_parent {
       public runOrder = [];
@@ -200,7 +198,6 @@ describe('specRunner.runSpec', () => {
     }
 
     //let specParent = specRegistry.getSpecByClassName(specClassName_parent);
-    let specChild = specRegistry.getSpecByClassName(specClassName_child);
     let newReporter = new SpecReporter();
     let specRunner = new SpecRunner(specEntry, specReporter);
     let newReport = specRunner.runSpec(newReporter);
@@ -208,5 +205,21 @@ describe('specRunner.runSpec', () => {
     expect(specRunner.getUsedSpecObject().runOrder).toContain('given0');
     expect(specRunner.getUsedSpecObject().runOrder).toContain('theWhen');
     expect(specRunner.getUsedSpecObject().runOrder).toContain('then0');
+  });
+
+  it('should not run a Spec marked as @Ignore, return before validation', () => {
+    @Ignore('not complete')
+    @Spec('Ignored')
+    class SpecRunner_runSpec_Ignored{}
+    let specClassName = 'SpecRunner_runSpec_Ignored';
+
+    let spec = specRegistry.getSpecByClassName(specClassName);
+    expect(spec.isIgnored()).toBeTruthy('spec should have been marked as ignored');
+    expect(spec.isExecutableSpec()).toBeTruthy('spec was skipped because it is marked as not executable');
+
+    let specRunner = new SpecRunner(spec, specReporter);
+    let specReport = specRunner.runSpec();
+    expect(specReport.getValidationErrors().length).toBe(0, 'tried to build ignored Spec');
+
   })
 });

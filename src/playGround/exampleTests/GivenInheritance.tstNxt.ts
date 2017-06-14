@@ -13,7 +13,7 @@ class ParentSpecClass{
 @Spec('Given-Inheritance')
 class ChildSpecClass extends ParentSpecClass{
   @Given('doung nothing') doNothing(){}
-  @Given('valueToInherit gets set', 1) setValue(){}
+  //@Given('valueToInherit gets set', 1) setValue(){}
   @When('I extend a Parent Class') extendClass(){
 
   }

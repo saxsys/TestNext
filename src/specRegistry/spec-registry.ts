@@ -21,24 +21,6 @@ export class SpecRegistry {
 
   }
 
-  registerSpecForSubject(specClassConstructor:Function , subject:string ){
-    let specClassName = specClassConstructor.name;
-
-    //write subject into Spec
-    let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
-    specRegEntry.addSubject(subject);
-
-    //write Spec into Subject List
-    let subjClasses = this.subject_specNames.get(subject);
-    if(subjClasses == null){
-      subjClasses = [];
-      this.subject_specNames.set(subject, subjClasses);
-    } else if(subjClasses.includes(specClassName)){
-        return;
-    }
-    subjClasses.push(specClassName);
-  }
-
   registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
 
     let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
@@ -55,6 +37,28 @@ export class SpecRegistry {
     specRegEntry.addThen(functionName, description, execNumber);
   }
 
+  registerSpecForSubject(specClassConstructor:Function , subject:string ){
+    let specClassName = specClassConstructor.name;
+
+    //write subject into Spec
+    let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
+    specRegEntry.addSubject(subject);
+
+    //write Spec into Subject List
+    let subjClasses = this.subject_specNames.get(subject);
+    if(subjClasses == null){
+      subjClasses = [];
+      this.subject_specNames.set(subject, subjClasses);
+    } else if(subjClasses.includes(specClassName)){
+      return;
+    }
+    subjClasses.push(specClassName);
+  }
+
+  registerSpecAsIgnored(specClassConstructor:Function, reason:string){
+    let spec = this.getOrRegisterSpecClass(specClassConstructor);
+    spec.setIgnored(reason);
+  }
 
 
   getSpecClassNames(): Array<String> {
@@ -69,7 +73,7 @@ export class SpecRegistry {
     return this.specClasses.get(className);
   }
 
-  getAllSpec(): Array<ISpec>{
+  getAllSpecs(): Array<ISpec>{
     return Array.from(this.specClasses.values());
   }
 
@@ -102,7 +106,7 @@ export class SpecRegistry {
     return specsWithoutSubject;
   }
 
-  getExecutableSpec():Array<ISpec>{
+  getExecutableSpecs():Array<ISpec>{
     let executableSpecs = new Array<ISpec>();
     Array.from(this.specClasses.values()).forEach((spec) => {
       if(spec.isExecutableSpec())

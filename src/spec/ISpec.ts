@@ -1,11 +1,13 @@
-import {SpecMethod} from "../specRegistry/specMethod/spec-method";
 import {SpecMethodType} from "../specRegistry/specMethod/spec-method-type";
 export interface ISpec{
   getDescription():string
   getClassName():string;
-  getClassConstructor():Function;
+  getIgnoreReason():string;
+
   getParentSpec(): ISpec;
+  getClassConstructor():Function;
   getNewSpecObject(): any;
+
   getOwnGiven(): Array<ISpecMethod>;
   getOwnGivenByName(methodName:string):ISpecMethod;
   getGiven():Array<ISpecMethod>;
@@ -16,7 +18,9 @@ export interface ISpec{
   getWhen(): ISpecMethod;
   getOwnMethods():Array<ISpecMethod>;
   getOwnMethod(methodName:string):ISpecMethod;
+
   isExecutableSpec():boolean;
+  isIgnored():boolean;
 }
 
 export interface ISpecMethod{

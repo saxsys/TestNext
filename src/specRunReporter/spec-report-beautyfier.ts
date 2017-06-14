@@ -8,13 +8,18 @@ export class SpecReportBeautyfier {
   public static SpecReportToString(specReport:ISpecReport, paddingNumber?: number):string{
     if(paddingNumber == null) paddingNumber = 0;
     let padding = SpecReportBeautyfier.getPaddingString(paddingNumber);
+    let padding2ndLevel = SpecReportBeautyfier.getPaddingString((paddingNumber+1)*2);
 
     let str = '';
     let spec = specReport.getSpec();
     let validationErrors = specReport.getValidationErrors();
-    let runErrors = specReport.getFailReports();
 
     str += padding + SpecReportBeautyfier.specDescriptionToString(spec) + '\n';
+
+    if(specReport.isIgnored())
+      str += padding2ndLevel + 'IGNORED: ' + specReport.getIgnoreReason() + '\n';
+    if(!specReport.isExecutable())
+      str += padding2ndLevel + 'NOT EXECUTABLE\n';
 
     str += SpecReportBeautyfier.stringFromValidationErrors(validationErrors, (paddingNumber+1)*2);
 
