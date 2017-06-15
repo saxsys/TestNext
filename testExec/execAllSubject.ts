@@ -1,4 +1,4 @@
-import {SpecExecChooser} from "../src/specExecChooser/spec-exec-chooser";
+import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
 
 const glob = require('glob');
 const path = require('path');
@@ -17,7 +17,7 @@ glob.sync('./dist/src/**/*.tstNxt.js').forEach(function (file) {
   testFiles.push(path.resolve(file));
 });
 
-//load all test-files, Spec-Classes are getting registered
+//load all test-files, Specr-Classes are getting registered
 testFiles.forEach((file) => {
   //console.reportRun(file);
   require(file);

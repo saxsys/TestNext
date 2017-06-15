@@ -1,4 +1,4 @@
-import {SpecExecChooser} from "../src/specExecChooser/spec-exec-chooser";
+import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
 
 const glob = require('glob');
 const path = require('path');
