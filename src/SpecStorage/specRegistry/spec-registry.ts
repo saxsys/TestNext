@@ -38,6 +38,11 @@ export class SpecRegistry {
     specRegEntry.addThen(functionName, description, execNumber);
   }
 
+  registerThenErrorForSpec(specClass: Function, functionName: string, description: string) {
+    let specRegEntry = this.getOrRegisterSpecClass(specClass);
+    specRegEntry.addThenError(functionName, description);
+  }
+
   registerSpecForSubject(specClassConstructor:Function , subject:string ){
     let specClassName = specClassConstructor.name;
 
@@ -148,5 +153,6 @@ export class SpecRegistry {
     }
     return specRegEntry;
   }
+
 
 }

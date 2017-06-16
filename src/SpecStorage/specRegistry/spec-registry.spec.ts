@@ -332,18 +332,6 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     expect(whenEntry.getDescription()).toEqual(description);
   });
 
-  xit('should refuse the When, if no property with the Name exists on the SpecContainer', () => {
-    expect(() => {
-      specRegistry.registerWhenForSpec(specClassConstructor, nonExistPropName, description);
-    }).toThrowError(SpecRegistryError, specClassName + '.' + nonExistPropName + ' does not exist.');
-  });
-
-  xit('should refuse the When, if property with the Name exists on the SpecContainer, but is not a function', () => {
-    expect(() => {
-      specRegistry.registerWhenForSpec(specClassConstructor, numericPropertyName, description);
-    }).toThrowError(SpecRegistryError, specClassName + '.' + numericPropertyName + ' is not a function.');
-  });
-
   it('should refuse to add a When for a new class-name-duplicate', () => {
     class SpecRegistryWhen_ClassNameDouble {
       private thenFunction() {
@@ -374,6 +362,47 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     let thenRegEntry = specRegEntry.getOwnWhen();
     expect(thenRegEntry.getName()).toEqual(functionName);
     expect(thenRegEntry.getDescription()).toEqual(description);
+  });
+});
+
+describe('SpecRegistry-registerThenErrorForSpec', () => {
+  class SpecRegistry_regThenError{
+    public thenError(){}
+  }
+  let specClassConstructor = SpecRegistry_regThenError.prototype.constructor;
+  let specClassName = 'SpecRegistry_regThenError';
+  let specName = 'SpecRegistry regThenError';
+
+  let functionName = 'thenError';
+  let description = 'such an Error';
+
+
+
+  it('should register ThenError, for existing Specs', () => {
+    let specReg = new SpecRegistry();
+
+    specReg.registerSpec(specClassConstructor, specName);
+    specReg.registerThenErrorForSpec(specClassConstructor, functionName, description);
+
+    let specEntry = specReg.getSpecByClassName(specClassName);
+    expect(specEntry).not.toBeNull();
+    let methodEntry = specEntry.getThenThrow();
+    expect(methodEntry).not.toBeNull();
+    expect(methodEntry.getName()).toEqual(functionName);
+    expect(methodEntry.getDescription()).toEqual(description);
+  });
+
+  it('should register ThenError, while Spec is not registered', () => {
+    let specReg = new SpecRegistry();
+
+    specReg.registerThenErrorForSpec(specClassConstructor, functionName, description);
+
+    let specEntry = specReg.getSpecByClassName(specClassName);
+    expect(specEntry).not.toBeNull();
+    let methodEntry = specEntry.getThenThrow();
+    expect(methodEntry).not.toBeNull();
+    expect(methodEntry.getName()).toEqual(functionName);
+    expect(methodEntry.getDescription()).toEqual(description);
   });
 });
 

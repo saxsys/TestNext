@@ -1,4 +1,7 @@
-import {Given, Ignore, Providers, Spec, SUT, Then, When} from "../../SpecDeclaration/testDecorators/test-decorators";
+import {
+  Given, Ignore, Providers, Spec, SUT, Then, ThenThrow,
+  When
+} from "../../SpecDeclaration/testDecorators/test-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRunner} from "./spec-runner";
 import {SpecReporter} from "../specRunReporter/spec-reporter";
@@ -8,6 +11,8 @@ import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
 import {SpecWithSUT} from "../../SpecDeclaration/spec/spec";
 import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
+import {first} from "rxjs/operator/first";
+import * as _ from "underscore";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {
@@ -112,7 +117,7 @@ describe('specRunner.runSpec', () => {
     let specRunner = new SpecRunner(specEntry, specLogger);
     let report = specRunner.runSpec();
     expect(report.getValidationErrors()).toContain(
-      new SpecValidationError('There must be at lease one @Then in ' + specClassName)
+      new SpecValidationError('There must be at lease one @Then or a @ThenThrow in ' + specClassName)
     );
     expect(specRunner.getUsedSpecObject()).toBeNull();
     expect(report.getReports().length).toBe(0);
@@ -330,4 +335,66 @@ describe('specRunner.runSpec', () => {
 
 
   });
+
+  it('should compare Errors thrown in @When to Error given in @ThenThrow', () => {
+    let specClassName = 'SpecRunner_runSpec_ExpectError_valid';
+
+    @Spec('a valid Test')
+    class SpecRunner_runSpec_ExpectError_valid {
+
+      @Given('given 0')given0() {
+      }
+
+      @When('the When') theWhen() {
+        throw new Error('some Error');
+      }
+
+      @ThenThrow('thenThrow') thenThrow() {
+        throw new Error('some Error');
+      }
+    }
+
+    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let reporter = new SpecReporter();
+    let specRunner = new SpecRunner(specEntry, reporter);
+    let report = specRunner.runSpec();
+
+    expect(report.getValidationErrors().length).toBe(0, 'existing Validation Errors');
+    expect(report.getReports().length).toBe(3);
+    expect(report.isRunFailed()).toBeFalsy();
+  });
+
+  it('should report when other Error is thrown than expected', ()=>{
+    let specClassName = 'SpecRunner_runSpec_ExpectError_WrongError';
+    let firstError = new Error('some Error');
+    let otherError = new Error('different');
+
+    @Spec('a valid Test')
+    class SpecRunner_runSpec_ExpectError_WrongError {
+
+      @Given('given 0')given0() {
+      }
+
+      @When('the When') theWhen() {
+        throw firstError;
+      }
+
+      @ThenThrow('thenThrow') thenThrow() {
+        throw otherError;
+      }
+    }
+
+    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let reporter = new SpecReporter();
+    let specRunner = new SpecRunner(specEntry, reporter);
+    let report = specRunner.runSpec();
+    let failedReports = report.getFailReports();
+    let failedWhen = failedReports[0];
+    let failedThenThrow = failedReports[1];
+    expect(failedWhen.getError()).toEqual(firstError);
+    expect(failedThenThrow.getError().message).toEqual(
+      'thrown Error(Error: some Error) should be equal to expected Error(Error: different)'
+    );
+
+  })
 });

@@ -1,4 +1,4 @@
-import {Given, Spec, Then, When} from "SpecDeclaration/testDecorators/test-decorators";
+import {Given, Spec, Then, ThenThrow, When} from "SpecDeclaration/testDecorators/test-decorators";
 import {SpecValidator} from "./spec-validator";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecValidationError} from "./spec-validation-error";
@@ -115,6 +115,7 @@ describe('SpecValidator.vaidate', () => {
       SpecValidationError,
       'On "' + specClassName + '" @Given function "nonExistGiven" does not exist');
   });
+
 
   it('should refuse specs without @When', () => {
     let specClassName = 'SpecValidator_validate_noWhen';
@@ -241,7 +242,8 @@ describe('SpecValidator.vaidate', () => {
     );
   });
 
-  it('should refuse specs without @Then', () => {
+
+  it('should refuse specs without @Then or @ThenThrow', () => {
     let specClassName = 'SpecValidator_validate_noThen';
     @Spec('a invalid Test')
     class SpecValidator_validate_noThen {
@@ -258,8 +260,9 @@ describe('SpecValidator.vaidate', () => {
 
     expect(() => {
       SpecValidator.validate(spec)
-    }).toThrowError(SpecValidationError, 'There must be at lease one @Then in ' + specClassName);
+    }).toThrowError(SpecValidationError, 'There must be at lease one @Then or a @ThenThrow in ' + specClassName);
   });
+
 
   it('should accept Specs with only inherited @Then', () => {
     let specClassName_parent = 'SpecValidator_validate_inheritThen_parent';
@@ -318,5 +321,26 @@ describe('SpecValidator.vaidate', () => {
       'On "' + specClassName + '" @Then function "nonExistThen" does not exist');
   });
 
+  it('should accept Specs with @ThenThrow', () => {
+    let specClassName = 'SpecValidator_validate_validThenThrow';
+    @Spec('a invalid Test')
+    class SpecValidator_validate_validThenThrow {
+      public runOrder = [];
+
+      @Given('given 0', 0) given0() {
+        this.runOrder.push('given0');
+      }
+      @When('the When') theWhen() {
+        this.runOrder.push('theWhen');
+      }
+      @ThenThrow('a Error') aError(){
+        throw new Error('aError')
+      }
+    }
+    let spec = specRegistry.getSpecByClassName(specClassName);
+    expect(()=>{
+      SpecValidator.validate(spec);
+    }).not.toThrow();
+  });
 
 });

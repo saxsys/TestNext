@@ -30,6 +30,13 @@ export function Then(description: string, execNumber?: number) {
   }
 }
 
+export function ThenThrow(description: string) {
+  return (target: any, key: string) => {
+    let constructor = target.constructor;
+    specRegistry.registerThenErrorForSpec(constructor, key, description,);
+  }
+}
+
 export function Subject(description: string) {
   return (constructor: Function) => {
 

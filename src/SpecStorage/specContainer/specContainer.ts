@@ -10,6 +10,7 @@ import * as _ from "underscore";
 
 
 export class SpecContainer implements ISpecContainer{
+
   private specClassConstructor: any;
   private specDescription: string;
   private subjects = new Array<string>();
@@ -23,6 +24,7 @@ export class SpecContainer implements ISpecContainer{
   private given = new Map<number, SpecMethodContainer>(); // exec-Number, MethodName
   private when: SpecMethodContainer;
   private then = new Map<number, SpecMethodContainer>();
+  private thenThrow: SpecMethodContainer;
 
   constructor(specClassConstructor: Function, parentSpec?:ISpecContainer) {
     if(this.specClassConstructor)
@@ -56,10 +58,12 @@ export class SpecContainer implements ISpecContainer{
     this.providers = _.union(newProviders, this.providers);
 
   }
+
   setIgnored(reason:string){
     this.ignored = true;
     this.ignoreReason = reason;
   }
+
 
   addGiven(functionName: string, description: string, execNumber?: number) {
     if(this.getOwnMethod(functionName) != null)
@@ -69,6 +73,14 @@ export class SpecContainer implements ISpecContainer{
     if (this.given.get(execNumber) != null)
       throw new SpecRegistryError('Multiple @given, without ExecNumber, or it (' + execNumber + ') already exists on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
     this.given.set(execNumber, new SpecMethodContainer(functionName, description, SpecMethodType.GIVEN, execNumber));
+  }
+
+  addWhen(functionName: string, description: string) {
+    if (this.when != null)
+      throw new SpecRegistryError('Only one @When allowed on ' + this.getClassName() + ' cannot add ' + functionName + ', ' + this.when.getName() + ' is already @When', this.getClassName(), functionName);
+    if(this.getOwnMethod(functionName) != null)
+      throw new SpecRegistryError('Multiple Methods with same Name on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
+    this.when = new SpecMethodContainer(functionName, description, SpecMethodType.WHEN);
   }
 
   addThen(functionName: string, description: string, execNumber: number) {
@@ -81,12 +93,19 @@ export class SpecContainer implements ISpecContainer{
     this.then.set(execNumber, new SpecMethodContainer(functionName, description, SpecMethodType.THEN, execNumber));
   }
 
-  addWhen(functionName: string, description: string) {
-    if (this.when != null)
-      throw new SpecRegistryError('Only one @When allowed on ' + this.getClassName() + 'cannot add ' + functionName + ', ' + this.when.getName() + ' is already @When', this.getClassName(), functionName);
+  addThenError(functionName: string, description: string){
+    if(this.thenThrow != null)
+      throw new SpecRegistryError(
+        'Only one @ThenThrow allowed on ' + this.getClassName() + ' cannot add ' + functionName +
+        ', ' + this.thenThrow.getName() + ' is already @ThenThrow', this.getClassName(),
+        functionName
+      );
     if(this.getOwnMethod(functionName) != null)
-      throw new SpecRegistryError('Multiple Methods with same Name on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
-    this.when = new SpecMethodContainer(functionName, description, SpecMethodType.WHEN);
+      throw new SpecRegistryError(
+        'Multiple Methods with same Name on ' + this.getClassName() + '.' + functionName, this.getClassName(),
+        functionName
+      );
+    this.thenThrow = new SpecMethodContainer(functionName, description, SpecMethodType.THEN_ERROR);
   }
 
 
@@ -155,26 +174,6 @@ export class SpecContainer implements ISpecContainer{
     return this.providers;
   }
 
-  getOwnGiven(): Array<ISpecMethodContainer> {
-    let keys = Array.from(this.given.keys()).sort();
-
-    let returnArray = new Array<SpecMethodContainer>();
-    keys.forEach((key) => {
-      returnArray.push(this.given.get(key));
-    });
-    return returnArray;
-  }
-
-  getOwnGivenByName(methodName:string): ISpecMethodContainer{
-    let returnMethod = null;
-    this.given.forEach((method) => {
-      if(method.getName() == methodName) {
-        returnMethod = method;
-        return;
-      }
-      });
-      return returnMethod;
-  }
 
   getGiven():Array<ISpecMethodContainer>{
     let returnMethods = new Array<ISpecMethodContainer>();
@@ -186,14 +185,39 @@ export class SpecContainer implements ISpecContainer{
     return returnMethods;
   }
 
-  getOwnThen(): Array<ISpecMethodContainer> {
-    let keys = Array.from(this.then.keys()).sort();
+  getWhen():ISpecMethodContainer{
+    if(this.when != null)
+      return this.when;
+    if(this.parent != null)
+      return this.parent.getWhen();
+  }
 
-    let returnArray = new Array<SpecMethodContainer>();
-    keys.forEach((key) => {
-      returnArray.push(this.then.get(key));
+  getThen():Array<ISpecMethodContainer>{
+    let returnMethods = new Array<ISpecMethodContainer>();
+    if(this.parent != null)
+      returnMethods = returnMethods.concat(this.parent.getThen());
+    returnMethods = returnMethods.concat(this.getOwnThen());
+
+    return returnMethods;
+  }
+
+  getThenThrow():ISpecMethodContainer{
+    if(this.thenThrow != null)
+      return this.thenThrow;
+    if(this.parent != null)
+      return this.parent.getThenThrow();
+  }
+
+
+  getOwnGivenByName(methodName:string): ISpecMethodContainer{
+    let returnMethod = null;
+    this.given.forEach((method) => {
+      if(method.getName() == methodName) {
+        returnMethod = method;
+        return;
+      }
     });
-    return returnArray;
+    return returnMethod;
   }
 
   getOwnThenByName(methodName:string): ISpecMethodContainer{
@@ -208,24 +232,33 @@ export class SpecContainer implements ISpecContainer{
     return returnMethod;
   }
 
-  getThen():Array<ISpecMethodContainer>{
-    let returnMethods = new Array<ISpecMethodContainer>();
-    if(this.parent != null)
-      returnMethods = returnMethods.concat(this.parent.getThen());
-    returnMethods = returnMethods.concat(this.getOwnThen());
 
-    return returnMethods;
+  getOwnGiven(): Array<ISpecMethodContainer> {
+    let keys = Array.from(this.given.keys()).sort();
+
+    let returnArray = new Array<SpecMethodContainer>();
+    keys.forEach((key) => {
+      returnArray.push(this.given.get(key));
+    });
+    return returnArray;
   }
 
   getOwnWhen(): ISpecMethodContainer {
     return this.when;
   }
 
-  getWhen():ISpecMethodContainer{
-    if(this.when != null)
-      return this.when;
-    if(this.parent != null)
-      return this.parent.getWhen();
+  getOwnThen(): Array<ISpecMethodContainer> {
+    let keys = Array.from(this.then.keys()).sort();
+
+    let returnArray = new Array<SpecMethodContainer>();
+    keys.forEach((key) => {
+      returnArray.push(this.then.get(key));
+    });
+    return returnArray;
+  }
+
+  getOwnThenThrow():ISpecMethodContainer{
+    return this.thenThrow;
   }
 
 
@@ -234,6 +267,7 @@ export class SpecContainer implements ISpecContainer{
     methods = methods.concat(this.getOwnGiven());
     methods.push(this.getOwnWhen());
     methods = methods.concat(this.getOwnThen());
+    methods = methods.concat(this.getOwnThenThrow());
     return methods;
   }
 
@@ -243,10 +277,12 @@ export class SpecContainer implements ISpecContainer{
     if(this.when != null && this.when.getName() == methodName)
       return this.when;
 
+    if(this.thenThrow != null && this.thenThrow.getName() == methodName)
+      return this.thenThrow;
+
     method = this.getOwnGivenByName(methodName);
     if(method != null )
       return method;
-
 
     method = this.getOwnThenByName(methodName);
     return method;
@@ -258,6 +294,11 @@ export class SpecContainer implements ISpecContainer{
     return true;
   }
 
+  expectingErrors():boolean{
+    if(this.thenThrow != null)
+      return true;
+    return false;
+  }
 }
 
 

@@ -1,4 +1,4 @@
-import {Given, Ignore, Providers, Spec, Subject, SUT, Then, When} from "./test-decorators";
+import {Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow, When} from "./test-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../../SpecStorage/spec-registry-error";
 import {Assert} from "../assert/assert";
@@ -214,31 +214,11 @@ describe('TestDecorators.When', () => {
         }
       }
     }).toThrowError(SpecRegistryError,
-      'Only one @When allowed on ' + className + 'cannot add ' + methodName2 + ', ' + methodName1 + ' is already @When'
+      'Only one @When allowed on ' + className + ' cannot add ' + methodName2 + ', ' + methodName1 + ' is already @When'
     );
 
   });
 
-  xit('should refuse methods with arguments', () => {
-    expect(() => {
-      class TestDecorators_When_MethodArguments{
-        @When('A Method with Arguments') aMethodWithArguments(sth:any){}
-      }
-    }).toThrowError(SpecRegistryError,
-      '@When-method "TestDecorators_When_MethodArguments.aMethodWithArguments" has arguments, this is forbidden for @When-methods'
-    );
-  });
-
-  xit('should refuse classes with constructor-arguments', () => {
-    expect(() => {
-      class TestDecorators_When_ConstructorArguments {
-        constructor(anArgument:any){}
-        @When('When of Class with Constructor-Arguments') aWhenFunction(){}
-      }
-    }).toThrowError(SpecRegistryError,
-      'Spec "TestDecorators_When_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
-    );
-  });
 
 });
 
@@ -332,6 +312,79 @@ describe('TestDecorators.Then', () => {
     }).toThrowError(SpecRegistryError,
       'Spec "TestDecorators_Then_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
     );
+  });
+});
+
+describe('TestDecorators.ThenError', () => {
+  it('should register the ThenError-Method for the Spec', () => {
+
+    let specName = 'specClassDecorator ThenError Correct';
+    let className = 'SpecDecorators_ThenError_Correct';
+    let methodDescription = 'a random Error';
+    let methodName = 'randomError';
+
+    @Spec(specName)
+    class SpecDecorators_ThenError_Correct {
+      public val = 3;
+
+      @ThenThrow(methodDescription) randomError() {
+        throw new Error('Random Error');
+      }
+    }
+    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let methodRegEntry = specRegEntry.getThenThrow();
+    expect(methodRegEntry.getName()).toEqual(methodName);
+    expect(methodRegEntry.getDescription()).toEqual(methodDescription);
+  });
+
+  it('should register the @When without the Class being registered as @Spec', () => {
+
+    let methodDescription = 'A Method, within a Class no registered as Spec';
+    let className = 'SpecDecorators_ThenError_notRegistered';
+    let methodName = 'randomError';
+
+    class SpecDecorators_ThenError_notRegistered {
+      public val = 3;
+
+      @ThenThrow(methodDescription) randomError() {
+        throw new Error('Random Error');
+      }
+    }
+
+    let specClassConstructor = SpecDecorators_ThenError_notRegistered.prototype.constructor;
+    let entry = specRegistry.getSpecByClassName(className);
+    expect(entry.getSpecName()).toBeUndefined();
+
+    expect(entry.getClassConstructor()).toEqual(specClassConstructor);
+    let methodEntry = entry.getOwnThenThrow();
+    expect(methodEntry.getDescription()).toEqual(methodDescription);
+    expect(methodEntry.getName()).toEqual(methodName);
+  });
+
+  it('should refuse multiple @ThenTrow functions', () => {
+
+    let className = 'TestDecorator_ThenThrow_multipleWhen';
+    let specDescription = 'Spec with multiple @ThenThrow';
+    let methodName1 = 'oneError';
+    let methodName2 = 'errorAfterwards';
+
+    let methodDescription1 = 'one Error';
+    let methodDescription2 = 'error Afterwards';
+    expect(() => {
+      @Spec(specDescription)
+      class TestDecorator_ThenThrow_multipleWhen {
+        @ThenThrow(methodDescription1)oneError() {
+          throw new Error('one Error');
+        }
+
+        @ThenThrow(methodDescription2)errorAfterwards() {
+          throw new Error('error Afterwards')
+        }
+      }
+    }).toThrowError(SpecRegistryError,
+      'Only one @ThenThrow allowed on ' + className + ' cannot add ' + methodName2 + ', ' + methodName1 + ' is already @ThenThrow'
+    );
+
   });
 });
 

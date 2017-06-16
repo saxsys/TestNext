@@ -13,17 +13,22 @@ export interface ISpecContainer{
   getSUT():Provider;
   getProviders():Array<Provider>;
 
-  getOwnGiven(): Array<ISpecMethodContainer>;
-  getOwnGivenByName(methodName:string):ISpecMethodContainer;
   getGiven():Array<ISpecMethodContainer>;
-  getOwnThen(): Array<ISpecMethodContainer>;
-  getOwnThenByName(methodName:string):ISpecMethodContainer;
   getThen(): Array<ISpecMethodContainer>;
-  getOwnWhen(): ISpecMethodContainer;
   getWhen(): ISpecMethodContainer;
+  getThenThrow(): ISpecMethodContainer;
+
+  getOwnThenByName(methodName:string):ISpecMethodContainer;
+  getOwnGivenByName(methodName:string):ISpecMethodContainer;
+  getOwnGiven(): Array<ISpecMethodContainer>;
+  getOwnWhen(): ISpecMethodContainer;
+  getOwnThen(): Array<ISpecMethodContainer>;
+  getOwnThenThrow(): ISpecMethodContainer;
+
   getOwnMethods():Array<ISpecMethodContainer>;
   getOwnMethod(methodName:string):ISpecMethodContainer;
 
   isExecutableSpec():boolean;
   isIgnored():boolean;
+  expectingErrors():boolean;
 }

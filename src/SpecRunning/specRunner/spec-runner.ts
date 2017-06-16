@@ -7,6 +7,8 @@ import {AssertionError} from "../../SpecDeclaration/assert/assertion-Error";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {SpecWithSUT} from "../../SpecDeclaration/spec/spec";
+import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
+import * as _ from "underscore";
 
 
 export class SpecRunner {
@@ -34,16 +36,62 @@ export class SpecRunner {
     }
 
     let validity = this.validateSpec();
+
     if(!validity) {
       this.specObject = null;
       return this.specReport;
     }
+
     this.specObject =  this.specContainer.getNewSpecObject();
+
+    if(this.specContainer.expectingErrors())
+      this.runExpectingError();
+    else
+      this.runWithNormalThen();
+
+    return this.specReport;
+  }
+
+  private runExpectingError(){
+    let execClass = this.specObject;
+    let when = this.specContainer.getWhen();
+    let thenThrow = this.specContainer.getThenThrow();
+    let thrownError;
+    let expectedError;
+
+    this.runGiven();
+
+    //run When
+    try {
+      execClass[when.getName()]();
+    } catch (error){
+      thrownError = error;
+    }
+    //run ThenThrow
+    try {
+      execClass[thenThrow.getName()]();
+    } catch(error){
+      expectedError = error
+    }
+    //compare Errors
+    if(thrownError.message == expectedError.message){
+      this.specReport.reportRun(when, true);
+      this.specReport.reportRun(thenThrow, true);
+    } else {
+      this.specReport.reportRun(when, false, thrownError);
+      let errorReport = new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error');
+      this.specReport.reportRun(thenThrow, false, errorReport);
+    }
+
+  }
+
+  private runWithNormalThen(){
     this.runGiven();
     this.runWhen();
     this.runThen();
-    return this.specReport;
+
   }
+
 
   private validateSpec():boolean{
     try{
