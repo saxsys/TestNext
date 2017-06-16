@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
 
 const glob = require('glob');

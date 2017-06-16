@@ -1,7 +1,7 @@
-import {Given, Spec, Subject, Then, When} from "../../testDecorators/test-decorators";
-import {AssertionError} from "../../assert/assertion-Error";
-import {AssertProportion} from "../../assert/assert-proportion";
-import {Assert} from "../../assert/assert";
+import {Given, Spec, Subject, Then, When} from "../../SpecDeclaration/testDecorators/test-decorators";
+import {AssertionError} from "../../SpecDeclaration/assert/assertion-Error";
+import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
+import {Assert} from "../../SpecDeclaration/assert/assert";
 
 @Spec('a Spec of one Test')
 @Subject('TestingTest')

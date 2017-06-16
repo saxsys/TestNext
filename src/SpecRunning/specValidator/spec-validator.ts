@@ -1,4 +1,4 @@
-import {ISpecContainer} from "../../../SpecStorage/specContainer/iSpec-Container";
+import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecValidationError} from "./spec-validation-error";
 
 

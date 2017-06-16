@@ -1,4 +1,4 @@
-import {Provider} from "@angular/core";
+import {Provider, ReflectiveInjector} from "@angular/core";
 
 import {ISpecContainer} from './iSpec-Container';
 import {ISpecMethodContainer} from "./specMethodContainer/iSpec-method-Container";
@@ -25,6 +25,8 @@ export class SpecContainer implements ISpecContainer{
   private then = new Map<number, SpecMethodContainer>();
 
   constructor(specClassConstructor: Function, parentSpec?:ISpecContainer) {
+    if(this.specClassConstructor)
+      throw new Error ('Cannot instantiate SpecContainer with specClassConstructor = null');
     this.specClassConstructor = specClassConstructor;
     this.parent = parentSpec;
   }
@@ -35,7 +37,10 @@ export class SpecContainer implements ISpecContainer{
 
   setSUT(sut:Provider){
     if(this.sut != null)
-      throw new SpecRegistryError('Multiple @SUT on SpecClass "' + this.getClassName() + '", only one is possible', this.getClassName());
+      throw new SpecRegistryError('Multiple @SUT on SpecWithSUT "' + this.getClassName() + '", only one is possible', this.getClassName());
+
+    if(!this.providers.includes(sut))
+      this.providers.push(sut);
 
     this.sut = sut;
 
@@ -122,7 +127,20 @@ export class SpecContainer implements ISpecContainer{
     if(this.specClassConstructor.length > 0)
       throw new SpecRegistryError('Class of "' + this.getClassName() + '" has constructor-arguments, this is forbidden', this.getClassName());
 
-    return new this.specClassConstructor;
+    let object =  new this.specClassConstructor;
+
+    try {
+      if (this.sut != null) {
+        let injector = ReflectiveInjector.resolveAndCreate(this.providers);
+        object['SUT'] = injector.get(this.sut);
+      }
+    } catch(error){
+      throw new SpecRegistryError(error.message, this.getClassName());
+    }
+
+
+
+    return object;
   };
 
   isIgnored():boolean{

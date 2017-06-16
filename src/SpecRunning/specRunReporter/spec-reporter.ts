@@ -2,7 +2,7 @@ import {ISpecReport, ISpecReporter, ISpecMethodRunReport} from "./spec-report-in
 import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecMethodType} from "../../SpecStorage/specContainer/specMethodContainer/spec-method-type";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
-import {SpecValidationError} from "../specRunner/specValidator/spec-validation-error";
+import {SpecValidationError} from "../specValidator/spec-validation-error";
 
 export class SpecReporter implements ISpecReporter {
 

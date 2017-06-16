@@ -1,4 +1,4 @@
-export abstract class SpecClass{
+export abstract class SpecWithSUT{
   public SUT: any;
 
 }

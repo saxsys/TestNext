@@ -1,3 +1,6 @@
+// TODO implement running of SUT
+// TODO handle SUT and parentSpec (or SUT set twice for Parent and Child)
+
 // TODO Exceptions in When!
 
 // TODO What happens if an inherited Method gets overwritten

@@ -1,10 +1,13 @@
-import {Given, Ignore, Spec, Then, When} from "../../SpecDeclaration/testDecorators/test-decorators";
+import {Given, Ignore, Providers, Spec, SUT, Then, When} from "../../SpecDeclaration/testDecorators/test-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRunner} from "./spec-runner";
 import {SpecReporter} from "../specRunReporter/spec-reporter";
-import {SpecValidationError} from "./specValidator/spec-validation-error";
+import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {AssertionError} from "../../SpecDeclaration/assert/assertion-Error";
 import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
+import {SpecWithSUT} from "../../SpecDeclaration/spec/spec";
+import {Assert} from "../../SpecDeclaration/assert/assert";
+import {Injectable} from "@angular/core";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {
@@ -49,7 +52,7 @@ describe('specRunner.runSpec', () => {
   let methodsWithoutError = ['given0', 'given2', 'theWhen', 'then0'];
   let methodsWithAssertError = ['then1'];
   let randomError = new Error('Random Error');
-  let anyAssertionError = new AssertionError(1, 2, AssertProportion.EQUAL, 'Number','otherNumber');
+  let anyAssertionError = new AssertionError(1, 2, AssertProportion.EQUAL, 'Number', 'otherNumber');
 
   @Spec('a valid Test')
   class SpecRunner_runSpec {
@@ -109,7 +112,7 @@ describe('specRunner.runSpec', () => {
     let specRunner = new SpecRunner(specEntry, specLogger);
     let report = specRunner.runSpec();
     expect(report.getValidationErrors()).toContain(
-      new SpecValidationError('There must be at lease one @Then in ' +  specClassName)
+      new SpecValidationError('There must be at lease one @Then in ' + specClassName)
     );
     expect(specRunner.getUsedSpecObject()).toBeNull();
     expect(report.getReports().length).toBe(0);
@@ -126,7 +129,9 @@ describe('specRunner.runSpec', () => {
 
     let loggedFunctions = [];
     //get FunctionNames
-    methodLogs.forEach((mLog)=>{loggedFunctions.push(mLog.getMethodName());});
+    methodLogs.forEach((mLog) => {
+      loggedFunctions.push(mLog.getMethodName());
+    });
 
     methodNamesInOrder.forEach((methodName) => {
       expect(loggedFunctions).toContain(methodName);
@@ -134,8 +139,8 @@ describe('specRunner.runSpec', () => {
   });
 
   it('should reportRun methods without Error as successful', () => {
-    specReport.getReports().forEach((log)=>{
-      if(methodsWithoutError.indexOf(log.getMethodName()) >-1) {
+    specReport.getReports().forEach((log) => {
+      if (methodsWithoutError.indexOf(log.getMethodName()) > -1) {
         expect(log.isSuccess()).toBeTruthy();
         expect(log.getError()).toBeUndefined();
       }
@@ -143,8 +148,8 @@ describe('specRunner.runSpec', () => {
   });
 
   it('should reportRun methods with AssertionError as not successful and reportRun the error', () => {
-    specReport.getReports().forEach((log)=>{
-      if(methodsWithAssertError.indexOf(log.getMethodName()) >-1) {
+    specReport.getReports().forEach((log) => {
+      if (methodsWithAssertError.indexOf(log.getMethodName()) > -1) {
         expect(log.isSuccess()).toBeFalsy();
         expect(log.getError()).not.toBeUndefined();
         expect(log.getError()).toEqual(anyAssertionError);
@@ -159,15 +164,21 @@ describe('specRunner.runSpec', () => {
       @Given('given')given() {
         throw randomError;
       }
-      @When('when') when() {}
-      @Then('then') then() {}
+
+      @When('when') when() {
+      }
+
+      @Then('then') then() {
+      }
     }
     let specClassName = 'SpecRunner_runSpec_WithRandomError';
     let specEntry = specRegistry.getSpecByClassName(specClassName);
     let specLogger = new SpecReporter();
     let specRunner = new SpecRunner(specEntry, specLogger);
 
-    expect(() => {specRunner.runSpec()}).toThrow(randomError);
+    expect(() => {
+      specRunner.runSpec()
+    }).toThrow(randomError);
 
   });
 
@@ -177,17 +188,20 @@ describe('specRunner.runSpec', () => {
     expect(newReport.getReports()).toEqual(specReport.getReports());
   });
 
-  it('should execute also the Inherited Methods', ()=> {
+  it('should execute also the Inherited Methods', () => {
     let specClassName_child = 'SpecRunner_execInheritated_child';
 
     class SpecRunner_execInheritated_parent {
       public runOrder = [];
+
       @Given('given 0') given0() {
         this.runOrder.push('given0');
       }
+
       @When('the When') theWhen() {
         this.runOrder.push('theWhen');
       }
+
       @Then('then 0') then0() {
         this.runOrder.push('then0');
       }
@@ -210,7 +224,8 @@ describe('specRunner.runSpec', () => {
   it('should not run a Spec marked as @Ignore, return before validation', () => {
     @Ignore('not complete')
     @Spec('Ignored')
-    class SpecRunner_runSpec_Ignored{}
+    class SpecRunner_runSpec_Ignored {
+    }
     let specClassName = 'SpecRunner_runSpec_Ignored';
 
     let spec = specRegistry.getSpecByClassName(specClassName);
@@ -221,5 +236,98 @@ describe('specRunner.runSpec', () => {
     let specReport = specRunner.runSpec();
     expect(specReport.getValidationErrors().length).toBe(0, 'tried to build ignored Spec');
 
-  })
+  });
+
+  it('should build the SUT not having dependencies', () => {
+
+    class SpecRunner_runSpec_SutNoDependencies_SUT {
+      public firstNumber: number;
+      public secondNumber = 2;
+      public result;
+    }
+
+    @Spec('SpecRunner runSpec SUT no dependencies')
+      @SUT(SpecRunner_runSpec_SutNoDependencies_SUT)
+    class SpecRunner_runSpec_SutNoDependencies_Spec extends SpecWithSUT {
+      @Given('first Number is set to 1') setSutFirstNumber() {
+        this.SUT.firstNumber = 1;
+      }
+
+      @When('firstNumber is added with 2nd Number') resultIsFirstAddSecond() {
+        this.SUT.result = this.SUT.firstNumber + this.SUT.secondNumber;
+      }
+
+      @Then('result should be 3') resultIs3() {
+        Assert.that(this.SUT.result).equals(3);
+      }
+    }
+    let specClassName = 'SpecRunner_runSpec_SutNoDependencies_Spec';
+
+    let specContainer = specRegistry.getSpecByClassName(specClassName);
+
+    let specReporter = new SpecReporter();
+    let specRunner = new SpecRunner(specContainer, specReporter);
+    let specReport = specRunner.runSpec();
+    let obj = specRunner.getUsedSpecObject();
+
+    expect(obj.SUT).not.toBeUndefined();
+    expect(obj.SUT instanceof SpecRunner_runSpec_SutNoDependencies_SUT).toBeTruthy();
+    expect(obj.SUT.firstNumber).toBe(1);
+    expect(obj.SUT.result).toBe(3);
+  });
+
+  it('should build the SUT having dependencies, providers given', () => {
+
+
+    class SpecRunner_runSpec_SutWithDependency_Provider{
+      getNumber():number{
+        return 1;
+      }
+    }
+
+    @Injectable()
+    class SpecRunner_runSpec_SutWithDependencies_SUT {
+      constructor(numberProvider:SpecRunner_runSpec_SutWithDependency_Provider){
+        this.firstNumber = numberProvider.getNumber()
+      }
+
+      public firstNumber: number;
+      public secondNumber = 2;
+      public result;
+    }
+
+    @Spec('SpecRunner runSpec SUT')
+      @SUT(SpecRunner_runSpec_SutWithDependencies_SUT)
+      @Providers([SpecRunner_runSpec_SutWithDependency_Provider])
+    class SpecRunner_runSpec_SutWithDependencies_Spec extends SpecWithSUT {
+      @Given('first Number is set to 1') setSutFirstNumber() {
+        this.SUT.firstNumber = 1;
+      }
+
+      @When('firstNumber is added with 2nd Number') resultIsFirstAddSecond() {
+        this.SUT.result = this.SUT.firstNumber + this.SUT.secondNumber;
+      }
+
+      @Then('result should be 3') resultIs3() {
+        Assert.that(this.SUT.result).equals(3);
+      }
+    }
+    let specClassName = 'SpecRunner_runSpec_SutWithDependencies_Spec';
+
+    let specContainer = specRegistry.getSpecByClassName(specClassName);
+
+    let specReporter = new SpecReporter();
+    let specRunner = new SpecRunner(specContainer, specReporter);
+    let specReport = specRunner.runSpec();
+    let obj = specRunner.getUsedSpecObject();
+
+    expect(obj.SUT).not.toBeUndefined();
+    expect(obj.SUT instanceof SpecRunner_runSpec_SutWithDependencies_SUT).toBeTruthy();
+    expect(obj.SUT.firstNumber).toBe(1);
+    expect(obj.SUT.result).toBe(3);
+
+
+
+
+  });
 });

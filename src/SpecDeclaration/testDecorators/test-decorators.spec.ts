@@ -1,7 +1,8 @@
-import {Given, Ignore, Spec, Subject, Then, When} from "./test-decorators";
+import {Given, Ignore, Providers, Spec, Subject, SUT, Then, When} from "./test-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../../SpecStorage/spec-registry-error";
 import {Assert} from "../assert/assert";
+import {Provider} from "@angular/core";
 
 
 describe('TestDecorators.Spec', () => {
@@ -500,11 +501,48 @@ describe('TestDecorators.Ignore', () => {
 });
 
 describe('TestDecorators.SUT', () => {
-  it('should register SUT for Spec')
+
+  class TestDecorators_SUT_SUT{}
+
+  @Spec('TestDecorators SUT')
+  @SUT(TestDecorators_SUT_SUT)
+  class TestDecorators_SUT_Spec{
+
+  }
+
+  let specClassName = 'TestDecorators_SUT_Spec';
+
+  let specContainer = specRegistry.getSpecByClassName(specClassName);
+
+  it('should register SUT for Spec', () => {
+    expect(specContainer.getSUT()).toEqual(TestDecorators_SUT_SUT);
+  });
 });
 
 describe('TestDecorators.Providers', () => {
 
+  class TestDecorators_Providers_Provider1{}
+  class TestDecorators_Providers_Provider2{}
+  class TestDecorators_Providers_Provider3{}
+
+
+  @Spec('TestDecorators Providers')
+  @Providers([TestDecorators_Providers_Provider1, TestDecorators_Providers_Provider2])
+    @Providers([TestDecorators_Providers_Provider3])
+  class TestDecorators_Providers_Spec{
+
+  }
+
+  let specClassName = 'TestDecorators_Providers_Spec';
+
+  let specContainer = specRegistry.getSpecByClassName(specClassName);
+
+  it('should register Providers for Spec', ()=> {
+    expect(specContainer.getProviders().length).toBe(3);
+    expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider1);
+    expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider2);
+    expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider3);
+  })
 });
 
 

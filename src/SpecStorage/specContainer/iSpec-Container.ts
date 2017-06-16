@@ -1,4 +1,5 @@
 import {ISpecMethodContainer} from "./specMethodContainer/iSpec-method-Container";
+import {Provider} from "@angular/core";
 
 export interface ISpecContainer{
   getDescription():string
@@ -8,6 +9,9 @@ export interface ISpecContainer{
   getParentSpec(): ISpecContainer;
   getClassConstructor():Function;
   getNewSpecObject(): any;
+
+  getSUT():Provider;
+  getProviders():Array<Provider>;
 
   getOwnGiven(): Array<ISpecMethodContainer>;
   getOwnGivenByName(methodName:string):ISpecMethodContainer;

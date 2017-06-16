@@ -1,6 +1,7 @@
-import {ISpecContainer, ISpecMethodContainer} from "../../SpecStorage/specContainer/iSpec-Container";
+import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecMethodType} from "../../SpecStorage/specContainer/specMethodContainer/spec-method-type";
-import {SpecValidationError} from "../specRunner/specValidator/spec-validation-error";
+import {SpecValidationError} from "../specValidator/spec-validation-error";
+import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 
 export interface ISpecReporter {
   /*

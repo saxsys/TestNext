@@ -1,6 +1,6 @@
 import {Given, Spec, Then, When} from "SpecDeclaration/testDecorators/test-decorators";
 import {SpecValidator} from "./spec-validator";
-import {specRegistry} from "../../../SpecStorage/specRegistry/spec-registry-storage";
+import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecValidationError} from "./spec-validation-error";
 
 describe('SpecValidator.vaidate', () => {
@@ -317,5 +317,6 @@ describe('SpecValidator.vaidate', () => {
       SpecValidationError,
       'On "' + specClassName + '" @Then function "nonExistThen" does not exist');
   });
+
 
 });

@@ -4,6 +4,7 @@
 import {SpecContainer} from "./specContainer";
 import {SpecRegistryError} from "../spec-registry-error";
 import * as _ from "underscore";
+import {Injectable} from "@angular/core";
 
 class ExampleSpecClass {
 
@@ -237,15 +238,20 @@ describe('SpecContainer.setSUT', () => {
   let specClassConstructor = SpecContainer_setSUT.prototype.constructor;
   class SomeSUT{}
   let SUT = SomeSUT;
+  let specContainer = new SpecContainer(specClassConstructor);
 
   it('should be possible to set the SUT', () => {
-    let specContainer = new SpecContainer(specClassConstructor);
     specContainer.setSUT(SUT);
 
     let retSut = specContainer.getSUT();
 
     expect(retSut).toEqual(SUT);
   });
+
+  it('should have added SUT to Providers', () => {
+    expect(specContainer.getProviders()).toContain(SUT);
+  });
+
 
   it('should refuse adding multiple SUT', () => {
     class OtherSUT{}
@@ -259,9 +265,74 @@ describe('SpecContainer.setSUT', () => {
       specContainer.setSUT(otherSUT);
     }).toThrowError(
       SpecRegistryError,
-      'Multiple @SUT on SpecClass "SpecContainer_setSUT", only one is possible'
+      'Multiple @SUT on SpecWithSUT "SpecContainer_setSUT", only one is possible'
     );
   })
+});
+
+describe('SpecContainer.getNewSpecObject', () => {
+
+  class SpecContainer_SpecObject{}
+  let specClassConstructor = SpecContainer_SpecObject.prototype.constructor;
+
+  class SutDependency{}
+
+  @Injectable()
+  class SomeSUT{
+    dep:SutDependency;
+    constructor(dep:SutDependency){
+      this.dep = dep;
+    }
+  }
+
+  let SUT = SomeSUT;
+  let provider = SutDependency;
+
+  it('it should return a valid Object of the Class', () => {
+    let specContainer = new SpecContainer(specClassConstructor);
+    specContainer.setDescription('SpecContainer a new Spec wit SUT');
+    specContainer.setSUT(SUT);
+    specContainer.addProviders([provider]);
+
+    let specObject;
+    expect(() => {
+      specObject = specContainer.getNewSpecObject();
+    }).not.toThrowError();
+
+    expect(specObject.SUT).not.toBeUndefined();
+    expect(specObject.SUT instanceof SUT).toBeTruthy();
+
+
+
+  });
+
+  it('should throw Error, if SpecClass has constructor-arguments', () => {
+    class SpecContainer_NewObject_ClassWitArguments{
+      constructor(num:number){}
+    }
+    let specClassConstructor = SpecContainer_NewObject_ClassWitArguments.prototype.constructor;
+
+    let specContainer = new SpecContainer(specClassConstructor);
+
+    expect(() => {
+      specContainer.getNewSpecObject();
+    }).toThrowError(
+      SpecRegistryError,
+      'Class of "SpecContainer_NewObject_ClassWitArguments" has constructor-arguments, this is forbidden'
+    );
+  });
+
+  it('should throw Error, if not possible to build SUT, due to missing right Providers', () => {
+    let specContainer = new SpecContainer(specClassConstructor);
+    specContainer.setDescription('SpecContainer a new Spec wit SUT');
+    specContainer.setSUT(SUT);
+
+    expect(() => {
+      specContainer.getNewSpecObject();
+    }).toThrowError(
+      SpecRegistryError
+    );
+  });
 });
 
 describe('SpecContainer.setProviders', () => {
