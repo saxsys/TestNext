@@ -136,7 +136,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
     expect(entry).not.toBeUndefined();
     expect(entry.getSpecName()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(notYetRegisteredClass);
-    let givenEntry = entry.getOwnGiven()[0];
+    let givenEntry = entry.getGiven()[0];
     expect(givenEntry.getName()).toEqual(notYetRegisteredGivenName);
     expect(givenEntry.getDescription()).toEqual(givenDescription);
 
@@ -188,7 +188,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
   it('should register the Given, while parameters are correct', () => {
     specRegistry.registerGivenForSpec(specClassConstructor, givenFunctionName, givenDescription, givenExecNumber);
     let specRegEntry = specRegistry.getSpecByClassName(specClassName);
-    let givenRegEntry = specRegEntry.getOwnGiven()[givenExecNumber];
+    let givenRegEntry = specRegEntry.getGiven()[givenExecNumber];
     expect(givenRegEntry.getName()).toEqual(givenFunctionName);
     expect(givenRegEntry.getDescription()).toEqual(givenDescription);
   });
@@ -237,7 +237,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
     expect(specEntry).not.toBeUndefined();
     expect(specEntry.getSpecName()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
-    let thenEntry = specEntry.getOwnThen()[0];
+    let thenEntry = specEntry.getThen()[0];
     expect(thenEntry.getName()).toEqual(notYetRegisteredFunctionName);
     expect(thenEntry.getDescription()).toEqual(description);
   });
@@ -281,7 +281,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
   it('should register the Then, while parameters are correct', () => {
     specRegistry.registerThenForSpec(specClassConstructor, functionName, description, execNumber);
     let specRegEntry = specRegistry.getSpecByClassName(specClassName);
-    let thenRegEntry = specRegEntry.getOwnThen()[execNumber];
+    let thenRegEntry = specRegEntry.getThen()[execNumber];
     expect(thenRegEntry.getName()).toEqual(functionName);
     expect(thenRegEntry.getDescription()).toEqual(description);
   });
@@ -327,7 +327,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     expect(specEntry).not.toBeUndefined();
     expect(specEntry.getSpecName()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
-    let whenEntry = specEntry.getOwnWhen();
+    let whenEntry = specEntry.getWhen();
     expect(whenEntry.getName()).toEqual(notYetRegisteredFunctionName);
     expect(whenEntry.getDescription()).toEqual(description);
   });
@@ -359,7 +359,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
   it('should register the When, while parameters are correct', () => {
     specRegistry.registerWhenForSpec(specClassConstructor, functionName, description);
     let specRegEntry = specRegistry.getSpecByClassName(specClassName);
-    let thenRegEntry = specRegEntry.getOwnWhen();
+    let thenRegEntry = specRegEntry.getWhen();
     expect(thenRegEntry.getName()).toEqual(functionName);
     expect(thenRegEntry.getDescription()).toEqual(description);
   });

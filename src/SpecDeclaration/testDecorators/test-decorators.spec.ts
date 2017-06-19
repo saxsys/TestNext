@@ -80,7 +80,7 @@ describe('TestDecorators.Given', () => {
       }
     }
     let specRegEntry = specRegistry.getSpecByClassName(className);
-    let methodRegEntry = specRegEntry.getOwnGiven()[0];
+    let methodRegEntry = specRegEntry.getGiven()[0];
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
   });
@@ -98,7 +98,7 @@ describe('TestDecorators.Given', () => {
     let entry = specRegistry.getSpecByClassName(className);
     expect(entry.getSpecName()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(givenClassConstructor);
-    let givenEntry = entry.getOwnGiven()[0];
+    let givenEntry = entry.getGiven()[0];
     expect(givenEntry.getDescription()).toEqual(methodDescription);
     expect(givenEntry.getName()).toEqual(methodName);
   });
@@ -121,7 +121,7 @@ describe('TestDecorators.Given', () => {
     }
 
     let regEntry = specRegistry.getSpecByClassName(className);
-    let methodEntries = regEntry.getOwnGiven();
+    let methodEntries = regEntry.getGiven();
     expect(methodEntries.length).toBe(2);
 
     let methodEntry1 = methodEntries[0];
@@ -171,7 +171,7 @@ describe('TestDecorators.When', () => {
       }
     }
     let specRegEntry = specRegistry.getSpecByClassName(className);
-    let methodRegEntry = specRegEntry.getOwnWhen();
+    let methodRegEntry = specRegEntry.getWhen();
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
   });
@@ -190,7 +190,7 @@ describe('TestDecorators.When', () => {
     expect(entry.getSpecName()).toBeUndefined();
 
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
-    let methodEntry = entry.getOwnWhen();
+    let methodEntry = entry.getWhen();
     expect(methodEntry.getDescription()).toEqual(methodDescription);
     expect(methodEntry.getName()).toEqual(methodName);
   });
@@ -239,7 +239,7 @@ describe('TestDecorators.Then', () => {
     }
 
     let specRegEntry = specRegistry.getSpecByClassName(className);
-    let methodRegEntry = specRegEntry.getOwnThen()[0];
+    let methodRegEntry = specRegEntry.getThen()[0];
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
   });
@@ -258,7 +258,7 @@ describe('TestDecorators.Then', () => {
     let entry = specRegistry.getSpecByClassName(className);
     expect(entry.getSpecName()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
-    let methodEntry = entry.getOwnThen()[0];
+    let methodEntry = entry.getThen()[0];
     expect(methodEntry.getDescription()).toEqual(methodDescription);
     expect(methodEntry.getName()).toEqual(methodName);
   });
@@ -281,7 +281,7 @@ describe('TestDecorators.Then', () => {
     }
 
     let regEntry = specRegistry.getSpecByClassName(className);
-    let methodEntries = regEntry.getOwnThen();
+    let methodEntries = regEntry.getThen();
     expect(methodEntries.length).toBe(2);
 
     let methodEntry1 = methodEntries[0];
@@ -356,7 +356,7 @@ describe('TestDecorators.ThenError', () => {
     expect(entry.getSpecName()).toBeUndefined();
 
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
-    let methodEntry = entry.getOwnThenThrow();
+    let methodEntry = entry.getThenThrow();
     expect(methodEntry.getDescription()).toEqual(methodDescription);
     expect(methodEntry.getName()).toEqual(methodName);
   });
@@ -635,7 +635,7 @@ describe('TestDecorators.parentSpec', () => {
 
   it('should be possible to get all Given, from Parent and Child', () => {
     let allGivenFromChild = regEntryChild.getGiven();
-    let ownGivenFromParent = regEntryParent.getOwnGiven();
+    let ownGivenFromParent = regEntryParent.getGiven();
     expect(allGivenFromChild.length).toEqual(1);
     expect(ownGivenFromParent.length).toEqual(1);
     expect(allGivenFromChild[0]).toEqual(ownGivenFromParent[0]);

@@ -181,7 +181,7 @@ describe('SpecValidator.vaidate', () => {
     expect(() => {SpecValidator.validate(specChild);}).not.toThrow();
   });
 
-  it('should refuse Specs with own and inherited @When (multiple)', () => {
+  xit('should refuse Specs with own and inherited @When (multiple)', () => {
     let specClassName_parent = 'SpecValidator_validate_doubleWhen_parent';
     let specClassName_child = 'SpecValidator_validate_doubleWhen_child';
 

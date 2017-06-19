@@ -3,16 +3,24 @@
  */
 import {SpecContainer} from "./specContainer";
 import {SpecRegistryError} from "../spec-registry-error";
-import * as _ from "underscore";
 import {Injectable} from "@angular/core";
 
-class ExampleSpecClass {
+class SpecContainer_ExampleSpecClass {
 
 }
 
-const specClassConstructor = ExampleSpecClass.prototype.constructor;
-const specClassName = 'ExampleSpecClass';
-const specDescription = 'A Class without Decorators';
+class SpecContainer_ExampleParentsSpec{
+
+}
+
+
+const specClassConstructor = SpecContainer_ExampleSpecClass.prototype.constructor;
+const specClassName = 'SpecContainer_ExampleSpecClass';
+const specDescription = 'A Spec';
+
+const parentSpecClassConstructor = SpecContainer_ExampleParentsSpec.prototype.constructor;
+const parentSpecClassName = 'SpecContainer_ExampleParentsSpec';
+const parentSpecDescription = 'A Parent Spec';
 
 describe('SpecContainer', () => {
 
@@ -106,7 +114,9 @@ describe('SpecContainer.getNewSpecObject', () => {
   class SpecContainer_SpecObject{}
   let specClassConstructor = SpecContainer_SpecObject.prototype.constructor;
 
-  class SutDependency{}
+  class SutDependency{
+    public str = 'abc'
+  }
 
   @Injectable()
   class SomeSUT{
@@ -163,6 +173,35 @@ describe('SpecContainer.getNewSpecObject', () => {
     }).toThrowError(
       SpecRegistryError
     );
+  });
+
+  it('should have an accessible SUT', () => {
+    let specContainer = new SpecContainer(specClassConstructor);
+    specContainer.setDescription('SpecContainer a new Spec wit SUT');
+    specContainer.setSUT(SUT);
+    specContainer.addProviders([SutDependency]);
+
+    let specObj = specContainer.getNewSpecObject();
+
+    expect(specObj).not.toBeNull();
+    expect(specObj.SUT).not.toBeUndefined();
+    expect(specObj.SUT.dep).not.toBeUndefined();
+    expect(specObj.SUT.dep.str).toEqual('abc');
+
+  });
+
+  it('should use the SUT of the Parent, if no own is set', () => {
+    let parentContainer = new SpecContainer(parentSpecClassConstructor);
+    parentContainer.setSUT(SUT);
+    parentContainer.addProviders([SutDependency]);
+    let childSpecContainer = new SpecContainer(specClassConstructor, parentContainer);
+
+    let childSpecObj = childSpecContainer.getNewSpecObject();
+    expect(childSpecObj).not.toBeNull();
+    expect(childSpecObj.SUT).not.toBeUndefined();
+    expect(childSpecObj.SUT.dep).not.toBeUndefined();
+    expect(childSpecObj.SUT.dep.str).toEqual('abc');
+
   });
 });
 
@@ -360,7 +399,7 @@ describe('SpecContainer.getOwnGiven', () => {
     specContainer.addGiven('method0', 'specMethod0', 0);
     specContainer.addGiven('method1', 'specMethod1', 1);
 
-    let givenArray = specContainer.getOwnGiven();
+    let givenArray = specContainer.getGiven();
     let namesInOrder = [];
     givenArray.forEach((given) => {
       namesInOrder.push(given.getName());
@@ -387,7 +426,7 @@ describe('SpecContainer.getOwnThen', () => {
     specContainer.addThen( 'method0', 'specMethod0', 0);
     specContainer.addThen( 'method1', 'specMethod1', 1);
 
-    let thenArray = specContainer.getOwnThen();
+    let thenArray = specContainer.getThen();
     let namesInOrder = [];
     thenArray.forEach((then) => {
       namesInOrder.push(then.getName());

@@ -149,9 +149,10 @@ export class SpecContainer implements ISpecContainer{
     let object =  new this.specClassConstructor;
 
     try {
-      if (this.sut != null) {
-        let injector = ReflectiveInjector.resolveAndCreate(this.providers);
-        object['SUT'] = injector.get(this.sut);
+      let sut = this.getSUT();
+      if (sut != null) {
+        let injector = ReflectiveInjector.resolveAndCreate(this.getProviders());
+        object['SUT'] = injector.get(sut);
       }
     } catch(error){
       throw new SpecRegistryError(error.message, this.getClassName());
@@ -167,11 +168,24 @@ export class SpecContainer implements ISpecContainer{
   }
 
   getSUT():Provider {
-    return this.sut;
+    if(this.sut != null)
+      return this.sut;
+    else if(this.parent != null)
+      return this.parent.getSUT();
+    else
+      return null;
+
   }
 
   getProviders():Array<Provider>{
-    return this.providers;
+    let providers = this.providers;
+
+    if(this.parent != null) {
+      providers = _.union(providers, this.parent.getProviders());
+    }
+
+
+    return providers;
   }
 
 
@@ -209,7 +223,20 @@ export class SpecContainer implements ISpecContainer{
   }
 
 
-  getOwnGivenByName(methodName:string): ISpecMethodContainer{
+  isExecutableSpec():boolean{
+    if(this.specDescription == null)
+      return false;
+    return true;
+  }
+
+  isExpectingErrors():boolean{
+    if(this.thenThrow != null)
+      return true;
+    return false;
+  }
+
+
+  private getOwnGivenByName(methodName:string): ISpecMethodContainer{
     let returnMethod = null;
     this.given.forEach((method) => {
       if(method.getName() == methodName) {
@@ -220,7 +247,7 @@ export class SpecContainer implements ISpecContainer{
     return returnMethod;
   }
 
-  getOwnThenByName(methodName:string): ISpecMethodContainer{
+  private getOwnThenByName(methodName:string): ISpecMethodContainer{
     let returnMethod = null;
     this.then.forEach((method) => {
       if(method.getName() == methodName) {
@@ -232,8 +259,7 @@ export class SpecContainer implements ISpecContainer{
     return returnMethod;
   }
 
-
-  getOwnGiven(): Array<ISpecMethodContainer> {
+  private getOwnGiven(): Array<ISpecMethodContainer> {
     let keys = Array.from(this.given.keys()).sort();
 
     let returnArray = new Array<SpecMethodContainer>();
@@ -243,11 +269,11 @@ export class SpecContainer implements ISpecContainer{
     return returnArray;
   }
 
-  getOwnWhen(): ISpecMethodContainer {
+  private getOwnWhen(): ISpecMethodContainer {
     return this.when;
   }
 
-  getOwnThen(): Array<ISpecMethodContainer> {
+  private getOwnThen(): Array<ISpecMethodContainer> {
     let keys = Array.from(this.then.keys()).sort();
 
     let returnArray = new Array<SpecMethodContainer>();
@@ -257,12 +283,12 @@ export class SpecContainer implements ISpecContainer{
     return returnArray;
   }
 
-  getOwnThenThrow():ISpecMethodContainer{
+  private getOwnThenThrow():ISpecMethodContainer{
     return this.thenThrow;
   }
 
 
-  getOwnMethods():Array<ISpecMethodContainer>{
+  private getOwnMethods():Array<ISpecMethodContainer>{
     let methods = new Array<ISpecMethodContainer>();
     methods = methods.concat(this.getOwnGiven());
     methods.push(this.getOwnWhen());
@@ -271,7 +297,7 @@ export class SpecContainer implements ISpecContainer{
     return methods;
   }
 
-  getOwnMethod(methodName: string):ISpecMethodContainer{
+  private getOwnMethod(methodName: string):ISpecMethodContainer{
     let method;
 
     if(this.when != null && this.when.getName() == methodName)
@@ -288,17 +314,8 @@ export class SpecContainer implements ISpecContainer{
     return method;
   }
 
-  isExecutableSpec():boolean{
-    if(this.specDescription == null)
-      return false;
-    return true;
-  }
 
-  expectingErrors():boolean{
-    if(this.thenThrow != null)
-      return true;
-    return false;
-  }
+
 }
 
 

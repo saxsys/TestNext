@@ -18,17 +18,7 @@ export interface ISpecContainer{
   getWhen(): ISpecMethodContainer;
   getThenThrow(): ISpecMethodContainer;
 
-  getOwnThenByName(methodName:string):ISpecMethodContainer;
-  getOwnGivenByName(methodName:string):ISpecMethodContainer;
-  getOwnGiven(): Array<ISpecMethodContainer>;
-  getOwnWhen(): ISpecMethodContainer;
-  getOwnThen(): Array<ISpecMethodContainer>;
-  getOwnThenThrow(): ISpecMethodContainer;
-
-  getOwnMethods():Array<ISpecMethodContainer>;
-  getOwnMethod(methodName:string):ISpecMethodContainer;
-
   isExecutableSpec():boolean;
   isIgnored():boolean;
-  expectingErrors():boolean;
+  isExpectingErrors():boolean;
 }

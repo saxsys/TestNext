@@ -1,10 +1,6 @@
-// TODO implement running of SUT
-// TODO handle SUT and parentSpec (or SUT set twice for Parent and Child)
+// TODO Inheritance: handle SUT on Parent and Child
+// TODO Inheritance: handle overwriting methods of parent?
+// TODO Inheritance: handle multiple When and ThenThrow acquired by inheritance?
 
-// TODO Exceptions in When!
-
-// TODO What happens if an inherited Method gets overwritten
-// TODO can Class-Decorators be used on Methods and the other Way around?
-
-// TODO Assert To Be One Of
+// TODO Assert: 'To Be One Of', 'Contains',
 

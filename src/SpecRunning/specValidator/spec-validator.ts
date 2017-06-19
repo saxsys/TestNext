@@ -16,10 +16,6 @@ export class SpecValidator {
     }
 
 
-    if (specContainer.getParentSpec() != null && specContainer.getOwnWhen() != null && specContainer.getParentSpec().getWhen() != null)
-      throw new SpecValidationError('Spec "' + specContainer.getClassName() + '" has multiple @When functions, acquired by inheritance, this is forbidden');
-
-
     SpecValidator.validateWhenOf(specContainer, specObject);
     SpecValidator.validateGivenOf(specContainer, specObject);
     SpecValidator.validateThensOf(specContainer, specObject);
