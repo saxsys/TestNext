@@ -57,13 +57,18 @@ Example
   * the execution-numbers only refer to the methods inside the SpecClass (so parent and child separated)
 * Careful when inheriting:
   * a When in each, the parent- and child-class is invalid
-  * overwriting methods can cause trouble
+  * overriding methods can cause trouble
   
 ####Subject
 * For a better overview SpecClasses can be assigned to Subjects
 * One Subject can contain multiple SpecClasses
 * one SpecClass can be assigned to multiple Subjects
 * A Subject is assigned to a SpecClass with @Subject('Subject Name')
+
+#### Take Care
+* Use unique SpecClass-Names
+* overriding SpecMethods can cause Errors
+* if you use variables in the Decorator-descriptions, they must be from static
 
 ### Asserts
 // TODO

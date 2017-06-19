@@ -13,19 +13,19 @@ import {Car} from "../injectionTestfied/car";
 @SUT(Car)
 @Providers([Engine, Car])
 class CarDrives extends SpecWithSUT{
-  fuel = 10;
-  usage = 10;
 
-  @Given('I have ' + this.fuel+ 'l of fuel',0) fuel10l() {
-    this.SUT.setFuel(this.fuel);
+  static startFuel = 10;
+  static startUsage = 10;
+  @Given('I have ' + CarDrives.startFuel +'l of fuel',0) fuel10l() {
+    this.SUT.setFuel(CarDrives.startFuel);
   }
 
-  @Given('I use '+ this.usage +'l per 100km',1) fuelUsage10l() {
-    this.SUT.setFuelUsage(this.usage);
+  @Given('I use 10l per 100km',1) fuelUsage10l() {
+    this.SUT.setFuelUsage(10);
   }
 
   fuelUsageFor(km:number):number{
-    return (this.usage/100)*km;
+    return (this.SUT.usagePer100km/100)*km;
   }
 }
 
