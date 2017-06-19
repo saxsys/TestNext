@@ -6,7 +6,7 @@ export class Car{
   private engine:Engine;
   public seats = 5;
   public wheels = 4;
-  public fuelLiter = 100;
+  public fuel = 100;
   public usagePer100km = 8;
 
   constructor(engine:Engine){
@@ -15,13 +15,13 @@ export class Car{
 
   drive(dist:number){
     let fuelUsage = (this.usagePer100km/100)*dist;
-    if(fuelUsage > this.fuelLiter)
-      throw new Error('you cannot drive that far, it would take ' + fuelUsage + 'Liter, you have only ' + this.fuelLiter + 'Liter remaining');
-    this.fuelLiter -= fuelUsage;
+    if(fuelUsage > this.fuel)
+      throw new Error('you cannot drive that far, it would take ' + fuelUsage + 'Liter, you have only ' + this.fuel + 'Liter remaining');
+    this.fuel -= fuelUsage;
   }
 
   setFuel(fuel:number){
-    this.fuelLiter = fuel;
+    this.fuel = fuel;
   }
 
   setFuelUsage(usage:number){

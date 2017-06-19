@@ -396,5 +396,39 @@ describe('specRunner.runSpec', () => {
       'thrown Error(Error: some Error) should be equal to expected Error(Error: different)'
     );
 
-  })
+  });
+
+  it('should report, when not Error is thrown', () => {
+    let specClassName = 'SpecRunner_runSpec_ExpectError_NoError';
+    let firstError = new Error('some Error');
+    let otherError = new Error('different');
+
+    @Spec('a valid Test')
+    class SpecRunner_runSpec_ExpectError_NoError {
+
+      @Given('given 0')given0() {
+      }
+
+      @When('the When') theWhen() {
+
+      }
+
+      @ThenThrow('thenThrow') thenThrow() {
+        throw otherError;
+      }
+    }
+
+    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let reporter = new SpecReporter();
+    let specRunner = new SpecRunner(specEntry, reporter);
+    let report = specRunner.runSpec();
+    let failedReports = report.getFailReports();
+
+    expect(failedReports.length).toBe(1);
+    let noErrorReport = failedReports[0];
+    expect(noErrorReport.getError().message).toEqual('No Error was thrown, expected "different"');
+
+  });
+
+
 });

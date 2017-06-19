@@ -24,7 +24,7 @@ class CarDrivesEnoughFuel extends SpecWithSUT{
   }
 
   @Then('the car should have 46fuel') shouldHave46lLeft() {
-    Assert.that(this.SUT.fuelLiter).equals(46);
+    Assert.that(this.SUT.fuel).equals(46);
   }
 
 }

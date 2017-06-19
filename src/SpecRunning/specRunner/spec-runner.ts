@@ -44,7 +44,7 @@ export class SpecRunner {
 
     this.specObject =  this.specContainer.getNewSpecObject();
 
-    if(this.specContainer.expectingErrors())
+    if(this.specContainer.isExpectingErrors())
       this.runExpectingError();
     else
       this.runWithNormalThen();
@@ -72,6 +72,14 @@ export class SpecRunner {
       execClass[thenThrow.getName()]();
     } catch(error){
       expectedError = error
+    }
+
+    if(thrownError == null && expectedError != null){
+      let errorReport =
+        new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error',
+          'No Error was thrown, expected "' + expectedError.message + '"');
+      this.specReport.reportRun(thenThrow, false, errorReport);
+      return;
     }
     //compare Errors
     if(thrownError.message == expectedError.message){
