@@ -14,16 +14,11 @@ export class SpecRegistry {
     let specClassName = specClassConstructor.name;
 
     let registryEntry = this.getOrRegisterSpecClass(specClassConstructor);
-
-    if (registryEntry.getSpecName()!= null)
-      throw new SpecRegistryError('Spec "' + specClassName + '" already got has Description: "' + registryEntry.getSpecName() + '", only one is possible, cannot add: "' + specName + '"', specClassName);
-
     registryEntry.setDescription(specName);
 
   }
 
   registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
-
     let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
     specRegEntry.addGiven(functionName, description, execNumber);
   }

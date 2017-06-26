@@ -32,7 +32,7 @@ describe('SpecContainer', () => {
 
   it('should be constructed with proper parameters', () => {
     expect(specContainer).toBeDefined();
-    expect(specContainer.getSpecName()).toEqual(specDescription);
+    expect(specContainer.getDescription()).toEqual(specDescription);
     expect(specContainer.getClassConstructor()).toEqual(specClassConstructor);
   });
 });

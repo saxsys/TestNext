@@ -18,7 +18,7 @@ describe('TestDecorators.Spec', () => {
 
     let specRegEntry = specRegistry.getSpecByClassName(specClassName);
     expect(specRegEntry.getClassName()).toEqual('TestDecorators_Spec_Correct');
-    expect(specRegEntry.getSpecName()).toEqual(specName);
+    expect(specRegEntry.getDescription()).toEqual(specName);
   });
 
   it('should refuse Spec with existing class-name', () => {
@@ -96,7 +96,7 @@ describe('TestDecorators.Given', () => {
     }
     let givenClassConstructor = TestDecorators_Given_ClassWithoutDecorator.prototype.constructor;
     let entry = specRegistry.getSpecByClassName(className);
-    expect(entry.getSpecName()).toBeUndefined();
+    expect(entry.getDescription()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(givenClassConstructor);
     let givenEntry = entry.getGiven()[0];
     expect(givenEntry.getDescription()).toEqual(methodDescription);
@@ -187,7 +187,7 @@ describe('TestDecorators.When', () => {
     }
     let specClassConstructor = TestDecorators_When_ClassWithoutDecorator.prototype.constructor;
     let entry = specRegistry.getSpecByClassName(className);
-    expect(entry.getSpecName()).toBeUndefined();
+    expect(entry.getDescription()).toBeUndefined();
 
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
     let methodEntry = entry.getWhen();
@@ -256,7 +256,7 @@ describe('TestDecorators.Then', () => {
     }
     let specClassConstructor = TestDecorators_Then_ClassWithoutDecorator.prototype.constructor;
     let entry = specRegistry.getSpecByClassName(className);
-    expect(entry.getSpecName()).toBeUndefined();
+    expect(entry.getDescription()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
     let methodEntry = entry.getThen()[0];
     expect(methodEntry.getDescription()).toEqual(methodDescription);
@@ -353,7 +353,7 @@ describe('TestDecorators.ThenError', () => {
 
     let specClassConstructor = SpecDecorators_ThenError_notRegistered.prototype.constructor;
     let entry = specRegistry.getSpecByClassName(className);
-    expect(entry.getSpecName()).toBeUndefined();
+    expect(entry.getDescription()).toBeUndefined();
 
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
     let methodEntry = entry.getThenThrow();

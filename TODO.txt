@@ -2,5 +2,6 @@
 // TODO Inheritance: handle overwriting methods of parent?
 // TODO Inheritance: handle multiple When and ThenThrow acquired by inheritance?
 
-// TODO Assert: 'To Be One Of', 'Contains',
+// TODO Assert: 'To Be One Of', 'Contains', 'Of Type'
 
+//TODO Is a 'Cleanup' after @Then useful?

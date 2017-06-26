@@ -84,7 +84,7 @@ describe('SpecRegistry.getSpecByName', () => {
   });
   it('should return correct SpecContainer for existing specClassName', () => {
     let thirdTCaseRegEntry = specRegistry.getSpecByClassName(specClassName);
-    expect(thirdTCaseRegEntry.getSpecName()).toEqual(specName);
+    expect(thirdTCaseRegEntry.getDescription()).toEqual(specName);
     expect(thirdTCaseRegEntry.getClassConstructor()).toEqual(specClassConstructor);
   });
 
@@ -134,7 +134,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
     specRegistry.registerGivenForSpec(notYetRegisteredClass, notYetRegisteredGivenName, givenDescription, givenExecNumber);
     let entry = specRegistry.getSpecByClassName(notYetRegisteredClassName);
     expect(entry).not.toBeUndefined();
-    expect(entry.getSpecName()).toBeUndefined();
+    expect(entry.getDescription()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(notYetRegisteredClass);
     let givenEntry = entry.getGiven()[0];
     expect(givenEntry.getName()).toEqual(notYetRegisteredGivenName);
@@ -235,7 +235,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
     specRegistry.registerThenForSpec(notYetRegisteredClass, notYetRegisteredFunctionName, description, execNumber);
     let specEntry = specRegistry.getSpecByClassName(notYetRegisteredClassName);
     expect(specEntry).not.toBeUndefined();
-    expect(specEntry.getSpecName()).toBeUndefined();
+    expect(specEntry.getDescription()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
     let thenEntry = specEntry.getThen()[0];
     expect(thenEntry.getName()).toEqual(notYetRegisteredFunctionName);
@@ -325,7 +325,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     specRegistry.registerWhenForSpec(notYetRegisteredClass, notYetRegisteredFunctionName, description);
     let specEntry = specRegistry.getSpecByClassName(notYetRegisteredClassName);
     expect(specEntry).not.toBeUndefined();
-    expect(specEntry.getSpecName()).toBeUndefined();
+    expect(specEntry.getDescription()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
     let whenEntry = specEntry.getWhen();
     expect(whenEntry.getName()).toEqual(notYetRegisteredFunctionName);

@@ -1,14 +1,27 @@
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {Provider} from "@angular/core";
 
-
-export function Spec(testCaseName: string) {
+/**
+ * Class-Decorator
+ * Registers the SpecClass as such, sets the description and marks it as executable
+ * @param description
+ */
+export function Spec(description: string) {
   return (constructor: Function) => {
     let specClass = constructor;
-    specRegistry.registerSpec(specClass, testCaseName);
+    specRegistry.registerSpec(specClass, description);
   }
 }
-
+/**
+ * Method-Decorator
+ * Marks method to do the Setup for the SpecClass.
+ * (Method will be stored as Given-Method)
+ * There can be multiple @Given per SpecClass
+ * Containing class gets registered so the Method can Be inherited, SpecClass will not necessarily be executed.
+ *
+ * @param description
+ * @param execNumber Number for execution-order. Must be set, when multiple Given-Methods exist, must unique for Given in the SpecClass.
+ */
 export function Given(description: string, execNumber?: number) {
   return (target: any, key: string) => {
     let constructor = target.constructor;
@@ -16,6 +29,15 @@ export function Given(description: string, execNumber?: number) {
   }
 }
 
+/**
+ * Method-Decorator
+ * Marks method as including the condition of the Spec.
+ * (Method will be stored as When-Method)
+ * There can only be one @When per SpecClass.
+ * Containing class gets registered so the Method can Be inherited, SpecClass will not necessarily be executed.
+ *
+ * @param description
+ */
 export function When(description: string) {
   return (target: any, key: string) => {
     let constructor = target.constructor;
@@ -23,6 +45,16 @@ export function When(description: string) {
   }
 }
 
+/**
+ * Method-Decorator
+ * Marks method to do contain the Assertions of the Spec.
+ * (Method will be stored as Then-Method)
+ * There can be multiple @Then per SpecClass
+ * Containing class gets registered so the Method can be inherited, but the SpecClass will not necessarily be executed.
+ *
+ * @param description
+ * @param execNumber Number for execution-order. Must be set, when multiple Then-Methods exist, must unique for Given in the SpecClass.
+ */
 export function Then(description: string, execNumber?: number) {
   return (target: any, key: string) => {
     let constructor = target.constructor;
@@ -30,6 +62,15 @@ export function Then(description: string, execNumber?: number) {
   }
 }
 
+/**
+ * Method-Decorator
+ * Marks the to throw the same Error as expected to be thrown in the @When-Method
+ * (Method will be stored as ThenThrow-Method)
+ * There can only be one @ThenThrow per SpecClass.
+ * Containing class gets registered so the Method can be inherited, but the SpecClass will not necessarily be executed.
+ *
+ * @param description
+ */
 export function ThenThrow(description: string) {
   return (target: any, key: string) => {
     let constructor = target.constructor;
@@ -37,25 +78,58 @@ export function ThenThrow(description: string) {
   }
 }
 
-export function Subject(description: string) {
+/**
+ * Class-Decorator
+ * registers the SpecClass for a Subject
+ * One Subject can have multiple SpecClasses and one SpecClass can have multiple Subjects
+ * Class gets registered so it can be inherited, but the SpecClass will not necessarily be executed.
+ *
+ * @param subjectName
+ */
+export function Subject(subjectName: string) {
   return (constructor: Function) => {
 
-    specRegistry.registerSpecForSubject(constructor, description);
+    specRegistry.registerSpecForSubject(constructor, subjectName);
   }
 }
 
+/**
+ * Class-Decorator
+ * Marks the Class as ignored, so it will not be executed, nevertheless it gets registered.
+ *
+ * @param reason
+ * @return {(constructor:Function)=>undefined}
+ * @constructor
+ */
 export function Ignore(reason: string) {
   return (constructor: Function) => {
     specRegistry.registerSpecAsIgnored(constructor, reason);
   }
 }
 
+/**
+ * Class-Decorator
+ * Gives the Class which should be tested (System-under-Test).
+ * An Instance of the Class will be created automatically, as long as all dependencies are given in @Providers()
+ * Class gets registered so it can be inherited, but the SpecClass will not necessarily be executed.
+ *
+ * @param provider Class
+ */
 export function SUT(provider:Provider){
   return (constructor: Function) => {
     specRegistry.registerSutForSpec(constructor, provider);
   }
 }
 
+/**
+ * Class-Decorator
+ * Necessary if SUT has dependencies.
+ * Class gets registered so it can be inherited, but the SpecClass will not necessarily be executed.
+ * 
+ * @param providers Array of classes, necessary for instantiating the SUT
+ * @return {(constructor:Function)=>undefined}
+ * @constructor
+ */
 export function Providers(providers:Provider[]){
   return (constructor: Function) => {
     specRegistry.registerProvidersForSpec(constructor, providers);
