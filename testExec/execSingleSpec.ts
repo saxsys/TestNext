@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
+import {RunReportOutputConsole} from "../src/SpecRunning/RunReportOutput/run-report-output-console";
 
 const glob = require('glob');
 const path = require('path');
@@ -26,14 +27,11 @@ testFiles.forEach((file) => {
   require(file);
 });
 
-SpecExecChooser.execSpec(testName, showFailedOnly);
+let specRunOutput = new RunReportOutputConsole();
+specRunOutput.showFailedOnly(showFailedOnly);
 
-//SpecExecChooser.execAllSpecs();
-//SpecExecChooser.execBySubjects();
-//SpecExecChooser.execSubject(subject);
-//SpecExecChooser.execSpec('IncorrectTest');
-
-
+SpecExecChooser.execSpec(testName, specRunOutput);
+specRunOutput.outputReport();
 
 
 

@@ -1,111 +1,76 @@
 import {SpecReporter} from "../specRunReporter/spec-reporter";
-import {SpecReportBeautyfier} from "../specRunReporter/spec-report-beautyfier";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRunner} from "../specRunner/spec-runner";
-import {ISpecReport} from "../specRunReporter/spec-report-interfaces";
+import {IRunReportOutput} from "../RunReportOutput/iRun-report-output";
 
-export class SpecExecChooser{
+export class SpecExecChooser {
 
-  private static successColor = '\x1b[1;32m';
-  private static validErrorColor = '\x1b[1;33m';
-  private static failedRunColor = '\x1b[1;31m';
-  private static resetStyle = '\x1b[0m';
-  private static topicHeading = '\x1b[47m\x1b[30m';
-  private static notExecutedColor = '\x1b[0;37m';
-
-  static execAllSpecs(showFailedOnly?:boolean){
-
-
+  static execAllSpecs(reportOutput: IRunReportOutput) {
     let specReg = specRegistry.getExecutableSpecs();
     let specReporter = new SpecReporter();
 
     specReg.forEach((spec) => {
       let specRunner = new SpecRunner(spec, specReporter);
       let specReport = specRunner.runSpec();
-      SpecExecChooser.printSpecReport(specReport,0,showFailedOnly);
+      reportOutput.addReport(specReport);
     });
   }
 
-  static execBySubjects(showFailedOnly?:boolean) {
 
+  static execBySubjects(reportOutput: IRunReportOutput) {
     let specReporter = new SpecReporter();
     let subjects = specRegistry.getSubjects();
 
     subjects.forEach((subject) => {
-      console.log(this.topicHeading + subject + this.resetStyle);
       let subjectSpecs = specRegistry.getSpecsForSubject(subject);
       subjectSpecs.forEach((spec) => {
         let existSpecReport = specReporter.getSpecReportOf(spec.getClassName());
-        if(existSpecReport != null){
-          SpecExecChooser.printSpecReport(existSpecReport, 3, showFailedOnly);
-
+        if (existSpecReport != null) {
+          reportOutput.addReport(existSpecReport, subject);
         } else {
           let specRunner = new SpecRunner(spec, specReporter);
           let specReport = specRunner.runSpec();
-          SpecExecChooser.printSpecReport(specReport, 3, showFailedOnly);
+          reportOutput.addReport(specReport, subject);
         }
       });
-
     });
 
     let specWithoutSubject = specRegistry.getSpecsWithoutSubject();
-    if(specWithoutSubject.length > 0)
-      console.log(this.topicHeading + '#Without Subject' + this.resetStyle);
+    if (specWithoutSubject.length > 0)
       specWithoutSubject.forEach((spec) => {
         let specRunner = new SpecRunner(spec, specReporter);
         let specReport = specRunner.runSpec();
-        SpecExecChooser.printSpecReport(specReport, 3, showFailedOnly);
+        reportOutput.addReport(specReport, '#Without Subject');
       });
-
   }
 
-  static execSubject(subject: string, showFailedOnly?:boolean){
-    console.log(this.topicHeading + subject + this.resetStyle);
+
+  static execSubject(subject: string, reportOutput: IRunReportOutput) {
     let specs = specRegistry.getSpecsForSubject(subject);
-    if(specs == null){
-      console.log(this.validErrorColor + 'no Subject with Name "' + subject + '" found \n' +
-        'we got: ' + specRegistry.getSubjects() + this.resetStyle
-      );
-      return;
-    }
+    if (specs == null)
+      throw new Error('No Subject with Name "' + subject + '" found \n' +
+        'we got: ' + specRegistry.getSubjects());
 
     let specLogger = new SpecReporter();
     specs.forEach((spec) => {
       let specRunner = new SpecRunner(spec, specLogger);
       let specReport = specRunner.runSpec();
-      SpecExecChooser.printSpecReport(specReport, 3, showFailedOnly);
+      reportOutput.addReport(specReport, subject);
     });
   }
 
-  static execSpec(className:string, showFailedOnly?:boolean){
+  static execSpec(className: string, reportOutput: IRunReportOutput) {
     let spec = specRegistry.getSpecByClassName(className);
-    if(spec == null ){
-      console.log( this.validErrorColor +'no SpecClasses with Name "' + className + '" found \n' +
-        'we got: ' + specRegistry.getSpecClassNames() + this.resetStyle
-      );
-      return;
+    if (spec == null) {
+      throw new Error('No SpecClasses with Name "' + className + '" found \n' +
+        'we got: ' + specRegistry.getSpecClassNames());
     }
 
     let specReporter = new SpecReporter();
     let specRunner = new SpecRunner(spec, specReporter);
     let specReport = specRunner.runSpec();
-
-    SpecExecChooser.printSpecReport(specReport, 0, showFailedOnly);
+    reportOutput.addReport(specReport);
   }
 
-  private static printSpecReport(specReport:ISpecReport, paddingNumber?: number, showFailedOnly?:boolean){
-    if(paddingNumber == null) paddingNumber = 0;
-    if(showFailedOnly == null) showFailedOnly = false;
-
-    let reportString = SpecReportBeautyfier.SpecReportToString(specReport, paddingNumber);
-    if(specReport.isIgnored() || !specReport.isExecutable())
-      console.log(this.notExecutedColor + reportString + this.resetStyle);
-    else if(specReport.isInvalidSpec())
-      console.log(this.validErrorColor + reportString + this.resetStyle);
-    else if (specReport.isRunFailed())
-      console.log(this.failedRunColor + reportString + this.resetStyle);
-    else if(!showFailedOnly)
-      console.log(this.successColor + reportString + this.resetStyle);
-  }
 
 }
