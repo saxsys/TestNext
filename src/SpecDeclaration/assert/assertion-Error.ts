@@ -1,4 +1,3 @@
-import {SpecMethodType} from "../../SpecStorage/specContainer/specMethodContainer/spec-method-type";
 import {AssertProportion} from "./assert-proportion";
 export class AssertionError extends Error{
 

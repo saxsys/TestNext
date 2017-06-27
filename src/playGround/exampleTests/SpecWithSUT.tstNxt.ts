@@ -1,7 +1,6 @@
-import {SpecWithSUT} from "../../SpecDeclaration/spec/spec";
-import {Given, Providers, Spec, SUT, Then, When} from "../../SpecDeclaration/testDecorators/test-decorators";
+import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
+import {Given, Providers, Spec, SUT, Then, When} from "../../SpecDeclaration/specDecorators/spec-decorators";
 import {Assert} from "../../SpecDeclaration/assert/assert";
-import {Injectable} from "@angular/core";
 import {Car, PassengerCar, Taxi} from "../injectionTestfied/car";
 import {Engine} from "../injectionTestfied/engine";
 

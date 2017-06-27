@@ -1,8 +1,7 @@
-import {Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow, When} from "./test-decorators";
+import {Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow, When} from "./spec-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../../SpecStorage/spec-registry-error";
 import {Assert} from "../assert/assert";
-import {Provider} from "@angular/core";
 
 
 describe('TestDecorators.Spec', () => {

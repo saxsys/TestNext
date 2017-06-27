@@ -1,6 +1,5 @@
 import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecValidationError} from "./spec-validation-error";
-import {SpecContainer} from "../../SpecStorage/specContainer/specContainer";
 
 
 export class SpecValidator {

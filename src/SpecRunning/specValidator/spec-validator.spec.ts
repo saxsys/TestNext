@@ -1,4 +1,4 @@
-import {Given, Spec, Then, ThenThrow, When} from "SpecDeclaration/testDecorators/test-decorators";
+import {Given, Spec, Then, ThenThrow, When} from "SpecDeclaration/specDecorators/spec-decorators";
 import {SpecValidator} from "./spec-validator";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecValidationError} from "./spec-validation-error";

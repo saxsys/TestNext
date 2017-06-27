@@ -1,10 +1,10 @@
-///<reference path="../../SpecDeclaration/testDecorators/test-decorators.ts"/>
+///<reference path="../../SpecDeclaration/specDecorators/spec-decorators.ts"/>
 import {
   Given, Providers, SUT, Then, Spec, When, ThenThrow,
   Subject
-} from '../../SpecDeclaration/testDecorators/test-decorators';
+} from '../../SpecDeclaration/specDecorators/spec-decorators';
 import {Assert} from "../../SpecDeclaration/assert/assert";
-import {SpecWithSUT} from "../../SpecDeclaration/spec/spec";
+import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
 
 import {Engine} from "../injectionTestfied/engine";
 import {Car} from "../injectionTestfied/car";
