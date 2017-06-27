@@ -5,52 +5,51 @@ import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
 import {ISpecReport} from "../specRunReporter/iSpec-report";
-import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
+import {SpecReport} from "../specRunReporter/spec-report";
 
 
 export class SpecRunner {
 
-  private specContainer: ISpecContainer;
-  private specReport: ISpecReport;
-  private specObject:any;
+  specContainer: ISpecContainer;
+  usedObject:any;
+  report:ISpecReport;
 
-  constructor(spec:ISpecContainer, specReporter: ISpecReporter){
+  private constructor(spec:ISpecContainer, specReport:ISpecReport){
     this.specContainer = spec;
-    this.specReport = specReporter.getOrCreateSpecReport(spec);
+    this.report = specReport;
   }
 
-  runSpec(otherReporter?:ISpecReporter): ISpecReport{
-    if(otherReporter != null){
-      this.specReport = otherReporter.getOrCreateSpecReport(this.specContainer)
-    }
-    if(this.specContainer.isIgnored()) {
-      this.specReport.setIgnored(this.specContainer.getIgnoreReason());
-      return this.specReport;
-    }
-    if(!this.specContainer.isExecutableSpec()) {
-     this.specReport.setNotExecutable();
-      return this.specReport;
-    }
+  static runSpec(spec:ISpecContainer): SpecRunner{
+    let specReport = new SpecReport(spec);
+    let specRunner = new SpecRunner(spec, specReport);
 
-    let validity = this.validateSpec();
-
-    if(!validity) {
-      this.specObject = null;
-      return this.specReport;
+    if(spec.isIgnored()) {
+      specReport.setIgnored(spec.getIgnoreReason());
+      return specRunner;
+    }
+    if(!spec.isExecutableSpec()) {
+     specReport.setNotExecutable();
+      return specRunner;
     }
 
-    this.specObject =  this.specContainer.getNewSpecObject();
 
-    if(this.specContainer.isExpectingErrors())
-      this.runExpectingError();
+    if(!specRunner.validateSpec()) {
+      specRunner.usedObject = null;
+      return specRunner;
+    }
+
+    specRunner.usedObject =  spec.getNewSpecObject();
+
+    if(spec.isExpectingErrors())
+      specRunner.runExpectingError();
     else
-      this.runWithNormalThen();
+      specRunner.runWithNormalThen();
 
-    return this.specReport;
+    return specRunner;
   }
 
   private runExpectingError(){
-    let execClass = this.specObject;
+    let execClass = this.usedObject;
     let when = this.specContainer.getWhen();
     let thenThrow = this.specContainer.getThenThrow();
     let thrownError;
@@ -75,17 +74,17 @@ export class SpecRunner {
       let errorReport =
         new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error',
           'No Error was thrown, expected "' + expectedError.message + '"');
-      this.specReport.reportRun(thenThrow, false, errorReport);
+      this.report.reportRun(thenThrow, false, errorReport);
       return;
     }
     //compare Errors
     if(thrownError.message == expectedError.message){
-      this.specReport.reportRun(when, true);
-      this.specReport.reportRun(thenThrow, true);
+      this.report.reportRun(when, true);
+      this.report.reportRun(thenThrow, true);
     } else {
-      this.specReport.reportRun(when, false, thrownError);
+      this.report.reportRun(when, false, thrownError);
       let errorReport = new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error');
-      this.specReport.reportRun(thenThrow, false, errorReport);
+      this.report.reportRun(thenThrow, false, errorReport);
     }
 
   }
@@ -97,13 +96,12 @@ export class SpecRunner {
 
   }
 
-
   private validateSpec():boolean{
     try{
       SpecValidator.validate(this.specContainer);
     } catch (error){
       if(error instanceof SpecValidationError) {
-        this.specReport.reportValidationError(error);
+        this.report.reportValidationError(error);
         return false;
       }
       else
@@ -131,32 +129,21 @@ export class SpecRunner {
   }
 
   private runMethod(method: ISpecMethodContainer){
-    let execClass = this.specObject;
+    let execClass = this.usedObject;
     if(execClass[method.getName()] == null)
       throw Error('test-Runner method ' + method.getName() + ' not found on Class ' + this.specContainer.getClassName());
     try {
       execClass[method.getName()]();
     } catch (error) {
       if(error instanceof AssertionError) {
-        this.specReport.reportRun(method, false, error);
+        this.report.reportRun(method, false, error);
       } else {
         throw error;
       }
       return;
     }
 
-    this.specReport.reportRun(method, true);
+    this.report.reportRun(method, true);
   }
 
-  getSpecReport(): ISpecReport{
-    return this.specReport;
-  }
-
-  getSpec(): ISpecContainer{
-    return this.specContainer;
-  }
-
-  getUsedSpecObject():any{
-    return this.specObject;
-  }
 }

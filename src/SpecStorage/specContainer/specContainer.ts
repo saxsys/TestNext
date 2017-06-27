@@ -89,7 +89,7 @@ export class SpecContainer implements ISpecContainer{
 
   /**
    * Mark a Spec as ignored, give a reason
-   * @param reason why the spec should not be run
+   * @param reason why the specTypes should not be run
    */
   setIgnored(reason:string){
     this.ignored = true;

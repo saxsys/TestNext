@@ -1,51 +1,51 @@
 import {SpecReporter} from "../specRunReporter/spec-reporter";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRunner} from "../specRunner/spec-runner";
-import {ISpecReportOutput} from "../RunReportOutput/iSpec-report-output";
+import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
 
 export class SpecExecChooser {
 
-  static execAllSpecs(reportOutput: ISpecReportOutput) {
+  static execAllSpecs(specReporter: ISpecReporter) {
     let specReg = specRegistry.getExecutableSpecs();
-    let specReporter = new SpecReporter();
 
     specReg.forEach((spec) => {
-      let specRunner = new SpecRunner(spec, specReporter);
-      let specReport = specRunner.runSpec();
-      reportOutput.addReport(specReport);
+      let specRunner = SpecRunner.runSpec(spec);
+      specReporter.addReport(specRunner.report);
     });
   }
 
 
-  static execBySubjects(reportOutput: ISpecReportOutput) {
-    let specReporter = new SpecReporter();
+  static execBySubjects(specReporter: SpecReporter) {
     let subjects = specRegistry.getSubjects();
 
+    //for each existing Subject
     subjects.forEach((subject) => {
       let subjectSpecs = specRegistry.getSpecsForSubject(subject);
+      //For each Spec of the Subject
       subjectSpecs.forEach((spec) => {
+        //If Spec was already run for other Subject just add the report to the subject-topic
         let existSpecReport = specReporter.getSpecReportOf(spec.getClassName());
         if (existSpecReport != null) {
-          reportOutput.addReport(existSpecReport, subject);
+          specReporter.addReportToTopic(existSpecReport, subject)
         } else {
-          let specRunner = new SpecRunner(spec, specReporter);
-          let specReport = specRunner.runSpec();
-          reportOutput.addReport(specReport, subject);
+          //if spec is not already run, run it and add it to the subject-topic
+          let specRunner = SpecRunner.runSpec(spec);
+          specReporter.addReport(specRunner.report, subject);
         }
       });
     });
 
+    //run specs without subject
     let specWithoutSubject = specRegistry.getSpecsWithoutSubject();
     if (specWithoutSubject.length > 0)
       specWithoutSubject.forEach((spec) => {
-        let specRunner = new SpecRunner(spec, specReporter);
-        let specReport = specRunner.runSpec();
-        reportOutput.addReport(specReport, '#Without Subject');
+        let specRunner = SpecRunner.runSpec(spec);
+        specReporter.addReport(specRunner.report);
       });
   }
 
 
-  static execSubject(subject: string, reportOutput: ISpecReportOutput) {
+  static execSubject(subject: string, specReporter: ISpecReporter) {
     let specs = specRegistry.getSpecsForSubject(subject);
     if (specs == null)
       throw new Error('No Subject with Name "' + subject + '" found \n' +
@@ -53,23 +53,20 @@ export class SpecExecChooser {
 
     let specLogger = new SpecReporter();
     specs.forEach((spec) => {
-      let specRunner = new SpecRunner(spec, specLogger);
-      let specReport = specRunner.runSpec();
-      reportOutput.addReport(specReport, subject);
+      let specRunner = SpecRunner.runSpec(spec);
+      specReporter.addReport(specRunner.report, subject);
     });
   }
 
-  static execSpec(className: string, reportOutput: ISpecReportOutput) {
+  static execSpec(className: string, specReporter: ISpecReporter) {
     let spec = specRegistry.getSpecByClassName(className);
     if (spec == null) {
       throw new Error('No SpecClasses with Name "' + className + '" found \n' +
         'we got: ' + specRegistry.getSpecClassNames());
     }
 
-    let specReporter = new SpecReporter();
-    let specRunner = new SpecRunner(spec, specReporter);
-    let specReport = specRunner.runSpec();
-    reportOutput.addReport(specReport);
+    let specRunner = SpecRunner.runSpec(spec);
+    specReporter.addReport(specRunner.report);
   }
 
 

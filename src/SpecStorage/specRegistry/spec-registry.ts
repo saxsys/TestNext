@@ -1,6 +1,5 @@
 import {SpecContainer} from "../specContainer/specContainer";
 import {SpecRegistryError} from "../spec-registry-error";
-import {ISpecContainer} from "../specContainer/iSpec-Container";
 import * as _ from "underscore";
 import {Provider} from "@angular/core/core";
 
@@ -83,7 +82,7 @@ export class SpecRegistry {
     return this.specClasses.get(className);
   }
 
-  getAllSpecs(): Array<ISpecContainer>{
+  getAllSpecs(): Array<SpecContainer>{
     return Array.from(this.specClasses.values());
   }
 
@@ -116,8 +115,8 @@ export class SpecRegistry {
     return specsWithoutSubject;
   }
 
-  getExecutableSpecs():Array<ISpecContainer>{
-    let executableSpecs = new Array<ISpecContainer>();
+  getExecutableSpecs():Array<SpecContainer>{
+    let executableSpecs = new Array<SpecContainer>();
     Array.from(this.specClasses.values()).forEach((spec) => {
       if(spec.isExecutableSpec())
         executableSpecs.push(spec);

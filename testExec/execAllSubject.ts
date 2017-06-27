@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
 import {SpecReportOutputConsole} from "../src/SpecRunning/RunReportOutput/spec-report-output-console";
+import {SpecReporter} from "../src/SpecRunning/specRunReporter/spec-reporter";
 
 const glob = require('glob');
 const path = require('path');
@@ -26,10 +27,11 @@ testFiles.forEach((file) => {
   require(file);
 });
 
-let specRunOutput = new SpecReportOutputConsole();
+let reporter = new SpecReporter();
+let specRunOutput = new SpecReportOutputConsole(reporter);
 specRunOutput.showFailedOnly(showFailedOnly);
 
-SpecExecChooser.execBySubjects(specRunOutput);
+SpecExecChooser.execBySubjects(reporter);
 specRunOutput.outputReport();
 
 
