@@ -1,11 +1,11 @@
-
 import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
-import {ISpecReporter, ISpecReport} from "../specRunReporter/spec-report-interfaces";
 import {SpecValidator} from "../specValidator/spec-validator";
 import {AssertionError} from "../../SpecDeclaration/assert/assertion-Error";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
+import {ISpecReport} from "../specRunReporter/iSpec-report";
+import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
 
 
 export class SpecRunner {

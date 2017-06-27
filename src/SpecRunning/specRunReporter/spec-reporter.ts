@@ -1,6 +1,7 @@
-import {ISpecReport, ISpecReporter} from "./spec-report-interfaces";
 import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecReport} from "./spec-report";
+import {ISpecReporter} from "./iSpec-reporter";
+import {ISpecReport} from "./iSpec-report";
 
 export class SpecReporter implements ISpecReporter {
 

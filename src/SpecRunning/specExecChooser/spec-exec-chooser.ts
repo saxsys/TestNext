@@ -1,11 +1,11 @@
 import {SpecReporter} from "../specRunReporter/spec-reporter";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRunner} from "../specRunner/spec-runner";
-import {IRunReportOutput} from "../RunReportOutput/iRun-report-output";
+import {ISpecReportOutput} from "../RunReportOutput/iSpec-report-output";
 
 export class SpecExecChooser {
 
-  static execAllSpecs(reportOutput: IRunReportOutput) {
+  static execAllSpecs(reportOutput: ISpecReportOutput) {
     let specReg = specRegistry.getExecutableSpecs();
     let specReporter = new SpecReporter();
 
@@ -17,7 +17,7 @@ export class SpecExecChooser {
   }
 
 
-  static execBySubjects(reportOutput: IRunReportOutput) {
+  static execBySubjects(reportOutput: ISpecReportOutput) {
     let specReporter = new SpecReporter();
     let subjects = specRegistry.getSubjects();
 
@@ -45,7 +45,7 @@ export class SpecExecChooser {
   }
 
 
-  static execSubject(subject: string, reportOutput: IRunReportOutput) {
+  static execSubject(subject: string, reportOutput: ISpecReportOutput) {
     let specs = specRegistry.getSpecsForSubject(subject);
     if (specs == null)
       throw new Error('No Subject with Name "' + subject + '" found \n' +
@@ -59,7 +59,7 @@ export class SpecExecChooser {
     });
   }
 
-  static execSpec(className: string, reportOutput: IRunReportOutput) {
+  static execSpec(className: string, reportOutput: ISpecReportOutput) {
     let spec = specRegistry.getSpecByClassName(className);
     if (spec == null) {
       throw new Error('No SpecClasses with Name "' + className + '" found \n' +

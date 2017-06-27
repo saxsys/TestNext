@@ -1,6 +1,6 @@
-import {ISpecMethodRunReport} from "./spec-report-interfaces";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {SpecMethodType} from "../../SpecStorage/specContainer/specMethodContainer/spec-method-type";
+import {ISpecMethodRunReport} from "./iSpec-method-report";
 
 export class SpecMethodReport implements ISpecMethodRunReport {
   private specMethod: ISpecMethodContainer;

@@ -1,18 +1,16 @@
 import {
   Given, Ignore, Providers, Spec, SUT, Then, ThenThrow,
   When
-} from "../../SpecDeclaration/testDecorators/test-decorators";
+} from "../../SpecDeclaration/specDecorators/spec-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRunner} from "./spec-runner";
 import {SpecReporter} from "../specRunReporter/spec-reporter";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {AssertionError} from "../../SpecDeclaration/assert/assertion-Error";
 import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
-import {SpecWithSUT} from "../../SpecDeclaration/spec/spec";
+import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
 import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
-import {first} from "rxjs/operator/first";
-import * as _ from "underscore";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {
@@ -194,8 +192,6 @@ describe('specRunner.runSpec', () => {
   });
 
   it('should execute also the Inherited Methods', () => {
-    let specClassName_child = 'SpecRunner_execInheritated_child';
-
     class SpecRunner_execInheritated_parent {
       public runOrder = [];
 

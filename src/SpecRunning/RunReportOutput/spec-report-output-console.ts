@@ -1,8 +1,7 @@
-import {ISpecReport} from "../specRunReporter/spec-report-interfaces";
-import {IRunReportOutput} from "./iRun-report-output";
-import {SpecReportBeautyfier} from "../specRunReporter/spec-report-beautyfier";
+import {ISpecReportOutput} from "./iSpec-report-output";
+import {ISpecReport} from "../specRunReporter/iSpec-report";
 
-export class RunReportOutputConsole implements IRunReportOutput {
+export class SpecReportOutputConsole implements ISpecReportOutput {
 
   private successColor = '\x1b[1;32m';
   private validErrorColor = '\x1b[1;33m';
@@ -50,7 +49,7 @@ export class RunReportOutputConsole implements IRunReportOutput {
   private printSpecReport(specReport: ISpecReport, paddingNumber?: number) {
     if (paddingNumber == null) paddingNumber = 0;
 
-    let reportString = SpecReportBeautyfier.SpecReportToString(specReport, paddingNumber);
+    let reportString = specReport.getStringBeautified(paddingNumber);
     if (specReport.isIgnored() || !specReport.isExecutable())
       console.log(this.notExecutedColor + reportString + this.resetStyle);
     else if (specReport.isInvalidSpec())
