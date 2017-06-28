@@ -2,7 +2,6 @@ import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {SpecMethodReport} from "./spec-method-report";
-import {SpecReportBeautifier} from "./spec-report-beautifier";
 import {ISpecReport} from "./iSpec-report";
 import {ISpecMethodRunReport} from "./iSpec-method-report";
 
@@ -18,6 +17,8 @@ export class SpecReport implements ISpecReport {
   constructor(spec: ISpecContainer) {
     this.spec = spec;
   }
+
+
 
   reportRun(specMethod: ISpecMethodContainer, success: boolean, error?: Error) {
     this.methodReports.push(new SpecMethodReport(specMethod, success, error));
@@ -92,9 +93,5 @@ export class SpecReport implements ISpecReport {
 
   isExecutable():boolean{
     return this.executable;
-  }
-
-  getStringBeautified(padding?: number): string {
-    return SpecReportBeautifier.SpecReportToString(this, padding);
   }
 }

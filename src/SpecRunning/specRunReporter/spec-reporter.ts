@@ -66,18 +66,22 @@ export class SpecReporter implements ISpecReporter {
     return Array.from(this.topicsAndReports.keys());
   }
 
-  public getOrCreateSpecReport(spec: ISpecContainer, topic?:string): ISpecReport {
+  public getOrCreateSpecReport(spec: ISpecContainer): ISpecReport {
     let className = spec.getClassName();
     let specReport = this.specReports.get(className);
-    if (specReport != null && specReport.getSpec() != spec)
-      throw new Error('SpecReporter cannot add reports for multiple classes with same Name (' + className + ')');
-    if (specReport == null) {
+
+    //get or save Report
+    if (specReport != null && specReport.getSpec() != spec) {
+      throw new Error('SpecReporter cannot add reports for multiple runs with same specClassName (' + className + ')');
+    } else if (specReport == null) {
       specReport = new SpecReport(spec);
       this.specReports.set(className, specReport);
     }
-    if(!this.topicsAndReports.get(topic).includes(className)){
-      this.addReportToTopic(specReport, topic);
-    }
+
+    //mark report as not having a topic yet
+    this.addReportToTopic(specReport, null);
+
+
     return specReport;
   }
 

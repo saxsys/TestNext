@@ -70,12 +70,10 @@ export class SpecReportBeautifier {
     let padding = SpecReportBeautifier.getPaddingString(paddingNumber);
 
     retStr +=
-            padding + ' ____________________________________\n' +
-            padding + '| VALIDATION-ERRORS: ' + errors.length + '               |\n';
+            padding + 'INVALID: ';
     errors.forEach((error) => {
-      retStr += padding + '| ' + error.message + '\n';
+      retStr += error.message + '\n         ';
     });
-    retStr += padding + '|____________________________________|\n';
     return retStr;
   }
 

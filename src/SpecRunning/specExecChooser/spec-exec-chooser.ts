@@ -9,8 +9,7 @@ export class SpecExecChooser {
     let specReg = specRegistry.getExecutableSpecs();
 
     specReg.forEach((spec) => {
-      let specRunner = SpecRunner.runSpec(spec);
-      specReporter.addReport(specRunner.report);
+      let specRunner = SpecRunner.runSpec(spec, specReporter);
     });
   }
 
@@ -23,14 +22,15 @@ export class SpecExecChooser {
       let subjectSpecs = specRegistry.getSpecsForSubject(subject);
       //For each Spec of the Subject
       subjectSpecs.forEach((spec) => {
+
         //If Spec was already run for other Subject just add the report to the subject-topic
         let existSpecReport = specReporter.getSpecReportOf(spec.getClassName());
         if (existSpecReport != null) {
           specReporter.addReportToTopic(existSpecReport, subject)
         } else {
           //if spec is not already run, run it and add it to the subject-topic
-          let specRunner = SpecRunner.runSpec(spec);
-          specReporter.addReport(specRunner.report, subject);
+          let specRunner = SpecRunner.runSpec(spec, specReporter);
+          specReporter.addReportToTopic(specRunner.report, subject);
         }
       });
     });
@@ -39,8 +39,9 @@ export class SpecExecChooser {
     let specWithoutSubject = specRegistry.getSpecsWithoutSubject();
     if (specWithoutSubject.length > 0)
       specWithoutSubject.forEach((spec) => {
-        let specRunner = SpecRunner.runSpec(spec);
-        specReporter.addReport(specRunner.report);
+        if(!spec.isExecutableSpec())
+          return;
+        SpecRunner.runSpec(spec, specReporter);
       });
   }
 
@@ -53,8 +54,8 @@ export class SpecExecChooser {
 
     let specLogger = new SpecReporter();
     specs.forEach((spec) => {
-      let specRunner = SpecRunner.runSpec(spec);
-      specReporter.addReport(specRunner.report, subject);
+      let specRunner = SpecRunner.runSpec(spec, specReporter);
+      specReporter.addReportToTopic(specRunner.report, subject);
     });
   }
 
@@ -65,8 +66,7 @@ export class SpecExecChooser {
         'we got: ' + specRegistry.getSpecClassNames());
     }
 
-    let specRunner = SpecRunner.runSpec(spec);
-    specReporter.addReport(specRunner.report);
+    let specRunner = SpecRunner.runSpec(spec, specReporter);
   }
 
 

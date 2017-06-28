@@ -19,6 +19,4 @@ export interface ISpecReport {
   isIgnored():boolean;
   getIgnoreReason():string;
   isExecutable():boolean;
-  getStringBeautified(padding?: number):string;
-
 }

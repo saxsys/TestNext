@@ -10,7 +10,7 @@ import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
 import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
 import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
-import {SpecReport} from "../specRunReporter/spec-report";
+import {SpecReporter} from "../specRunReporter/spec-reporter";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {
@@ -35,8 +35,8 @@ describe('specRunner.constructor', () => {
     }
 
     let specEntry = specRegistry.getSpecByClassName(specClassName);
-
-    let specRunner = SpecRunner.runSpec(specEntry);
+    let specReporter = new SpecReporter();
+    let specRunner = SpecRunner.runSpec(specEntry, specReporter);
     expect(specRunner).not.toBeUndefined();
   });
 });
@@ -46,6 +46,7 @@ describe('specRunner.runSpec', () => {
   let specEntry;
   let specRunner;
   let specReport;
+  let specReporter;
 
   let specClassName = 'SpecRunner_runSpec';
   let methodNamesInOrder = ['given0', 'given1', 'theWhen', 'then0', 'then1'];
@@ -82,7 +83,8 @@ describe('specRunner.runSpec', () => {
 
   beforeAll(() => {
     specEntry = specRegistry.getSpecByClassName(specClassName);
-    specRunner = SpecRunner.runSpec(specEntry);
+    specReporter = new SpecReporter();
+    specRunner = SpecRunner.runSpec(specEntry, specReporter);
     specReport = specRunner.report;
   });
 
@@ -144,7 +146,7 @@ describe('specRunner.runSpec', () => {
 
 
     let specEntry = specRegistry.getSpecByClassName(specClassName);
-    let specRunner = SpecRunner.runSpec(specEntry);
+    let specRunner = SpecRunner.runSpec(specEntry, specReporter);
     let report = specRunner.report;
 
     expect(report.getValidationErrors()).toContain(
@@ -174,18 +176,19 @@ describe('specRunner.runSpec', () => {
 
 
     expect(() => {
-      SpecRunner.runSpec(specEntry);
+      SpecRunner.runSpec(specEntry, specReporter);
     }).toThrow(randomError);
 
   });
 
   it('should be allowed to run a test multiple times, with different reporters', () => {
-    let specRunner = SpecRunner.runSpec(specEntry);
+    let newSpecReporter = new SpecReporter();
+    let specRunner = SpecRunner.runSpec(specEntry, newSpecReporter);
     expect(specRunner.report.getReports()).toEqual(specReport.getReports());
   });
 
   it('should execute also the Inherited Methods', () => {
-    class SpecRunner_execInheritated_parent {
+    class SpecRunner_execInherited_parent {
       public runOrder = [];
 
       @Given('given 0') given0() {
@@ -202,11 +205,11 @@ describe('specRunner.runSpec', () => {
     }
 
     @Spec('a inherited Then')
-    class SpecRunner_execInheritated_child extends SpecRunner_execInheritated_parent {
+    class SpecRunner_execInheritated_child extends SpecRunner_execInherited_parent {
     }
 
     //let specParent = specRegistry.getSpecByClassName(specClassName_parent);
-    let specRunner = SpecRunner.runSpec(specEntry);
+    let specRunner = SpecRunner.runSpec(specEntry, specReporter);
 
     expect(specRunner.usedObject.runOrder).toContain('given0');
     expect(specRunner.usedObject.runOrder).toContain('theWhen');
@@ -224,7 +227,7 @@ describe('specRunner.runSpec', () => {
     expect(spec.isIgnored()).toBeTruthy('Spec should have been marked as ignored');
     expect(spec.isExecutableSpec()).toBeTruthy('Spec was skipped because it is marked as not executable');
 
-    let specRunner = SpecRunner.runSpec(spec);
+    let specRunner = SpecRunner.runSpec(spec, specReporter);
     expect(specRunner.report.getValidationErrors().length).toBe(0, 'tried to build ignored Spec');
 
   });
@@ -256,7 +259,7 @@ describe('specRunner.runSpec', () => {
 
     let specContainer = specRegistry.getSpecByClassName(specClassName);
 
-    let specRunner = SpecRunner.runSpec(specContainer);
+    let specRunner = SpecRunner.runSpec(specContainer, specReporter);
     let obj = specRunner.usedObject;
 
     expect(obj.SUT).not.toBeUndefined();
@@ -305,7 +308,7 @@ describe('specRunner.runSpec', () => {
 
     let specContainer = specRegistry.getSpecByClassName(specClassName);
 
-    let specRunner = SpecRunner.runSpec(specContainer);
+    let specRunner = SpecRunner.runSpec(specContainer, specReporter);
     let obj = specRunner.usedObject;
 
     expect(obj.SUT).not.toBeUndefined();
@@ -318,7 +321,33 @@ describe('specRunner.runSpec', () => {
 
   });
 
-  it('should compare Errors thrown in @When to Error given in @ThenThrow', () => {
+  it('should report a validation Error, if no Error is thrown in @ThenThrow', () => {
+    let specClassName = 'SpecRunner_runSpec_ExpectError_NoErrorInThenThrow';
+
+    @Spec('a Throw without Throwing')
+    class SpecRunner_runSpec_ExpectError_NoErrorInThenThrow {
+
+      @Given('given 0')given0() {
+      }
+
+      @When('the When') theWhen() {
+        throw new Error('some Error');
+      }
+
+      @ThenThrow('thenThrow') thenThrow() {
+      }
+    }
+
+    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let specRunner = SpecRunner.runSpec(specEntry, specReporter);
+    let validationErrors = specRunner.report.getValidationErrors();
+    console.log(specRunner.report);
+    expect(validationErrors.length).toBe(1);
+    expect(validationErrors[0].message).toEqual('@ThenThrow() of '+ specEntry.getClassName() + '.thenThrow does not throw an error')
+
+  });
+
+  it('should compare Errors thrown in @When to Error given in @ThenThrow and accept (and log) if Error was expected', () => {
     let specClassName = 'SpecRunner_runSpec_ExpectError_valid';
 
     @Spec('a valid Test')
@@ -337,11 +366,13 @@ describe('specRunner.runSpec', () => {
     }
 
     let specEntry = specRegistry.getSpecByClassName(specClassName);
-    let specRunner = SpecRunner.runSpec(specEntry);
+    let specRunner = SpecRunner.runSpec(specEntry, specReporter);
     let report = specRunner.report;
     expect(report.getValidationErrors().length).toBe(0, 'existing Validation Errors');
     expect(report.getReports().length).toBe(3);
     expect(report.isRunFailed()).toBeFalsy();
+
+    //console.log(report);
   });
 
   it('should report when other Error is thrown than expected', ()=>{
@@ -365,7 +396,7 @@ describe('specRunner.runSpec', () => {
     }
 
     let specEntry = specRegistry.getSpecByClassName(specClassName);
-    let specRunner = SpecRunner.runSpec(specEntry);
+    let specRunner = SpecRunner.runSpec(specEntry, specReporter);
     let report = specRunner.report;
     let failedReports = report.getFailReports();
     let failedWhen = failedReports[0];
@@ -398,7 +429,7 @@ describe('specRunner.runSpec', () => {
     }
 
     let specEntry = specRegistry.getSpecByClassName(specClassName);
-    let specRunner = SpecRunner.runSpec(specEntry);
+    let specRunner = SpecRunner.runSpec(specEntry, specReporter);
     let report = specRunner.report;
     let failedReports = report.getFailReports();
 

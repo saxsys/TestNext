@@ -31,6 +31,7 @@ testFiles.forEach((file) => {
 let reporter = new SpecReporter();
 let specRunOutput = new SpecReportOutputConsole(reporter);
 specRunOutput.showFailedOnly(showFailedOnly);
+specRunOutput.setHeading('Spec "' + testName + '"');
 
 try {
   SpecExecChooser.execSpec(testName, reporter);

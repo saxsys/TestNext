@@ -30,6 +30,7 @@ testFiles.forEach((file) => {
 let reporter = new SpecReporter();
 let specRunOutput = new SpecReportOutputConsole(reporter);
 specRunOutput.showFailedOnly(showFailedOnly);
+specRunOutput.setHeading('Specs Ordered by Subject');
 
 SpecExecChooser.execBySubjects(reporter);
 specRunOutput.outputReport();

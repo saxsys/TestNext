@@ -4,8 +4,8 @@ import {AssertionError} from "../../SpecDeclaration/assert/assertion-Error";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
+import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
 import {ISpecReport} from "../specRunReporter/iSpec-report";
-import {SpecReport} from "../specRunReporter/spec-report";
 
 
 export class SpecRunner {
@@ -19,8 +19,8 @@ export class SpecRunner {
     this.report = specReport;
   }
 
-  static runSpec(spec:ISpecContainer): SpecRunner{
-    let specReport = new SpecReport(spec);
+  static runSpec(spec:ISpecContainer, specReporter:ISpecReporter): SpecRunner{
+    let specReport = specReporter.getOrCreateSpecReport(spec);
     let specRunner = new SpecRunner(spec, specReport);
 
     if(spec.isIgnored()) {
@@ -70,20 +70,23 @@ export class SpecRunner {
       expectedError = error
     }
 
+
     if(thrownError == null && expectedError != null){
       let errorReport =
         new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error',
           'No Error was thrown, expected "' + expectedError.message + '"');
       this.report.reportRun(thenThrow, false, errorReport);
       return;
-    }
-    //compare Errors
-    if(thrownError.message == expectedError.message){
+    } else if(expectedError == null){
+      this.report.reportValidationError(new SpecValidationError('@ThenThrow() of ' + this.specContainer.getClassName()+'.'+thenThrow.getName() + ' does not throw an error'));
+    }else if(thrownError.message == expectedError.message){
+      //compare Errors
       this.report.reportRun(when, true);
       this.report.reportRun(thenThrow, true);
     } else {
       this.report.reportRun(when, false, thrownError);
-      let errorReport = new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error');
+      let errorReport =
+        new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error');
       this.report.reportRun(thenThrow, false, errorReport);
     }
 
