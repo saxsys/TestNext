@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
 import {SpecReportOutputConsole} from "../src/SpecRunning/RunReportOutput/spec-report-output-console";
 import {SpecReporter} from "../src/SpecRunning/specRunReporter/spec-reporter";
+import {specRegistry} from "../src/SpecStorage/specRegistry/spec-registry-storage";
 
 const glob = require('glob');
 const path = require('path');
@@ -35,7 +36,7 @@ specRunOutput.showFailedOnly(showFailedOnly);
 specRunOutput.setHeading('Specs of Subject "' + subjectName +'"');
 
 try {
-  SpecExecChooser.execSubject(subjectName, reporter);
+  SpecExecChooser.execSubject(specRegistry, subjectName, reporter);
 } catch(error){
   console.error('\x1b[1;31m', 'Error: ' + error.message, '\x1b[0m');
 }

@@ -341,7 +341,6 @@ describe('specRunner.runSpec', () => {
     let specEntry = specRegistry.getSpecByClassName(specClassName);
     let specRunner = SpecRunner.runSpec(specEntry, specReporter);
     let validationErrors = specRunner.report.getValidationErrors();
-    console.log(specRunner.report);
     expect(validationErrors.length).toBe(1);
     expect(validationErrors[0].message).toEqual('@ThenThrow() of '+ specEntry.getClassName() + '.thenThrow does not throw an error')
 
@@ -372,7 +371,6 @@ describe('specRunner.runSpec', () => {
     expect(report.getReports().length).toBe(3);
     expect(report.isRunFailed()).toBeFalsy();
 
-    //console.log(report);
   });
 
   it('should report when other Error is thrown than expected', ()=>{

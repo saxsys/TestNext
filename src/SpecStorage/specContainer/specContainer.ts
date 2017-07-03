@@ -138,7 +138,7 @@ export class SpecContainer implements ISpecContainer{
    * @param description
    * @param execNumber execNumber Number for execution-order. Must be set, when multiple Then-Methods exist, must unique for Then in the SpecClass.
    */
-  addThen(functionName: string, description: string, execNumber: number) {
+  addThen(functionName: string, description: string, execNumber?: number) {
     if(this.getOwnMethod(functionName) != null)
       throw new SpecRegistryError('Multiple Methods with same Name on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
     if (execNumber == null) execNumber = 0;
@@ -440,7 +440,7 @@ export class SpecContainer implements ISpecContainer{
    * @param methodName
    * @returns the ISpecMethodContainer for a Spec-Method with the methodName from this Spec (not inherited Methods)
    */
-  private getOwnMethod(methodName: string):ISpecMethodContainer{
+  getOwnMethod(methodName: string):ISpecMethodContainer{
     let method;
 
     if(this.when != null && this.when.getName() == methodName)

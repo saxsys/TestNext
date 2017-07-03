@@ -2,11 +2,12 @@ import 'reflect-metadata';
 import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
 import {SpecReportOutputConsole} from "../src/SpecRunning/RunReportOutput/spec-report-output-console";
 import {SpecReporter} from "../src/SpecRunning/specRunReporter/spec-reporter";
+import {specRegistry} from "../src/SpecStorage/specRegistry/spec-registry-storage";
 
 const glob = require('glob');
 const path = require('path');
 
-let testName = process.argv[2];
+let specClassName = process.argv[2];
 let showFailedOnlyArg = process.argv[3];
 
 let showFailedOnly = false;
@@ -31,10 +32,10 @@ testFiles.forEach((file) => {
 let reporter = new SpecReporter();
 let specRunOutput = new SpecReportOutputConsole(reporter);
 specRunOutput.showFailedOnly(showFailedOnly);
-specRunOutput.setHeading('Spec "' + testName + '"');
+specRunOutput.setHeading('Spec "' + specClassName + '"');
 
 try {
-  SpecExecChooser.execSpec(testName, reporter);
+  SpecExecChooser.execSpec(specRegistry, specClassName, reporter);
 } catch(error){
   console.error('\x1b[1;31m', 'Error: ' + error.message, '\x1b[0m');
 }

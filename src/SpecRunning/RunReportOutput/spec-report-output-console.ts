@@ -1,7 +1,7 @@
 import {ISpecReportOutput} from "./iSpec-report-output";
-import {ISpecReport} from "../specRunReporter/iSpec-report";
+import {ISpecReport} from "../specRunReporter/specReport/iSpec-report";
 import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
-import {SpecReportBeautifier} from "../specRunReporter/spec-report-beautifier";
+import {SpecReportBeautifier} from "./spec-report-beautifier";
 
 export class SpecReportOutputConsole implements ISpecReportOutput {
   private successColor = '\x1b[1;32m';
@@ -34,9 +34,10 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     //sort Topics by alphabet, no Topic at last
     topics = topics.sort((a, b) => {
       if(a == null) return 1;
-      else if(a == b) return 0;
-      else if(a > b) return -1;
-      else return 1;
+      if(b == null) return -1;
+      else if(a.toUpperCase() == b.toUpperCase()) return 0;
+      else if(a.toUpperCase() > b.toUpperCase()) return 1;
+      else return -1;
     });
 
     let topicCount = topics.length;

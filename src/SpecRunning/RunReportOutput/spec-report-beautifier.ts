@@ -1,8 +1,8 @@
 import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
-import {ISpecReport} from "./iSpec-report";
-import {ISpecMethodRunReport} from "./iSpec-method-report";
+import {ISpecReport} from "../specRunReporter/specReport/iSpec-report";
+import {ISpecMethodRunReport} from "../specRunReporter/specMethodReport/iSpec-method-report";
 
 export class SpecReportBeautifier {
 

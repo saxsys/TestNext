@@ -1,16 +1,16 @@
-import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
-import {SpecValidationError} from "../specValidator/spec-validation-error";
-import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
-import {SpecMethodReport} from "./spec-method-report";
+import {ISpecContainer} from "../../../SpecStorage/specContainer/iSpec-Container";
+import {SpecValidationError} from "../../specValidator/spec-validation-error";
+import {ISpecMethodContainer} from "../../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
+import {SpecMethodReport} from "../specMethodReport/spec-method-report";
 import {ISpecReport} from "./iSpec-report";
-import {ISpecMethodRunReport} from "./iSpec-method-report";
+import {ISpecMethodRunReport} from "../specMethodReport/iSpec-method-report";
 
 
 export class SpecReport implements ISpecReport {
 
   private spec: ISpecContainer;
   private methodReports = new Array<ISpecMethodRunReport>();
-  private valdidationErrors = new Array<SpecValidationError>();
+  private validationErrors = new Array<SpecValidationError>();
   private ignoredReason: String = null;
   private executable = true;
 
@@ -25,7 +25,7 @@ export class SpecReport implements ISpecReport {
   }
 
   reportValidationError(error: SpecValidationError) {
-    this.valdidationErrors.push(error);
+    this.validationErrors.push(error);
   }
 
   setIgnored(reason:string){
@@ -56,7 +56,7 @@ export class SpecReport implements ISpecReport {
   }
 
   getValidationErrors(): Array<SpecValidationError> {
-    return this.valdidationErrors;
+    return this.validationErrors;
   }
 
   getFailReports(): Array<ISpecMethodRunReport> {
@@ -74,7 +74,7 @@ export class SpecReport implements ISpecReport {
   }
 
   isInvalidSpec():boolean{
-    return this.valdidationErrors.length > 0;
+    return this.validationErrors.length > 0;
   }
 
   isIgnored():boolean{
@@ -84,11 +84,8 @@ export class SpecReport implements ISpecReport {
       return true;
   }
 
-  getIgnoreReason():string{
-    if(this.ignoredReason == null)
-      return '';
-    else
-      return this.ignoredReason.toString();
+  getIgnoreReason():String{
+    return this.ignoredReason;
   }
 
   isExecutable():boolean{

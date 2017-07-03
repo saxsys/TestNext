@@ -1,7 +1,7 @@
-import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
-import {SpecValidationError} from "../specValidator/spec-validation-error";
+import {ISpecMethodContainer} from "../../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
+import {SpecValidationError} from "../../specValidator/spec-validation-error";
 import {ISpecContainer} from "SpecStorage/specContainer/iSpec-Container";
-import {ISpecMethodRunReport} from "./iSpec-method-report";
+import {ISpecMethodRunReport} from "../specMethodReport/iSpec-method-report";
 
 export interface ISpecReport {
   reportRun(specMethod: ISpecMethodContainer, success: boolean, error?: Error);
@@ -17,6 +17,6 @@ export interface ISpecReport {
   isRunFailed(): boolean;
   isInvalidSpec():boolean;
   isIgnored():boolean;
-  getIgnoreReason():string;
+  getIgnoreReason():String;
   isExecutable():boolean;
 }

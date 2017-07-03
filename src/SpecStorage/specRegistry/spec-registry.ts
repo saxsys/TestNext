@@ -91,7 +91,7 @@ export class SpecRegistry {
     let classNames = this.subject_specNames.get(subject);
 
     if(classNames == null)
-      return specs;
+      return null;
 
     classNames.forEach((className) => {
       specs.push(this.getSpecByClassName(className));

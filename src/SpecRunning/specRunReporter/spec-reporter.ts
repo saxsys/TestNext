@@ -1,7 +1,7 @@
 import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
-import {SpecReport} from "./spec-report";
+import {SpecReport} from "./specReport/spec-report";
 import {ISpecReporter} from "./iSpec-reporter";
-import {ISpecReport} from "./iSpec-report";
+import {ISpecReport} from "./specReport/iSpec-report";
 
 export class SpecReporter implements ISpecReporter {
 
@@ -12,6 +12,8 @@ export class SpecReporter implements ISpecReporter {
 
   addReportToTopic(report:ISpecReport, topic:String){
     let reportName = report.getSpec().getClassName();
+    if(this.specReports.get(reportName) == null)
+      throw new Error('Report for "' + reportName + '" does not exist in Reporter');
     //Remove report from reports without topic (topic == null)
     let reportsWithoutTopic = this.topicsAndReports.get(null);
     if(topic!= null && reportsWithoutTopic != null && reportsWithoutTopic.includes(reportName)){
@@ -19,6 +21,10 @@ export class SpecReporter implements ISpecReporter {
       if (index > -1) {
         reportsWithoutTopic.splice(index, 1);
       }
+      //remove , if empty
+      if(reportsWithoutTopic.length == 0)
+        this.topicsAndReports.delete(null);
+
     }
 
     //Add Element to Topic
@@ -43,7 +49,7 @@ export class SpecReporter implements ISpecReporter {
   getReportsOfTopic(topic:String):Array<ISpecReport>{
     let reportNamesOfTopic = this.topicsAndReports.get(topic);
     if(reportNamesOfTopic == null)
-      return [];
+      return null;
 
     let reports = [];
     reportNamesOfTopic.forEach(reportName => {
@@ -66,7 +72,7 @@ export class SpecReporter implements ISpecReporter {
     return Array.from(this.topicsAndReports.keys());
   }
 
-  public getOrCreateSpecReport(spec: ISpecContainer): ISpecReport {
+  getOrCreateSpecReport(spec: ISpecContainer): ISpecReport {
     let className = spec.getClassName();
     let specReport = this.specReports.get(className);
 

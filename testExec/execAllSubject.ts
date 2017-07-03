@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
 import {SpecReportOutputConsole} from "../src/SpecRunning/RunReportOutput/spec-report-output-console";
 import {SpecReporter} from "../src/SpecRunning/specRunReporter/spec-reporter";
+import {specRegistry} from "../src/SpecStorage/specRegistry/spec-registry-storage";
 
 const glob = require('glob');
 const path = require('path');
@@ -32,7 +33,7 @@ let specRunOutput = new SpecReportOutputConsole(reporter);
 specRunOutput.showFailedOnly(showFailedOnly);
 specRunOutput.setHeading('Specs Ordered by Subject');
 
-SpecExecChooser.execBySubjects(reporter);
+SpecExecChooser.execBySubjects(specRegistry, reporter);
 specRunOutput.outputReport();
 
 

@@ -5,7 +5,7 @@ import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
 import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
-import {ISpecReport} from "../specRunReporter/iSpec-report";
+import {ISpecReport} from "../specRunReporter/specReport/iSpec-report";
 
 
 export class SpecRunner {
