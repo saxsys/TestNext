@@ -28,7 +28,7 @@ describe('SpecRegistry.registerSpec()', () => {
     let specRegisterSpecNameDoubleClass = SpecRegisterSpecNameDoubleClass.prototype.constructor;
     let specNameDoubleClassName = 'SpecRegisterSpecNameDoubleClass';
     specRegistry.registerSpec(specRegisterSpecNameDoubleClass, existingSpecName);
-    expect(specRegistry.getSpecByClassName(specNameDoubleClassName)).not.toBeUndefined();
+    expect(specRegistry.getSpecContainerByClassName(specNameDoubleClassName)).not.toBeUndefined();
   });
 
   it('should refuse adding multiple SpecName for one SpecContainer', () => {
@@ -83,13 +83,13 @@ describe('SpecRegistry.getSpecByName', () => {
     specRegistry.registerSpec(specClassConstructor, specName)
   });
   it('should return correct SpecContainer for existing specClassName', () => {
-    let thirdTCaseRegEntry = specRegistry.getSpecByClassName(specClassName);
+    let thirdTCaseRegEntry = specRegistry.getSpecContainerByClassName(specClassName);
     expect(thirdTCaseRegEntry.getDescription()).toEqual(specName);
     expect(thirdTCaseRegEntry.getClassConstructor()).toEqual(specClassConstructor);
   });
 
   it('should return null for not existing specClassName', () => {
-    expect(specRegistry.getSpecByClassName(nonRegisteredSpecClassName)).toBeUndefined();
+    expect(specRegistry.getSpecContainerByClassName(nonRegisteredSpecClassName)).toBeUndefined();
   });
 });
 
@@ -132,7 +132,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
     let notYetRegisteredGivenName = 'givenFunction';
 
     specRegistry.registerGivenForSpec(notYetRegisteredClass, notYetRegisteredGivenName, givenDescription, givenExecNumber);
-    let entry = specRegistry.getSpecByClassName(notYetRegisteredClassName);
+    let entry = specRegistry.getSpecContainerByClassName(notYetRegisteredClassName);
     expect(entry).not.toBeUndefined();
     expect(entry.getDescription()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(notYetRegisteredClass);
@@ -187,7 +187,7 @@ describe('SpecRegistry.registerGivenForSpec', () => {
 
   it('should register the Given, while parameters are correct', () => {
     specRegistry.registerGivenForSpec(specClassConstructor, givenFunctionName, givenDescription, givenExecNumber);
-    let specRegEntry = specRegistry.getSpecByClassName(specClassName);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(specClassName);
     let givenRegEntry = specRegEntry.getGiven()[givenExecNumber];
     expect(givenRegEntry.getName()).toEqual(givenFunctionName);
     expect(givenRegEntry.getDescription()).toEqual(givenDescription);
@@ -233,7 +233,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
     let notYetRegisteredFunctionName = 'thenFunction';
 
     specRegistry.registerThenForSpec(notYetRegisteredClass, notYetRegisteredFunctionName, description, execNumber);
-    let specEntry = specRegistry.getSpecByClassName(notYetRegisteredClassName);
+    let specEntry = specRegistry.getSpecContainerByClassName(notYetRegisteredClassName);
     expect(specEntry).not.toBeUndefined();
     expect(specEntry.getDescription()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
@@ -280,7 +280,7 @@ describe('SpecRegistry.registerThenForSpec', () => {
 
   it('should register the Then, while parameters are correct', () => {
     specRegistry.registerThenForSpec(specClassConstructor, functionName, description, execNumber);
-    let specRegEntry = specRegistry.getSpecByClassName(specClassName);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(specClassName);
     let thenRegEntry = specRegEntry.getThen()[execNumber];
     expect(thenRegEntry.getName()).toEqual(functionName);
     expect(thenRegEntry.getDescription()).toEqual(description);
@@ -323,7 +323,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
     let notYetRegisteredFunctionName = 'givenFunction';
 
     specRegistry.registerWhenForSpec(notYetRegisteredClass, notYetRegisteredFunctionName, description);
-    let specEntry = specRegistry.getSpecByClassName(notYetRegisteredClassName);
+    let specEntry = specRegistry.getSpecContainerByClassName(notYetRegisteredClassName);
     expect(specEntry).not.toBeUndefined();
     expect(specEntry.getDescription()).toBeUndefined();
     expect(specEntry.getClassConstructor()).toEqual(notYetRegisteredClass);
@@ -358,7 +358,7 @@ describe('SpecRegistry.registerWhenForSpec', () => {
 
   it('should register the When, while parameters are correct', () => {
     specRegistry.registerWhenForSpec(specClassConstructor, functionName, description);
-    let specRegEntry = specRegistry.getSpecByClassName(specClassName);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(specClassName);
     let thenRegEntry = specRegEntry.getWhen();
     expect(thenRegEntry.getName()).toEqual(functionName);
     expect(thenRegEntry.getDescription()).toEqual(description);
@@ -384,7 +384,7 @@ describe('SpecRegistry-registerThenErrorForSpec', () => {
     specReg.registerSpec(specClassConstructor, specName);
     specReg.registerThenErrorForSpec(specClassConstructor, functionName, description);
 
-    let specEntry = specReg.getSpecByClassName(specClassName);
+    let specEntry = specReg.getSpecContainerByClassName(specClassName);
     expect(specEntry).not.toBeNull();
     let methodEntry = specEntry.getThenThrow();
     expect(methodEntry).not.toBeNull();
@@ -397,7 +397,7 @@ describe('SpecRegistry-registerThenErrorForSpec', () => {
 
     specReg.registerThenErrorForSpec(specClassConstructor, functionName, description);
 
-    let specEntry = specReg.getSpecByClassName(specClassName);
+    let specEntry = specReg.getSpecContainerByClassName(specClassName);
     expect(specEntry).not.toBeNull();
     let methodEntry = specEntry.getThenThrow();
     expect(methodEntry).not.toBeNull();
@@ -418,12 +418,12 @@ describe('SpecRegistry.registerSpecForSubject', () => {
 
   beforeAll(() => {
     specRegistry.registerSpec(existSpecClass, existSpecClassDescription);
-    specRegEntry = specRegistry.getSpecByClassName(existSpecClassName);
+    specRegEntry = specRegistry.getSpecContainerByClassName(existSpecClassName);
   });
   it('should register subject for existing class and save into SpecContainer', () => {
     specRegistry.registerSpecForSubject(existSpecClass, subjectName1);
 
-    let registeredSpecsForSubject = specRegistry.getSpecsForSubject(subjectName1);
+    let registeredSpecsForSubject = specRegistry.getSpecContainersForSubject(subjectName1);
     expect(registeredSpecsForSubject).toContain(specRegEntry);
     expect(specRegEntry.getSubjects()).toContain(subjectName1);
   });
@@ -436,8 +436,8 @@ describe('SpecRegistry.registerSpecForSubject', () => {
     let subjectName2 = 'subjectTest2';
 
     specRegistry.registerSpecForSubject(newSpecClass, subjectName2);
-    let specRegEntry = specRegistry.getSpecByClassName(newSpecClassName);
-    let registeredSpecsForSubject = specRegistry.getSpecsForSubject(subjectName2);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(newSpecClassName);
+    let registeredSpecsForSubject = specRegistry.getSpecContainersForSubject(subjectName2);
 
     expect(specRegEntry).not.toBeNull();
     expect(registeredSpecsForSubject).toContain(specRegEntry);
@@ -457,7 +457,7 @@ describe('SpecRegistry.registerSpecForSubject', () => {
   });
 });
 
-describe('SpecRegistry.getSpecsWithoutSubject', () => {
+describe('SpecRegistry.getSpecContainersWithoutSubject', () => {
   let specRegistry = new SpecRegistry();
   it('should return Specs, which do not have a Subject', () => {
     class SpecRegistry_getSpecWithoutSubject_ClassWithoutSubject {
@@ -472,9 +472,9 @@ describe('SpecRegistry.getSpecsWithoutSubject', () => {
     specRegistry.registerSpecForSubject(classWithSubject, classWithSubjectName);
     specRegistry.registerSpecForSubject(classWithSubject, 'Subject opposite to NoSubject');
 
-    let entryWithoutSubject = specRegistry.getSpecByClassName(classWithoutSubjectName);
-    let entryWithSubject = specRegistry.getSpecByClassName(classWithSubjectName);
-    let specsWithoutSubject = specRegistry.getSpecsWithoutSubject();
+    let entryWithoutSubject = specRegistry.getSpecContainerByClassName(classWithoutSubjectName);
+    let entryWithSubject = specRegistry.getSpecContainerByClassName(classWithSubjectName);
+    let specsWithoutSubject = specRegistry.getSpecContainersWithoutSubject();
     expect(specsWithoutSubject).toContain(entryWithoutSubject);
     expect(specsWithoutSubject).not.toContain(entryWithSubject);
 
@@ -482,7 +482,7 @@ describe('SpecRegistry.getSpecsWithoutSubject', () => {
   });
 });
 
-describe('SpecRegistry.getAllSpecs', () => {
+describe('SpecRegistry.getAllSpecContainer', () => {
   let specReg = new SpecRegistry();
   class SpecRegistry_getAllSpec_SpecAddedWithDescription {}
   let spec_AddedWithDescription = SpecRegistry_getAllSpec_SpecAddedWithDescription.prototype.constructor;
@@ -502,11 +502,11 @@ describe('SpecRegistry.getAllSpecs', () => {
     //Add SpecContainer by RegisterGiven, without SpecDescription, will not be accepted as Executable
     specReg.registerGivenForSpec(spec_AddedWithoutDescription, 'aClassMethod', 'methodDescription');
 
-    entryWithDescr = specReg.getSpecByClassName('SpecRegistry_getAllSpec_SpecAddedWithDescription');
-    entryWithoutDescr = specReg.getSpecByClassName('SpecRegistry_getAllSpec_SpecAddedWithoutDescription');
+    entryWithDescr = specReg.getSpecContainerByClassName('SpecRegistry_getAllSpec_SpecAddedWithDescription');
+    entryWithoutDescr = specReg.getSpecContainerByClassName('SpecRegistry_getAllSpec_SpecAddedWithoutDescription');
     expect(entryWithDescr).not.toBeNull();
     expect(entryWithoutDescr).not.toBeNull();
-    gotAllSpecs = specReg.getAllSpecs();
+    gotAllSpecs = specReg.getAllSpecContainer();
   });
 
   it('should return all Specs, also Specs with SpecDescription (= Executable)', () => {
@@ -518,7 +518,7 @@ describe('SpecRegistry.getAllSpecs', () => {
 
 });
 
-describe('SpecRegistry.getExecutableSpecs', () => {
+describe('SpecRegistry.getExecutableSpecContainers', () => {
   let specReg = new SpecRegistry();
   class SpecRegistry_getExecutableSpec_SpecAddedWithDescription {}
   let spec_AddedWithDescription = SpecRegistry_getExecutableSpec_SpecAddedWithDescription.prototype.constructor;
@@ -538,12 +538,12 @@ describe('SpecRegistry.getExecutableSpecs', () => {
     //Add SpecContainer by RegisterGiven, without SpecDescription, will not be accepted as Executable
     specReg.registerGivenForSpec(spec_AddedWithoutDescription, 'aClassMethod', 'methodDescription');
 
-    entryWithDescr = specReg.getSpecByClassName('SpecRegistry_getExecutableSpec_SpecAddedWithDescription');
-    entryWithoutDescr = specReg.getSpecByClassName('SpecRegistry_getExecutableSpec_SpecAddedWithoutDescription');
+    entryWithDescr = specReg.getSpecContainerByClassName('SpecRegistry_getExecutableSpec_SpecAddedWithDescription');
+    entryWithoutDescr = specReg.getSpecContainerByClassName('SpecRegistry_getExecutableSpec_SpecAddedWithoutDescription');
     expect(entryWithDescr).not.toBeNull();
     expect(entryWithoutDescr).not.toBeNull();
 
-    gotExecSpecs = specReg.getExecutableSpecs();
+    gotExecSpecs = specReg.getExecutableSpecContainers();
   });
 
   it('should return executable Specs Specs with SpecDescription (= Executable)', () => {
@@ -565,7 +565,7 @@ describe('SpecRegistry.registerSpecAsIgnored', ()=>{
     let specClassCoonstructor = SpecRegistry_registerIgnored_defaultNotIgnored.prototype.constructor;
     specReg.registerSpec(specClassCoonstructor, 'existing SpecContainer');
 
-    let spec = specReg.getSpecByClassName(specClassName);
+    let spec = specReg.getSpecContainerByClassName(specClassName);
     expect(spec).not.toBeNull();
     expect(spec.isIgnored()).toBeFalsy();
   });
@@ -578,7 +578,7 @@ describe('SpecRegistry.registerSpecAsIgnored', ()=>{
     specReg.registerSpec(specClassConstructor, 'existing SpecContainer');
     specReg.registerSpecAsIgnored(specClassConstructor, ignoreReason);
 
-    let spec = specReg.getSpecByClassName(specClassName);
+    let spec = specReg.getSpecContainerByClassName(specClassName);
     expect(spec).not.toBeNull();
     expect(spec.isIgnored()).toBeTruthy();
   });
@@ -590,7 +590,7 @@ describe('SpecRegistry.registerSpecAsIgnored', ()=>{
     let ignoreReason = 'I Could not handle it anymore';
     specReg.registerSpecAsIgnored(specClassConstructor, ignoreReason);
 
-    let spec = specReg.getSpecByClassName(specClassName);
+    let spec = specReg.getSpecContainerByClassName(specClassName);
     expect(spec).not.toBeNull();
     expect(spec.isIgnored()).toBeTruthy();
   });
@@ -610,7 +610,7 @@ describe('SpecRegistry.registerSutForSpec', () => {
 
   beforeAll(()=>{
     specReg.registerSpec(specClassConstructor, 'an existing Spec');
-    spec = specReg.getSpecByClassName(specClassName);
+    spec = specReg.getSpecContainerByClassName(specClassName);
   });
 
   it('should set sut for existing SpecContainer', () => {
@@ -626,7 +626,7 @@ describe('SpecRegistry.registerSutForSpec', () => {
 
     specReg.registerSutForSpec(specClassConstructor, SUT);
 
-    let specContainer = specReg.getSpecByClassName(specClassName);
+    let specContainer = specReg.getSpecContainerByClassName(specClassName);
     expect(specContainer).not.toBeNull();
 
     expect(specContainer.getSUT()).toEqual(SUT);
@@ -647,7 +647,7 @@ describe('SpecRegistry.registerSutForSpec', () => {
 
   beforeAll(()=>{
     specReg.registerSpec(specClassConstructor, 'an existing Spec');
-    spec = specReg.getSpecByClassName(specClassName);
+    spec = specReg.getSpecContainerByClassName(specClassName);
   });
 
   it('should set sut for existing SpecContainer', () => {
@@ -663,7 +663,7 @@ describe('SpecRegistry.registerSutForSpec', () => {
 
     specReg.registerSutForSpec(specClassConstructor, SUT);
 
-    let specContainer = specReg.getSpecByClassName(specClassName);
+    let specContainer = specReg.getSpecContainerByClassName(specClassName);
     expect(specContainer).not.toBeNull();
 
     expect(specContainer.getSUT()).toEqual(SUT);
@@ -686,7 +686,7 @@ describe('SpecRegistry.setProviders', () => {
 
   beforeAll(()=>{
     specReg.registerSpec(specClassConstructor, 'a Spec for adding providers later');
-    specContainer = specReg.getSpecByClassName(specClassName);
+    specContainer = specReg.getSpecContainerByClassName(specClassName);
   });
 
   it('should register providers for existing SpecContainer, having none', () => {
@@ -701,7 +701,7 @@ describe('SpecRegistry.setProviders', () => {
     let specClassName = 'SpecRegistry_setProviders_NewSpec';
 
     specReg.registerProvidersForSpec(specClassConstructor, providers);
-    let specContainer = specReg.getSpecByClassName(specClassName);
+    let specContainer = specReg.getSpecContainerByClassName(specClassName);
     expect(specContainer).not.toBeNull();
     expect(specContainer.getProviders()).toEqual(providers)
 

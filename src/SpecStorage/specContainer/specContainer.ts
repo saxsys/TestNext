@@ -98,7 +98,7 @@ export class SpecContainer implements ISpecContainer{
 
   /**
    * Add a function that does the Setup for the Spec.
-   * A check weather the function rally exists will not be done here.
+   * A check whether the function rally exists will not be done here.
    *
    * @param functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier), must be public.
    * @param description
@@ -117,7 +117,7 @@ export class SpecContainer implements ISpecContainer{
   /**
    * Set one function that includes the condition of the Spec.
    * There can only be one When-Function.
-   * A check weather the function rally exists will not be done here.
+   * A check whether the function rally exists will not be done here.
    *
    * @param functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier) and must be public:
    * @param description
@@ -132,7 +132,7 @@ export class SpecContainer implements ISpecContainer{
 
   /**
    * Add a function that includes the Asserts of the Spec.
-   * A check weather the function rally exists will not be done here.
+   * A check whether the function rally exists will not be done here.
    *
    * @param functionName functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier) and must be public.
    * @param description
@@ -150,7 +150,7 @@ export class SpecContainer implements ISpecContainer{
 
   /**
    * Set a function throwing the same Error as expected to be thrown in the When-Method
-   * A check weather the function rally exists and really throws an error will not be done here.
+   * A check whether the function rally exists and really throws an error will not be done here.
    * @param functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier) and must be public:
    * @param description
    */
@@ -246,7 +246,7 @@ export class SpecContainer implements ISpecContainer{
 
   /**
    *
-   * @returns weather the Spec is marked as ignored.
+   * @returns whether the Spec is marked as ignored.
    */
   isIgnored():boolean{
     return this.ignored;
@@ -331,7 +331,7 @@ export class SpecContainer implements ISpecContainer{
 
   /**
    *
-   * @returns weather the Spec should be executable, depending on the Spec-Description
+   * @returns whether the Spec should be executable, depending on the Spec-Description
    */
   isExecutableSpec():boolean{
     if(this.specDescription == null)
@@ -340,7 +340,7 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
-   * @returns weather in the When-Method an error is expected, depending weather a ThenThrow-Method is set
+   * @returns whether in the When-Method an error is expected, depending whether a ThenThrow-Method is set
    */
   isExpectingErrors():boolean{
     if(this.thenThrow != null)

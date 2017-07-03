@@ -37,10 +37,10 @@ describe('SpecReporter.getOrCreateSpecReport', () => {
   });
 
   it('should create the Report', () => {
-    let report = reporter.getSpecReportOf(reportedSpec.getClassName());
+    let report = reporter.getReportForSpec(reportedSpec.getClassName());
     expect(report).not.toBeUndefined();
     expect(report).not.toBeNull();
-    expect(report.getSpec()).toEqual(reportedSpec);
+    expect(report.getSpecContainer()).toEqual(reportedSpec);
   });
 
   it('should refuse Class Name Duplicates', ()=>{
@@ -60,7 +60,7 @@ describe('SpecReporter.getOrCreateSpecReport', () => {
     let otherSpec = ExampleSpecFiller.getSpecWithoutSubject();
     let otherReport = reporter.getOrCreateSpecReport(otherSpec);
     expect(otherReport).not.toBeNull();
-    expect(otherReport.getSpec()).toEqual(otherSpec);
+    expect(otherReport.getSpecContainer()).toEqual(otherSpec);
   });
 
   it('should add Reports to Topic "null" by default', ()=>{
@@ -89,7 +89,7 @@ describe('SpecReporter.addReportToTopic', () => {
 
     expect(()=> {
       reporter.addReportToTopic(nonExistReport, 'aTopic');
-    }).toThrowError('Report for "' + nonExistReport.getSpec().getClassName() + '" does not exist in Reporter');
+    }).toThrowError('Report for "' + nonExistReport.getSpecContainer().getClassName() + '" does not exist in Reporter');
   });
 
   it('should add Report to Topic and remove from reports without topic', () => {

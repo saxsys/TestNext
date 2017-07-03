@@ -8,40 +8,91 @@ export class SpecRegistry {
   private specClasses = new Map<string, SpecContainer>();
   private subject_specNames = new Map<string, Array<string>>();
 
-
-  registerSpec(specClassConstructor: Function, specName: string) {
+  /**
+   * Creates and saves a SpecContainer for the Spec as such, sets the description and marks it so as executable
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param specDescription Description of the Spec
+   */
+  registerSpec(specClassConstructor: Function, specDescription: string) {
     let specClassName = specClassConstructor.name;
 
-    let registryEntry = this.getOrRegisterSpecClass(specClassConstructor);
-    registryEntry.setDescription(specName);
+    let registryEntry = this.getOrRegisterSpecContainerForClass(specClassConstructor);
+    registryEntry.setDescription(specDescription);
 
   }
 
+  /**
+   * Registers the method in the SpecContainer as Given-Method for the Spec
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   * No Validation happens at this point, whether the methods exists on SpecClass
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param functionName Name of the Function to register
+   * @param description
+   * @param execNumber place in execution order
+   */
   registerGivenForSpec(specClassConstructor: Function, functionName: string, description: string, execNumber?: number) {
-    let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
+    let specRegEntry = this.getOrRegisterSpecContainerForClass(specClassConstructor);
     specRegEntry.addGiven(functionName, description, execNumber);
   }
 
+  /**
+   * Registers the method in the SpecContainer as When-Method for the Spec
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   * No Validation happens at this point, whether the methods exists on SpecClass
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param functionName Name of the Function to register
+   * @param description
+   */
   registerWhenForSpec(specClass: Function, functionName: string, description: string) {
-    let specRegEntry = this.getOrRegisterSpecClass(specClass);
+    let specRegEntry = this.getOrRegisterSpecContainerForClass(specClass);
     specRegEntry.addWhen(functionName, description);
   }
 
+  /**
+   * Registers the method in the SpecContainer as Then-Method for the Spec
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   * No Validation happens at this point, whether the methods exists on SpecClass
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param functionName Name of the Function to register
+   * @param description
+   * @param execNumber place in execution order
+   */
   registerThenForSpec(specClass: Function, functionName: string, description: string, execNumber?: number) {
-    let specRegEntry = this.getOrRegisterSpecClass(specClass);
+    let specRegEntry = this.getOrRegisterSpecContainerForClass(specClass);
     specRegEntry.addThen(functionName, description, execNumber);
   }
 
+  /**
+   * Registers the method in the SpecContainer as ThenThrow-Method for the Spec
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   * No Validation happens at this point, whether the methods exists on SpecClass or throws an error
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param functionName Name of the Function to register
+   * @param description
+   */
   registerThenErrorForSpec(specClass: Function, functionName: string, description: string) {
-    let specRegEntry = this.getOrRegisterSpecClass(specClass);
+    let specRegEntry = this.getOrRegisterSpecContainerForClass(specClass);
     specRegEntry.addThenError(functionName, description);
   }
 
+  /**
+   * Registers the SpecContainer for a Subject, saved in registry and SpecContainer
+   * One Subject can have multiple SpecClasses and one SpecClass can have multiple Subjects
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param subject
+   */
   registerSpecForSubject(specClassConstructor:Function , subject:string ){
     let specClassName = specClassConstructor.name;
 
     //write subject into SpecContainer
-    let specRegEntry = this.getOrRegisterSpecClass(specClassConstructor);
+    let specRegEntry = this.getOrRegisterSpecContainerForClass(specClassConstructor);
     specRegEntry.addSubject(subject);
 
     //write Spec into Subject List
@@ -55,38 +106,78 @@ export class SpecRegistry {
     subjClasses.push(specClassName);
   }
 
+  /**
+   * Marks the Spec as ignored (in the SpecContainer).
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param reason
+   */
   registerSpecAsIgnored(specClassConstructor:Function, reason:string){
-    let spec = this.getOrRegisterSpecClass(specClassConstructor);
+    let spec = this.getOrRegisterSpecContainerForClass(specClassConstructor);
     spec.setIgnored(reason);
   }
 
+  /**
+   * Registers a Class as SUT in the SpecContainer
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   *
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param sut
+   */
   registerSutForSpec(specClassConstructor:Function, sut:Provider){
-    let spec = this.getOrRegisterSpecClass(specClassConstructor);
+    let spec = this.getOrRegisterSpecContainerForClass(specClassConstructor);
     spec.setSUT(sut);
   };
 
+  /**
+   * Register Providers of SUT in the SpecContainer.
+   * @param specClassConstructor Constructor of the SpecClass
+   * @param providers
+   */
   registerProvidersForSpec(specClassConstructor:Function, providers:Array<Provider>){
-    let spec = this.getOrRegisterSpecClass(specClassConstructor);
+    let spec = this.getOrRegisterSpecContainerForClass(specClassConstructor);
     spec.addProviders(providers);
   }
 
+
+  /**
+   * @return {string[]} with all the names of all SpecClasses in this registry
+   */
   getSpecClassNames(): Array<String> {
     return Array.from(this.specClasses.keys());
   }
 
+  /**
+   * @return {string[]} with all Subject-names in this registry
+   */
   getSubjects():Array<string>{
     return Array.from(this.subject_specNames.keys());
   }
 
-  getSpecByClassName(className: string): SpecContainer {
+  /**
+   * get the SpecContainer for the SpecClass with the name
+   * @param className of the SpecClass
+   * @return {SpecContainer} SpecContainer of the SpecClass
+   */
+  getSpecContainerByClassName(className: string): SpecContainer {
     return this.specClasses.get(className);
   }
 
-  getAllSpecs(): Array<SpecContainer>{
+  /**
+   * returns all SpecContainers of this registry
+   * @return {Array<SpecContainer>}
+   */
+  getAllSpecContainer(): Array<SpecContainer>{
     return Array.from(this.specClasses.values());
   }
 
-  getSpecsForSubject(subject:string):Array<SpecContainer>{
+  /**
+   * returns all SpecContainers registered for the Subject
+   * @param subject
+   * @return {SpecContainer[]}
+   */
+  getSpecContainersForSubject(subject:string):Array<SpecContainer>{
     let specs = new Array<SpecContainer>();
     let classNames = this.subject_specNames.get(subject);
 
@@ -94,14 +185,18 @@ export class SpecRegistry {
       return null;
 
     classNames.forEach((className) => {
-      specs.push(this.getSpecByClassName(className));
+      specs.push(this.getSpecContainerByClassName(className));
     });
 
     return specs;
 
   }
 
-  getSpecsWithoutSubject():Array<SpecContainer>{
+  /**
+   *returns all SpecContainers not registered for any Subject
+   * @return {SpecContainer[]}
+   */
+  getSpecContainersWithoutSubject():Array<SpecContainer>{
     let allRemainingSpecNames = Array.from(this.specClasses.keys());
 
     this.subject_specNames.forEach((specs) => {
@@ -115,7 +210,11 @@ export class SpecRegistry {
     return specsWithoutSubject;
   }
 
-  getExecutableSpecs():Array<SpecContainer>{
+  /**
+   * returns all SpecConatiners marked as executable
+   * @return {SpecContainer[]}
+   */
+  getExecutableSpecContainers():Array<SpecContainer>{
     let executableSpecs = new Array<SpecContainer>();
     Array.from(this.specClasses.values()).forEach((spec) => {
       if(spec.isExecutableSpec())
@@ -124,7 +223,12 @@ export class SpecRegistry {
     return executableSpecs;
   }
 
-  private getOrRegisterSpecClass(specClassConstructor:Function): SpecContainer{
+  /**
+   *  returns the SpecConatainer for the SpecClass, creates it if not existant, does not mark  ir as executable
+   * @param specClassConstructor Constructor of the SpecClass
+   * @return {SpecContainer}
+   */
+  private getOrRegisterSpecContainerForClass(specClassConstructor:Function): SpecContainer{
     let specClassName = specClassConstructor.name;
 
     let specRegEntry = this.specClasses.get(specClassName);
@@ -135,7 +239,7 @@ export class SpecRegistry {
       let parentSpec = null;
       let prototype = specClassConstructor.prototype;
       if(prototype.__proto__.constructor.name != 'Object') {
-        parentSpec = this.getOrRegisterSpecClass(prototype.__proto__.constructor);
+        parentSpec = this.getOrRegisterSpecContainerForClass(prototype.__proto__.constructor);
       }
 
       specRegEntry = new SpecContainer(specClassConstructor, parentSpec);

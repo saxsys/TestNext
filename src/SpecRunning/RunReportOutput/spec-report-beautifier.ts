@@ -14,7 +14,7 @@ export class SpecReportBeautifier {
     let padding2ndLevel = SpecReportBeautifier.getPaddingString((paddingNumber+1)*2);
 
     let str = '';
-    let spec = specReport.getSpec();
+    let spec = specReport.getSpecContainer();
     let validationErrors = specReport.getValidationErrors();
 
     str += padding + SpecReportBeautifier.specDescriptionToString(spec) + '\n';
@@ -26,7 +26,7 @@ export class SpecReportBeautifier {
 
     str += SpecReportBeautifier.stringFromValidationErrors(validationErrors, (paddingNumber+1)*2);
 
-    specReport. getReports().forEach((log) => {
+    specReport. getRunReports().forEach((log) => {
       str += SpecReportBeautifier.specMethodReportToString(log, (paddingNumber+1)*2) + '\n';
     });
 

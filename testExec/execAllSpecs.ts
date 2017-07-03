@@ -35,7 +35,7 @@ specRunOutput.showFailedOnly(showFailedOnly);
 specRunOutput.setHeading('All Specs');
 
 SpecExecChooser.execAllSpecs(specRegistry, reporter);
-specRunOutput.outputReport();
+specRunOutput.outputResult();
 
 
 

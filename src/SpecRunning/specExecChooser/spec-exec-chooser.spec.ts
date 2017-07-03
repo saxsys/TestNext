@@ -58,12 +58,12 @@ describe('SpecExecChooser.execAllSpecs', () => {
     SpecExecChooser.execAllSpecs(registry, reporter);
 
     let reports = reporter.getReports();
-    expect(reports.length).toBe(registry.getAllSpecs().length, 'number of reports differ from number of registered Specs');
+    expect(reports.length).toBe(registry.getAllSpecContainer().length, 'number of reports differ from number of registered Specs');
 
-    let reportStandardSpec = reporter.getSpecReportOf(standardSpec.getClassName());
-    let reportInheritedSpec = reporter.getSpecReportOf(inheritedSpec.getClassName());
-    let reportWithSubject = reporter.getSpecReportOf(specWithSubject.getClassName());
-    let reportWithoutGiven = reporter.getSpecReportOf(specWithoutGiven.getClassName());
+    let reportStandardSpec = reporter.getReportForSpec(standardSpec.getClassName());
+    let reportInheritedSpec = reporter.getReportForSpec(inheritedSpec.getClassName());
+    let reportWithSubject = reporter.getReportForSpec(specWithSubject.getClassName());
+    let reportWithoutGiven = reporter.getReportForSpec(specWithoutGiven.getClassName());
     expect(reportStandardSpec).not.toBeNull('StandardTest not logged');
     expect(reportInheritedSpec).not.toBeNull('StandardTest not logged');
     expect(reportWithSubject).not.toBeNull('SpecWithSubject not logged');
@@ -305,11 +305,11 @@ describe('SpecExecChooser.execBySubjects', () => {
     SpecExecChooser.execBySubjects(registry, reporter);
 
     registry.getSubjects().forEach(subject => {
-      let specsNamesOfSubject = registry.getSpecsForSubject(subject).map((spec)=>{
+      let specsNamesOfSubject = registry.getSpecContainersForSubject(subject).map((spec)=>{
           return spec.getClassName();
         });
       let specsNamesOfTopic = reporter.getReportsOfTopic(subject).map((report)=>{
-        return report.getSpec().getClassName()
+        return report.getSpecContainer().getClassName()
       });
 
       expect(specsNamesOfTopic.sort()).toEqual(specsNamesOfSubject.sort());
@@ -320,12 +320,12 @@ describe('SpecExecChooser.execBySubjects', () => {
     let reporter = new SpecReporter();
     SpecExecChooser.execBySubjects(registry, reporter);
 
-    let specWithoutSubject = registry.getSpecsWithoutSubject().map((spec)=>{
+    let specWithoutSubject = registry.getSpecContainersWithoutSubject().map((spec)=>{
       return spec.getClassName();
     });
 
     let specWithoutTopic = reporter.getReportsOfTopic(null).map((report)=>{
-      return report.getSpec().getClassName();
+      return report.getSpecContainer().getClassName();
     });
     expect(specWithoutTopic.sort()).toEqual(specWithoutSubject.sort());
   });

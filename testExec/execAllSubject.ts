@@ -34,7 +34,7 @@ specRunOutput.showFailedOnly(showFailedOnly);
 specRunOutput.setHeading('Specs Ordered by Subject');
 
 SpecExecChooser.execBySubjects(specRegistry, reporter);
-specRunOutput.outputReport();
+specRunOutput.outputResult();
 
 
 

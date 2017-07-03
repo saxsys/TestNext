@@ -1,4 +1,4 @@
 export interface ISpecReportOutput{
-  outputReport();
+  outputResult();
   showFailedOnly(val?:boolean);
 }

@@ -8,26 +8,53 @@ import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
 import {ISpecReport} from "../specRunReporter/specReport/iSpec-report";
 
 
+/**
+ * Class to execute a Spec (with SpecRunner.runSpec()), it contains the results of the run afterwards
+ */
 export class SpecRunner {
 
+  /**
+   * SpecContainer with the executed Spec
+   */
   specContainer: ISpecContainer;
+
+  /**
+   * Object of the SpecClass, which was used in the run
+   */
   usedObject:any;
+
+  /**
+   * report containing the results of the run
+   */
   report:ISpecReport;
 
+  /**
+   * constructor for usage in runSpec only
+   * @param spec
+   * @param specReport
+   */
   private constructor(spec:ISpecContainer, specReport:ISpecReport){
     this.specContainer = spec;
     this.report = specReport;
   }
 
-  static runSpec(spec:ISpecContainer, specReporter:ISpecReporter): SpecRunner{
-    let specReport = specReporter.getOrCreateSpecReport(spec);
-    let specRunner = new SpecRunner(spec, specReport);
+  /**
+   * Runs a Spec, after validating it
+   * creates and returns a SpecRunner, containing results and run-data
+   *
+   * @param specContainer with the Spec to run
+   * @param specReporter to report the run-result
+   * @return {SpecRunner} containing the results of the run
+   */
+  static runSpec(specContainer:ISpecContainer, specReporter:ISpecReporter): SpecRunner{
+    let specReport = specReporter.getOrCreateSpecReport(specContainer);
+    let specRunner = new SpecRunner(specContainer, specReport);
 
-    if(spec.isIgnored()) {
-      specReport.setIgnored(spec.getIgnoreReason());
+    if(specContainer.isIgnored()) {
+      specReport.setIgnored(specContainer.getIgnoreReason());
       return specRunner;
     }
-    if(!spec.isExecutableSpec()) {
+    if(!specContainer.isExecutableSpec()) {
      specReport.setNotExecutable();
       return specRunner;
     }
@@ -38,9 +65,9 @@ export class SpecRunner {
       return specRunner;
     }
 
-    specRunner.usedObject =  spec.getNewSpecObject();
+    specRunner.usedObject =  specContainer.getNewSpecObject();
 
-    if(spec.isExpectingErrors())
+    if(specContainer.isExpectingErrors())
       specRunner.runExpectingError();
     else
       specRunner.runWithNormalThen();

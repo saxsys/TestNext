@@ -40,7 +40,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerThenForSpec(specClassConstructor, 'checkHappened', 'something should have happened', 0);
     specRegistry.registerThenForSpec(specClassConstructor, 'checkOtherHappened', 'influenced this', 1);
 
-    return specRegistry.getSpecByClassName('StandardSpec');
+    return specRegistry.getSpecContainerByClassName('StandardSpec');
 
   }
 
@@ -88,7 +88,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerThenForSpec(childClassConstructor, 'givenShouldBeExecuted', 'Given of parent should have been executed');
 
 
-    return specRegistry.getSpecByClassName('Inherit_ChildClass');
+    return specRegistry.getSpecContainerByClassName('Inherit_ChildClass');
   }
 
   static  addIgnoredSpecTo(specRegistry: SpecRegistry): SpecContainer {
@@ -102,7 +102,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerSpec(ignoredConstructor, 'Ignored Spec');
     specRegistry.registerSpecAsIgnored(ignoredConstructor, 'because I need a Ignored test and it is not complete');
 
-    return specRegistry.getSpecByClassName('Ignoring_ignoredSpec');
+    return specRegistry.getSpecContainerByClassName('Ignoring_ignoredSpec');
   }
 
   static  addSpecWithSubjectsTo(specRegistry: SpecRegistry): SpecContainer {
@@ -152,7 +152,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerThenForSpec(specClassConstructor, 'worldBeSaved', 'world should be saved', 1);
     specRegistry.registerThenForSpec(specClassConstructor, 'countShouldBe3', 'count should be 3', 0);
 
-    return specRegistry.getSpecByClassName('SpecWithSubjects');
+    return specRegistry.getSpecContainerByClassName('SpecWithSubjects');
   }
 
   static  addNonExecutableSpecTo(specRegistry: SpecRegistry): SpecContainer {
@@ -175,7 +175,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerWhenForSpec(specClassConstructor, 'nothingIs', 'i do nothing');
     specRegistry.registerThenForSpec(specClassConstructor, 'happensNothing', 'nothing should happen');
 
-    return specRegistry.getSpecByClassName('SpecWithoutSpec');
+    return specRegistry.getSpecContainerByClassName('SpecWithoutSpec');
   }
 
   static  addSpecWithoutGivenTo(specRegistry: SpecRegistry): SpecContainer {
@@ -203,7 +203,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerWhenForSpec(specClassConstructor, 'thereIsNoGiven', 'no Given');
     specRegistry.registerThenForSpec(specClassConstructor, 'shouldError', 'there should be an error');
 
-    return specRegistry.getSpecByClassName('SpecMissingGiven');
+    return specRegistry.getSpecContainerByClassName('SpecMissingGiven');
   }
 
   static  addSpecWithoutWhenTo(specRegistry: SpecRegistry): SpecContainer {
@@ -231,7 +231,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerGivenForSpec(specClassConstructor, 'noWhen', 'there is no When');
     specRegistry.registerThenForSpec(specClassConstructor, 'shouldError', 'there should be an error');
 
-    return specRegistry.getSpecByClassName('SpecMissingWhen');
+    return specRegistry.getSpecContainerByClassName('SpecMissingWhen');
   }
 
   static  addSpecWithoutThenTo(specRegistry: SpecRegistry): SpecContainer {
@@ -259,7 +259,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerGivenForSpec(specClassConstructor, 'noThen', 'there is no Then');
     specRegistry.registerWhenForSpec(specClassConstructor, 'itIsCalledNevertheless', 'it is called Nevertheless');
 
-    return specRegistry.getSpecByClassName('SpecMissingThen');
+    return specRegistry.getSpecContainerByClassName('SpecMissingThen');
   }
 
   static  addSpecWithoutSubjectTo(specRegistry: SpecRegistry): SpecContainer {
@@ -305,7 +305,7 @@ export class ExampleRegistryFiller {
     specRegistry.registerThenForSpec(specClassConstructor, 'worldBeSaved', 'world should be saved', 1);
     specRegistry.registerThenForSpec(specClassConstructor, 'countShouldBe3', 'count should be 3', 0);
 
-    return specRegistry.getSpecByClassName('SpecWithoutSubjects');
+    return specRegistry.getSpecContainerByClassName('SpecWithoutSubjects');
   }
 
 

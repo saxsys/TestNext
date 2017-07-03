@@ -31,7 +31,7 @@ describe('SpecValidator.vaidate', () => {
         this.runOrder.push('then1');
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
 
     expect(() => {
       SpecValidator.validate(spec)
@@ -52,7 +52,7 @@ describe('SpecValidator.vaidate', () => {
         this.runOrder.push('then0');
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
 
     expect(() => {
       SpecValidator.validate(spec)
@@ -86,8 +86,8 @@ describe('SpecValidator.vaidate', () => {
 
     }
 
-    //let specParent = specRegistry.getSpecByClassName(specClassName_parent);
-    let specChild = specRegistry.getSpecByClassName(specClassName_child);
+    //let specParent = specRegistry.getSpecContainerByClassName(specClassName_parent);
+    let specChild = specRegistry.getSpecContainerByClassName(specClassName_child);
 
     expect(() => {SpecValidator.validate(specChild);}).not.toThrow();
   });
@@ -106,7 +106,7 @@ describe('SpecValidator.vaidate', () => {
         this.runOrder.push('then1');
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
     spec.addGiven('nonExistGiven', 'does not exist', 1);
 
     expect(() => {
@@ -139,7 +139,7 @@ describe('SpecValidator.vaidate', () => {
         this.runOrder.push('then1');
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
 
     expect(() => {
       SpecValidator.validate(spec);
@@ -175,8 +175,8 @@ describe('SpecValidator.vaidate', () => {
 
     }
 
-    //let specParent = specRegistry.getSpecByClassName(specClassName_parent);
-    let specChild = specRegistry.getSpecByClassName(specClassName_child);
+    //let specParent = specRegistry.getSpecContainerByClassName(specClassName_parent);
+    let specChild = specRegistry.getSpecContainerByClassName(specClassName_child);
 
     expect(() => {SpecValidator.validate(specChild);}).not.toThrow();
   });
@@ -210,7 +210,7 @@ describe('SpecValidator.vaidate', () => {
       }
 
     }
-    let spec = specRegistry.getSpecByClassName(specClassName_child);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName_child);
 
     expect(() => {
       SpecValidator.validate(spec);
@@ -231,7 +231,7 @@ describe('SpecValidator.vaidate', () => {
         this.runOrder.push('then1');
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
     spec.addWhen('nonExistWhen', 'does not exist');
 
     expect(() => {
@@ -256,7 +256,7 @@ describe('SpecValidator.vaidate', () => {
         this.runOrder.push('theWhen');
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
 
     expect(() => {
       SpecValidator.validate(spec)
@@ -291,8 +291,8 @@ describe('SpecValidator.vaidate', () => {
 
     }
 
-    //let specParent = specRegistry.getSpecByClassName(specClassName_parent);
-    let specChild = specRegistry.getSpecByClassName(specClassName_child);
+    //let specParent = specRegistry.getSpecContainerByClassName(specClassName_parent);
+    let specChild = specRegistry.getSpecContainerByClassName(specClassName_child);
 
     expect(() => {SpecValidator.validate(specChild);}).not.toThrow();
   });
@@ -311,7 +311,7 @@ describe('SpecValidator.vaidate', () => {
         this.runOrder.push('then1');
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
     spec.addThen('nonExistThen', 'does not exist', 1);
 
     expect(() => {
@@ -337,7 +337,7 @@ describe('SpecValidator.vaidate', () => {
         throw new Error('aError')
       }
     }
-    let spec = specRegistry.getSpecByClassName(specClassName);
+    let spec = specRegistry.getSpecContainerByClassName(specClassName);
     expect(()=>{
       SpecValidator.validate(spec);
     }).not.toThrow();

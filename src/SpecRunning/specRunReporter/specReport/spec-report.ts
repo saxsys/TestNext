@@ -5,7 +5,10 @@ import {SpecMethodReport} from "../specMethodReport/spec-method-report";
 import {ISpecReport} from "./iSpec-report";
 import {ISpecMethodRunReport} from "../specMethodReport/iSpec-method-report";
 
-
+/**
+ * Collection of reports reported for a single exectuion of one Spec
+ * including validation- and run-reports
+ */
 export class SpecReport implements ISpecReport {
 
   private spec: ISpecContainer;
@@ -14,24 +17,44 @@ export class SpecReport implements ISpecReport {
   private ignoredReason: String = null;
   private executable = true;
 
-  constructor(spec: ISpecContainer) {
-    this.spec = spec;
+  /**
+   * @param specContainer SpecContainer for the Spec to report
+   */
+  constructor(specContainer: ISpecContainer) {
+    this.spec = specContainer;
   }
 
 
-
+  /**
+   * reports that a Method was executed
+   * @param specMethod
+   * @param success whether the run was successful
+   * @param error optional, error which was thrown while executing the method
+   */
   reportRun(specMethod: ISpecMethodContainer, success: boolean, error?: Error) {
     this.methodReports.push(new SpecMethodReport(specMethod, success, error));
   }
 
+  /**
+   * reports an error that was thrown while validating the Spec
+   * @param error
+   */
   reportValidationError(error: SpecValidationError) {
     this.validationErrors.push(error);
   }
 
+  /**
+   * report that the Spec was not executed because it is marked as ignored, because of a reason
+   * @param reason why the Spec was not Executed
+   */
   setIgnored(reason:string){
     this.ignoredReason = reason
   }
 
+  /**
+   * report the Spec as not Executable (or revert that with argument false)
+   * @param value optional, default true
+   */
   setNotExecutable(value?:boolean){
     if(value == null)
       this.executable = false;
@@ -39,14 +62,26 @@ export class SpecReport implements ISpecReport {
       this.executable = true;
   }
 
-  getSpec(): ISpecContainer {
+  /**
+   * returns the specContainer for which the reports are made
+   * @return {ISpecContainer}
+   */
+  getSpecContainer(): ISpecContainer {
     return this.spec;
   }
 
-  getReports(): Array<ISpecMethodRunReport> {
+  /**
+   * @return {ISpecMethodRunReport[]} Array of the Reports for the Execution of the SpecMethods
+   */
+  getRunReports(): Array<ISpecMethodRunReport> {
     return this.methodReports;
   }
 
+  /**
+   * get reports for execution of one specific method
+   * @param methodName Name of the asked method
+   * @return {ISpecMethodRunReport[]} reports for the asked method
+   */
   getReportsForMethodName(methodName: string): Array<ISpecMethodRunReport> {
     let returnReports = new Array<ISpecMethodRunReport>();
     this.methodReports.forEach((report) => {
@@ -55,10 +90,17 @@ export class SpecReport implements ISpecReport {
     return returnReports;
   }
 
+  /**
+   * @return {SpecValidationError[]} all Errors occurred while validating the Spec
+   */
   getValidationErrors(): Array<SpecValidationError> {
     return this.validationErrors;
   }
 
+  /**
+   * get only failed reports
+   * @return {ISpecMethodRunReport[]} Array with reports for only failed SpecMethods
+   */
   getFailReports(): Array<ISpecMethodRunReport> {
     let failed = Array<ISpecMethodRunReport>();
 
@@ -69,14 +111,23 @@ export class SpecReport implements ISpecReport {
     return failed;
   }
 
+  /**
+   * @return {boolean} whether errors occurred executing the Spec
+   */
   isRunFailed(): boolean {
     return (this.getFailReports().length > 0)
   }
 
+  /**
+   * @return {boolean} whether the Spec was reported as invalid
+   */
   isInvalidSpec():boolean{
     return this.validationErrors.length > 0;
   }
 
+  /**
+   * @return {boolean} whether the Spec was reported as ignored
+   */
   isIgnored():boolean{
     if(this.ignoredReason == null)
       return false;
@@ -84,10 +135,16 @@ export class SpecReport implements ISpecReport {
       return true;
   }
 
+  /**
+   * @return {String} reported reason why the Spec was ignored, null if it was not reported as such
+   */
   getIgnoreReason():String{
     return this.ignoredReason;
   }
 
+  /**
+   * @return {boolean} whether the Spec was reported as executable
+   */
   isExecutable():boolean{
     return this.executable;
   }

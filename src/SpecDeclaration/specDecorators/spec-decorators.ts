@@ -122,7 +122,8 @@ export function SUT(provider:Provider){
 
 /**
  * Class-Decorator
- * Necessary if SUT has dependencies.
+ * Register Providers (Dependencies) of SUT.
+ * Necessary if SUT has injected dependencies.
  * Class gets registered so it can be inherited, but the SpecClass will not necessarily be executed.
  *
  * @param providers Array of classes, necessary for instantiating the SUT

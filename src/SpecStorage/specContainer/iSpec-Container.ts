@@ -73,16 +73,16 @@ export interface ISpecContainer{
 
   /**
    *
-   * @returns weather the Spec should be executable, depending on the Spec-Description
+   * @returns whether the Spec should be executable, depending on the Spec-Description
    */
   isExecutableSpec():boolean;
   /**
    *
-   * @returns weather the Spec is marked as ignored.
+   * @returns whether the Spec is marked as ignored.
    */
   isIgnored():boolean;
   /**
-   * @returns weather in the When-Method an error is expected, depending weather a ThenThrow-Method is set
+   * @returns whether in the When-Method an error is expected, depending whether a ThenThrow-Method is set
    */
   isExpectingErrors():boolean;
 }

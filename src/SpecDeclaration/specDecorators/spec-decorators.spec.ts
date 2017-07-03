@@ -15,7 +15,7 @@ describe('TestDecorators.Spec', () => {
 
     }
 
-    let specRegEntry = specRegistry.getSpecByClassName(specClassName);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(specClassName);
     expect(specRegEntry.getClassName()).toEqual('TestDecorators_Spec_Correct');
     expect(specRegEntry.getDescription()).toEqual(specName);
   });
@@ -78,7 +78,7 @@ describe('TestDecorators.Given', () => {
       @Given(methodDescription, 0) aCorrectMethodIsGiven() {
       }
     }
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
     let methodRegEntry = specRegEntry.getGiven()[0];
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
@@ -94,7 +94,7 @@ describe('TestDecorators.Given', () => {
       }
     }
     let givenClassConstructor = TestDecorators_Given_ClassWithoutDecorator.prototype.constructor;
-    let entry = specRegistry.getSpecByClassName(className);
+    let entry = specRegistry.getSpecContainerByClassName(className);
     expect(entry.getDescription()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(givenClassConstructor);
     let givenEntry = entry.getGiven()[0];
@@ -119,7 +119,7 @@ describe('TestDecorators.Given', () => {
       }
     }
 
-    let regEntry = specRegistry.getSpecByClassName(className);
+    let regEntry = specRegistry.getSpecContainerByClassName(className);
     let methodEntries = regEntry.getGiven();
     expect(methodEntries.length).toBe(2);
 
@@ -169,7 +169,7 @@ describe('TestDecorators.When', () => {
       @When(methodDescription) whenItIsACorrectMethod() {
       }
     }
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
     let methodRegEntry = specRegEntry.getWhen();
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
@@ -185,7 +185,7 @@ describe('TestDecorators.When', () => {
       }
     }
     let specClassConstructor = TestDecorators_When_ClassWithoutDecorator.prototype.constructor;
-    let entry = specRegistry.getSpecByClassName(className);
+    let entry = specRegistry.getSpecContainerByClassName(className);
     expect(entry.getDescription()).toBeUndefined();
 
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
@@ -237,7 +237,7 @@ describe('TestDecorators.Then', () => {
       }
     }
 
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
     let methodRegEntry = specRegEntry.getThen()[0];
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
@@ -254,7 +254,7 @@ describe('TestDecorators.Then', () => {
       }
     }
     let specClassConstructor = TestDecorators_Then_ClassWithoutDecorator.prototype.constructor;
-    let entry = specRegistry.getSpecByClassName(className);
+    let entry = specRegistry.getSpecContainerByClassName(className);
     expect(entry.getDescription()).toBeUndefined();
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
     let methodEntry = entry.getThen()[0];
@@ -279,7 +279,7 @@ describe('TestDecorators.Then', () => {
       }
     }
 
-    let regEntry = specRegistry.getSpecByClassName(className);
+    let regEntry = specRegistry.getSpecContainerByClassName(className);
     let methodEntries = regEntry.getThen();
     expect(methodEntries.length).toBe(2);
 
@@ -330,7 +330,7 @@ describe('TestDecorators.ThenError', () => {
         throw new Error('Random Error');
       }
     }
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
     let methodRegEntry = specRegEntry.getThenThrow();
     expect(methodRegEntry.getName()).toEqual(methodName);
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
@@ -351,7 +351,7 @@ describe('TestDecorators.ThenError', () => {
     }
 
     let specClassConstructor = SpecDecorators_ThenError_notRegistered.prototype.constructor;
-    let entry = specRegistry.getSpecByClassName(className);
+    let entry = specRegistry.getSpecContainerByClassName(className);
     expect(entry.getDescription()).toBeUndefined();
 
     expect(entry.getClassConstructor()).toEqual(specClassConstructor);
@@ -398,9 +398,9 @@ describe('TestDecorators.Subject', () => {
       public val = 3;
     }
 
-    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
     expect(specEntry.getSubjects()).toContain(subjectName);
-    expect(specRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
+    expect(specRegistry.getSpecContainersForSubject(subjectName)).toContain(specEntry);
   });
 
   it('should register multiple Subject for Spec', () => {
@@ -414,10 +414,10 @@ describe('TestDecorators.Subject', () => {
       public val = 3;
     }
 
-    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
     expect(specEntry.getSubjects()).toContain(subjectName1, subjectName2);
-    expect(specRegistry.getSpecsForSubject(subjectName1)).toContain(specEntry);
-    expect(specRegistry.getSpecsForSubject(subjectName2)).toContain(specEntry);
+    expect(specRegistry.getSpecContainersForSubject(subjectName1)).toContain(specEntry);
+    expect(specRegistry.getSpecContainersForSubject(subjectName2)).toContain(specEntry);
   });
 
   it('should register one Subject once for Spec, even if called multiple times', () => {
@@ -431,11 +431,11 @@ describe('TestDecorators.Subject', () => {
       public val = 3;
     }
 
-    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
     expect(specEntry.getSubjects().length).toBe(1);
     expect(specEntry.getSubjects()).toContain(subjectName1);
-    expect(specRegistry.getSpecsForSubject(subjectName1).length).toBe(1);
-    expect(specRegistry.getSpecsForSubject(subjectName1)).toContain(specEntry);
+    expect(specRegistry.getSpecContainersForSubject(subjectName1).length).toBe(1);
+    expect(specRegistry.getSpecContainersForSubject(subjectName1)).toContain(specEntry);
   });
 
   it('should register Subject for classes with all Methods', () => {
@@ -450,10 +450,10 @@ describe('TestDecorators.Subject', () => {
       @Then('a then') aThen(){}
     }
 
-    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
     expect(specEntry).not.toBeNull();
     expect(specEntry.getSubjects()).toContain(subjectName);
-    expect(specRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
+    expect(specRegistry.getSpecContainersForSubject(subjectName)).toContain(specEntry);
 
   });
 
@@ -466,10 +466,10 @@ describe('TestDecorators.Subject', () => {
       public val = 3;
     }
 
-    let specEntry = specRegistry.getSpecByClassName(specClassName);
+    let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
     expect(specEntry).not.toBeNull();
     expect(specEntry.getSubjects()).toContain(subjectName);
-    expect(specRegistry.getSpecsForSubject(subjectName)).toContain(specEntry);
+    expect(specRegistry.getSpecContainersForSubject(subjectName)).toContain(specEntry);
   });
 
   xit('should throw SpecRegostryError, when unregistered Spec has construtor-arguments', () => {
@@ -497,7 +497,7 @@ describe('TestDecorators.Ignore', () => {
     @Spec(specName)
     class TestDecorators_Ignored_NotIgnored {}
 
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
     expect(specRegEntry.isIgnored()).toBeFalsy();
     expect(specRegEntry.getIgnoreReason()).toEqual('');
@@ -513,7 +513,7 @@ describe('TestDecorators.Ignore', () => {
     @Spec(specName)
     class TestDecorators_Ignored_Correct {}
 
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
     expect(specRegEntry.isIgnored()).toBeTruthy();
     expect(specRegEntry.getIgnoreReason()).toEqual(ignoreReason);
@@ -528,7 +528,7 @@ describe('TestDecorators.Ignore', () => {
     @Ignore(ignoreReason)
     class TestDecorators_Ignored_NoSpec {}
 
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
     expect(specRegEntry.getIgnoreReason()).toEqual(ignoreReason);
   });
@@ -544,7 +544,7 @@ describe('TestDecorators.Ignore', () => {
     @Spec(specName)
     class TestDecorators_Ignored_MultiIgnore {}
 
-    let specRegEntry = specRegistry.getSpecByClassName(className);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
     expect(specRegEntry.isIgnored()).toBeTruthy();
     expect([ignoreReason1, ignoreReason2]).toContain(specRegEntry.getIgnoreReason());
@@ -564,7 +564,7 @@ describe('TestDecorators.SUT', () => {
 
   let specClassName = 'TestDecorators_SUT_Spec';
 
-  let specContainer = specRegistry.getSpecByClassName(specClassName);
+  let specContainer = specRegistry.getSpecContainerByClassName(specClassName);
 
   it('should register SUT for Spec', () => {
     expect(specContainer.getSUT()).toEqual(TestDecorators_SUT_SUT);
@@ -587,7 +587,7 @@ describe('TestDecorators.Providers', () => {
 
   let specClassName = 'TestDecorators_Providers_Spec';
 
-  let specContainer = specRegistry.getSpecByClassName(specClassName);
+  let specContainer = specRegistry.getSpecContainerByClassName(specClassName);
 
   it('should register Providers for Spec', ()=> {
     expect(specContainer.getProviders().length).toBe(3);
@@ -622,8 +622,8 @@ describe('TestDecorators.parentSpec', () => {
 
 
   beforeAll(() => {
-    regEntryParent = specRegistry.getSpecByClassName('TestDecorators_ParentSpec_ParentSpecClass');
-    regEntryChild = specRegistry.getSpecByClassName('TestDecorators_parentSpec_ChildSpecClass');
+    regEntryParent = specRegistry.getSpecContainerByClassName('TestDecorators_ParentSpec_ParentSpecClass');
+    regEntryChild = specRegistry.getSpecContainerByClassName('TestDecorators_parentSpec_ChildSpecClass');
   });
 
   it('should be possible to get the Parent', () => {

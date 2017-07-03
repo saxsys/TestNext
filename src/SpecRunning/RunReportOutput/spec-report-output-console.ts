@@ -3,6 +3,9 @@ import {ISpecReport} from "../specRunReporter/specReport/iSpec-report";
 import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
 import {SpecReportBeautifier} from "./spec-report-beautifier";
 
+/**
+ * Output for Reported Data
+ */
 export class SpecReportOutputConsole implements ISpecReportOutput {
   private successColor = '\x1b[1;32m';
   private validErrorColor = '\x1b[1;33m';
@@ -22,11 +25,17 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   private specReporter:ISpecReporter;
   private heading = null;
 
+  /**
+   * @param specReporter Reporter with Data to print
+   */
   constructor(specReporter: ISpecReporter){
     this.specReporter = specReporter;
   }
 
-  outputReport(){
+  /**
+   * generate a new Output and print it into the console
+   */
+  outputResult(){
     if(this.heading != null)
       console.log(this.clearScreenStyle + this.headingStyle + '\n' + this.heading + '\n' + this.resetStyle  + '\n');
     //get topics
@@ -67,10 +76,17 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     });
   }
 
+  /**
+   * @param heading for the Spec-Report
+   */
   setHeading(heading:string){
     this.heading = heading;
   }
 
+  /**
+   * set if only failed Runs should be printed
+   * @param val optional, only false as argument necessary
+   */
   showFailedOnly(val?: boolean) {
     if (val == null || val)
       this.failedOnly = true;
@@ -78,6 +94,11 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       this.failedOnly = false;
   }
 
+  /**
+   * print a single Spec into the console
+   * @param specReport
+   * @param paddingNumber
+   */
   private printSpecReport(specReport: ISpecReport, paddingNumber?: number) {
     if (paddingNumber == null) paddingNumber = 0;
 

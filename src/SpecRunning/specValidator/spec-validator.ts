@@ -1,9 +1,17 @@
 import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecValidationError} from "./spec-validation-error";
 
-
+/**
+ * Collection of Methods validating a Spec
+ * throwing SpecValidationError, if not valid
+ */
 export class SpecValidator {
 
+  /**
+   * validates the given Spec
+   * throws SpecValidationError, if not valid
+   * @param specContainer
+   */
   public static validate(specContainer: ISpecContainer) {
 
     let specObject;

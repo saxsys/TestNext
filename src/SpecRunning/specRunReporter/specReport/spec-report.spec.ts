@@ -18,7 +18,7 @@ describe('SpecReport', () => {
   });
 
   it('should save the Spec', () => {
-    expect(report.getSpec()).toEqual(spec);
+    expect(report.getSpecContainer()).toEqual(spec);
   });
   it('should not be ignored by default', () => {
     expect(report.isIgnored()).toBeFalsy();
@@ -102,7 +102,7 @@ describe('SpecReport.getFailReports', () => {
   it('should return [], if no failed Reports exist', () => {
     let report = new SpecReport(spec);
     report.reportRun(spec.getOwnMethod(methodNames[0]), true);
-    expect(report.getReports().length).toBe(1, 'Precondition successful report exists');
+    expect(report.getRunReports().length).toBe(1, 'Precondition successful report exists');
 
     let failedReports = report.getFailReports();
     expect(failedReports instanceof Array).toBeTruthy('returned no Array');
