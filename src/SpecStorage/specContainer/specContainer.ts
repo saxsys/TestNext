@@ -7,6 +7,7 @@ import {SpecMethodType} from "./specMethodContainer/spec-method-type";
 
 import {SpecRegistryError} from "../spec-registry-error";
 import * as _ from "underscore";
+import {SpecMethodList} from "./specMethodList/spec-method-list";
 
 /**
  * Class to contain a SpecClass and store additional information on the Spec (such as Given-, When-, Then-Methods, Ignored or the SUT)
@@ -23,9 +24,10 @@ export class SpecContainer implements ISpecContainer{
   private sut:Provider;
   private providers =  new Array<Provider>();
 
-  private given = new Map<number, SpecMethodContainer>(); // exec-Number, MethodName
+  //private given = new Map<number, SpecMethodContainer>(); // exec-Number, MethodName
+  private given:SpecMethodList;
   private when: SpecMethodContainer;
-  private then = new Map<number, SpecMethodContainer>();
+  private then:SpecMethodList;
   private thenThrow: SpecMethodContainer;
 
   /**
@@ -34,10 +36,15 @@ export class SpecContainer implements ISpecContainer{
    * @param parentSpec optional, Parent SpecClass, of witch the new SpecClass inherits (e.g. Given-Methods or the SUT)
    */
   constructor(specClassConstructor: Function, parentSpec?:ISpecContainer) {
-    if(this.specClassConstructor)
+    if(specClassConstructor == null)
       throw new Error ('Cannot instantiate SpecContainer with specClassConstructor = null');
+
     this.specClassConstructor = specClassConstructor;
+
     this.parent = parentSpec;
+
+    this.given = new SpecMethodList(specClassConstructor.name, SpecMethodType.GIVEN);
+    this.then = new SpecMethodList(specClassConstructor.name, SpecMethodType.THEN);
   }
 
   /**
@@ -107,11 +114,8 @@ export class SpecContainer implements ISpecContainer{
   addGiven(functionName: string, description: string, execNumber?: number) {
     if(this.getOwnMethod(functionName) != null)
       throw new SpecRegistryError('Multiple Methods with same Name on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
-    if (execNumber == null) execNumber = 0;
-    if (this.given == null) this.given = new Map<number, SpecMethodContainer>();
-    if (this.given.get(execNumber) != null)
-      throw new SpecRegistryError('Multiple @given, without ExecNumber, or it (' + execNumber + ') already exists on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
-    this.given.set(execNumber, new SpecMethodContainer(functionName, description, SpecMethodType.GIVEN, execNumber));
+
+    this.given.addMethod(functionName, description, execNumber);
   }
 
   /**
@@ -141,11 +145,7 @@ export class SpecContainer implements ISpecContainer{
   addThen(functionName: string, description: string, execNumber?: number) {
     if(this.getOwnMethod(functionName) != null)
       throw new SpecRegistryError('Multiple Methods with same Name on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
-    if (execNumber == null) execNumber = 0;
-    if (this.then == null) this.then = new Map<number, SpecMethodContainer>();
-    if (this.then.get(execNumber) != null)
-      throw new SpecRegistryError('Multiple @then, without ExecNumber, or it (' + execNumber + ') already exists on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
-    this.then.set(execNumber, new SpecMethodContainer(functionName, description, SpecMethodType.THEN, execNumber));
+    this.then.addMethod(functionName, description, execNumber);
   }
 
   /**
@@ -354,29 +354,14 @@ export class SpecContainer implements ISpecContainer{
    * @returns the ISpecMethodContainer for a Given-Method with the methodName from this Spec (not inherited Methods)
    */
   private getOwnGivenByName(methodName:string): ISpecMethodContainer{
-    let returnMethod = null;
-    this.given.forEach((method) => {
-      if(method.getName() == methodName) {
-        returnMethod = method;
-        return;
-      }
-    });
-    return returnMethod;
+    return this.given.getMethod(methodName);
   }
   /**
    * @param methodName
    * @returns the ISpecMethodContainer for a Then-Method with the methodName from this Spec (not inherited Methods)
    */
   private getOwnThenByName(methodName:string): ISpecMethodContainer{
-    let returnMethod = null;
-    this.then.forEach((method) => {
-      if(method.getName() == methodName) {
-        returnMethod = method;
-        return;
-      }
-    });
-
-    return returnMethod;
+    return this.then.getMethod(methodName);
   }
 
   /**
@@ -384,13 +369,7 @@ export class SpecContainer implements ISpecContainer{
    * @returns an Array of ISpecMethodContainer, for all Given-Methods from this Spec (not inherited Methods)
    */
   private getOwnGiven(): Array<ISpecMethodContainer> {
-    let keys = Array.from(this.given.keys()).sort();
-
-    let returnArray = new Array<SpecMethodContainer>();
-    keys.forEach((key) => {
-      returnArray.push(this.given.get(key));
-    });
-    return returnArray;
+    return this.given.getMethods();
   }
 
   /**
@@ -406,13 +385,7 @@ export class SpecContainer implements ISpecContainer{
    * @returns an Array of ISpecMethodContainer, for all Then-Methods from this Spec (not inherited Methods)
    */
   private getOwnThen(): Array<ISpecMethodContainer> {
-    let keys = Array.from(this.then.keys()).sort();
-
-    let returnArray = new Array<SpecMethodContainer>();
-    keys.forEach((key) => {
-      returnArray.push(this.then.get(key));
-    });
-    return returnArray;
+    return this.then.getMethods();
   }
 
   /**

@@ -253,9 +253,30 @@ describe('SpecContainer.addGiven', () => {
       specContainer.addGiven(givenName1, givenDescription1, 0)
     })
       .toThrowError(SpecRegistryError,
-        'Multiple @given, without ExecNumber, or it (0) already exists on ' + specClassName + '.' + givenName1
+        'In ' + specClassName + ' are multiple @Given, with the Same ExecNumber (0), this is forbidden'
       );
 
+  });
+
+  it('should accept multiple Given without ExecNumber', ()=>{
+    specContainer.addGiven(givenName0, givenDescription0);
+    specContainer.addGiven(givenName1, givenDescription1);
+    let givenArray = specContainer.getOwnGiven();
+    expect(givenArray.length).toEqual(2);
+  });
+
+  it('should refuse Given mixed with and without execNumber (without Number first)', ()=>{
+    specContainer.addGiven(givenName0, givenDescription0);
+    expect(()=>{
+      specContainer.addGiven(givenName1, givenDescription1, 1);
+    }).toThrowError(SpecRegistryError, '@Given ' + specClassName + '.' + givenName1 + ' is invalid, you either have to give execNumbers for all, or for none');
+  });
+
+  it('should refuse Given mixed with and without execNumber (with execNumber first)', ()=>{
+    specContainer.addGiven(givenName0, givenDescription0, 0);
+    expect(()=>{
+      specContainer.addGiven(givenName1, givenDescription1);
+    }).toThrowError(SpecRegistryError, '@Given ' + specClassName + '.' + givenName1 + ' is invalid, you either have to give execNumbers for all, or for none');
   });
 });
 
@@ -306,9 +327,31 @@ describe('SpecContainer.addThen', () => {
       specContainer.addThen(thenName1, thenDescription1, 0)
     })
       .toThrowError(SpecRegistryError,
-        'Multiple @then, without ExecNumber, or it (0) already exists on ' + specClassName + '.' + thenName1
+        'In ' + specClassName + ' are multiple @Then, with the Same ExecNumber (0), this is forbidden'
       );
   });
+
+  it('should accept multiple Then without ExecNumber', ()=>{
+    specContainer.addThen(thenName0, thenDescription0);
+    specContainer.addThen(thenName1, thenDescription0);
+    let thenArray = specContainer.getOwnThen();
+    expect(thenArray.length).toEqual(2);
+  });
+
+  it('should refuse Then mixed with and without execNumber (without Number first)', ()=>{
+    specContainer.addThen(thenName0, thenDescription0);
+    expect(()=>{
+      specContainer.addThen(thenName1, thenDescription0, 1);
+    }).toThrowError(SpecRegistryError, '@Then ' + specClassName + '.' + thenName1 + ' is invalid, you either have to give execNumbers for all, or for none');
+  });
+
+  it('should refuse Then mixed with and without execNumber (with execNumber first)', ()=>{
+    specContainer.addThen(thenName0, thenDescription0, 0);
+    expect(()=>{
+      specContainer.addThen(thenName1, thenDescription1);
+    }).toThrowError(SpecRegistryError, '@Then ' + specClassName + '.' + thenName1 + ' is invalid, you either have to give execNumbers for all, or for none');
+  });
+
 });
 
 describe('SpecContainer.addWhen', () => {

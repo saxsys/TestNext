@@ -3,8 +3,8 @@ import {Given, Spec, Subject, Then, When} from "../../SpecDeclaration/specDecora
 @Spec('a Spec of one Test')
 @Subject('TestingTest')
 class OneTest{
-  @Given('some Stuff is given',0) someGivenStuff(){}
-  @Given('it is this Way around',1) moreSetStuff(){}
+  @Given('some Stuff is given') someGivenStuff(){}
+  @Given('it is this Way around') moreSetStuff(){}
   @When('something is triggered') triggerStuff(){}
   @Then('something should have happened', 0) checkHappened(){}
   @Then('influenced this', 1) checkOtherHappened(){
