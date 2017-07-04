@@ -1,9 +1,5 @@
-// TODO Inheritance: handle SUT on Parent and Child
-// TODO Inheritance: handle overwriting methods of parent?
 // TODO Inheritance: handle multiple When and ThenThrow acquired by inheritance?
 
-// TODO Assert: 'To Be One Of', 'Contains', 'Of Type'
 
-//TODO Is a 'Cleanup' after @Then useful?
 
 //TODO should NonExecutable-Specs be called and logged in ExecChooser?
