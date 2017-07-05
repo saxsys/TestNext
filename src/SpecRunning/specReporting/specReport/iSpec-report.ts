@@ -1,7 +1,8 @@
 import {ISpecMethodContainer} from "../../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {SpecValidationError} from "../../specValidator/spec-validation-error";
 import {ISpecContainer} from "SpecStorage/specContainer/iSpec-Container";
-import {ISpecMethodRunReport} from "../specMethodReport/iSpec-method-report";
+import {ISpecMethodReport} from "../specMethodReport/iSpec-method-report";
+import {SpecRunStatus} from "../spec-run-status";
 
 /**
  * Collection of reports reported for a single exectuion of one Spec
@@ -42,16 +43,26 @@ export interface ISpecReport {
   getSpecContainer(): ISpecContainer;
 
   /**
-   * @return {ISpecMethodRunReport[]} Array of the Reports for the Execution of the SpecMethods
+   * @return {string} Name of the SpecClass
    */
-  getRunReports():Array<ISpecMethodRunReport>;
+  getSpecClassName():string;
+
+  /**
+   * @return {string} Description of the Spec
+   */
+  getSpecDescription():string;
+
+  /**
+   * @return {ISpecMethodReport[]} Array of the Reports for the Execution of the SpecMethods
+   */
+  getRunReports():Array<ISpecMethodReport>;
 
   /**
    * get reports for execution of one specific method
    * @param methodName Name of the asked method
-   * @return {ISpecMethodRunReport[]} reports for the asked method
+   * @return {ISpecMethodReport[]} reports for the asked method
    */
-  getReportsForMethodName(methodName: string): Array<ISpecMethodRunReport>;
+  getReportsForMethodName(methodName: string): Array<ISpecMethodReport>;
 
   /**
   * @return {SpecValidationError[]} all Errors occurred while validating the Spec
@@ -60,9 +71,9 @@ export interface ISpecReport {
 
   /**
    * get only failed reports
-   * @return {ISpecMethodRunReport[]} Array with reports for only failed SpecMethods
+   * @return {ISpecMethodReport[]} Array with reports for only failed SpecMethods
    */
-  getFailReports(): Array<ISpecMethodRunReport>;
+  getFailReports(): Array<ISpecMethodReport>;
 
   /**
    * @return {boolean} whether errors occurred executing the Spec
@@ -88,4 +99,10 @@ export interface ISpecReport {
    * @return {boolean} whether the Spec was reported as executable
    */
   isExecutable():boolean;
+
+  /**
+   * @return {SpecRunStatus} stat of execution of the Spec
+   */
+  getRunStatus():SpecRunStatus;
+
 }

@@ -1,6 +1,6 @@
 import {SpecExecChooser} from "./spec-exec-chooser";
 import {SpecRegistry} from "../../SpecStorage/specRegistry/spec-registry";
-import {SpecReporter} from "../specRunReporter/spec-reporter";
+import {SpecReporter} from "../specReporting/specReporter/spec-reporter";
 import {ExampleRegistryFiller} from "../../utils/testData/example-registry-filler";
 
 describe('SpecExecChooser.execAllSpecs', () => {

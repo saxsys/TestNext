@@ -1,5 +1,5 @@
-import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
-import {ISpecReport} from "./specReport/iSpec-report";
+import {ISpecContainer} from "../../../SpecStorage/specContainer/iSpec-Container";
+import {ISpecReport} from "../specReport/iSpec-report";
 
 /**
  * Collecting Reports for multiple Specs

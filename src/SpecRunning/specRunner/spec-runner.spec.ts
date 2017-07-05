@@ -10,7 +10,7 @@ import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
 import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
 import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
-import {SpecReporter} from "../specRunReporter/spec-reporter";
+import {SpecReporter} from "../specReporting/specReporter/spec-reporter";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {

@@ -4,7 +4,7 @@ import {SpecMethodType} from "../../../SpecStorage/specContainer/specMethodConta
 /**
  * Report of a single execution of a single SpecMethod
  */
-export interface ISpecMethodRunReport {
+export interface ISpecMethodReport {
   /**
    * @return {ISpecMethodContainer} the MethodContainer of the reported Method
    */

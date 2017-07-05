@@ -1,12 +1,10 @@
-import {ISpecContainer} from "../../SpecStorage/specContainer/iSpec-Container";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
-import {ISpecMethodContainer} from "../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
-import {ISpecReport} from "../specRunReporter/specReport/iSpec-report";
-import {ISpecMethodRunReport} from "../specRunReporter/specMethodReport/iSpec-method-report";
+import {ISpecReport} from "../specReporting/specReport/iSpec-report";
+import {ISpecMethodReport} from "../specReporting/specMethodReport/iSpec-method-report";
 
 export class SpecReportBeautifier {
 
-  private static paddingSymb = ' ';
+  private static paddingSymb = '  ';
 
   public static SpecReportToString(specReport:ISpecReport, paddingNumber?: number):string{
     if(paddingNumber == null) paddingNumber = 0;
@@ -14,10 +12,9 @@ export class SpecReportBeautifier {
     let padding2ndLevel = SpecReportBeautifier.getPaddingString((paddingNumber+1)*2);
 
     let str = '';
-    let spec = specReport.getSpecContainer();
     let validationErrors = specReport.getValidationErrors();
 
-    str += padding + SpecReportBeautifier.specDescriptionToString(spec) + '\n';
+    str += padding + SpecReportBeautifier.specDescriptionToString(specReport) + '\n';
 
     if(specReport.isIgnored())
       str += padding2ndLevel + 'IGNORED: ' + specReport.getIgnoreReason() + '\n';
@@ -33,30 +30,26 @@ export class SpecReportBeautifier {
     return str;
   }
 
-  private static specMethodReportToString(specMethodRunReport: ISpecMethodRunReport, paddingNumber?: number): string {
+  private static specMethodReportToString(specMethodRunReport: ISpecMethodReport, paddingNumber?: number): string {
     if(paddingNumber == null) paddingNumber = 0;
     let padding = SpecReportBeautifier.getPaddingString(paddingNumber);
 
     let str = '';
-    str += padding + (specMethodRunReport.isSuccess() ? '' : 'FAILED : ') + SpecReportBeautifier.specMethodToString(specMethodRunReport.getSpecMethod(), 0);
+    str += padding +
+      (specMethodRunReport.isSuccess() ? '' : 'FAILED : ') +
+      specMethodRunReport.getMethodType() + ' ' + specMethodRunReport.getDescription() + '(' + specMethodRunReport.getMethodName()+')';
+
     if(specMethodRunReport.getError() != null)
       str += '\n' + padding + '         '+ specMethodRunReport.getError().message;
 
     return str;
   }
 
-  private static specMethodToString(specMethod: ISpecMethodContainer, paddingNumber?: number): string {
-    if(paddingNumber == null) paddingNumber = 0;
-    let padding = SpecReportBeautifier.getPaddingString(paddingNumber);
-
-    return padding + specMethod.getMethodType().toString() + ' ' + specMethod.getDescription() + ' (' + specMethod.getName() + ')';
-  }
-
-  private static specDescriptionToString(spec: ISpecContainer):string{
-    if(spec.getDescription() != null){
-      return spec.getDescription() + ' (' + spec.getClassName() + ')';
+  static specDescriptionToString(specReport:ISpecReport):string{
+    if(specReport.getSpecDescription() != null){
+      return specReport.getSpecDescription() + ' (' + specReport.getSpecClassName() + ')';
     } else {
-      return spec.getClassName();
+      return specReport.getSpecClassName();
     }
   }
 

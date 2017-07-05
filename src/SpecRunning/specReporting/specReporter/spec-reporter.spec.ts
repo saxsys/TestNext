@@ -1,5 +1,5 @@
 import {SpecReporter} from "./spec-reporter";
-import {ExampleSpecFiller} from '../../utils/testData/example-spec-filler';
+import {ExampleSpecFiller} from '../../../utils/testData/example-spec-filler';
 
 describe('SpecReporter', () =>{
 

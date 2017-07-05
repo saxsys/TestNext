@@ -1,5 +1,5 @@
 import {SpecRunner} from "../specRunner/spec-runner";
-import {ISpecReporter} from "../specRunReporter/iSpec-reporter";
+import {ISpecReporter} from "../specReporting/specReporter/iSpec-reporter";
 import {SpecRegistry} from "../../SpecStorage/specRegistry/spec-registry";
 
 /**

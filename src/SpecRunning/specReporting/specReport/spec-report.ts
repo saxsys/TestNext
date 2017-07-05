@@ -3,7 +3,8 @@ import {SpecValidationError} from "../../specValidator/spec-validation-error";
 import {ISpecMethodContainer} from "../../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {SpecMethodReport} from "../specMethodReport/spec-method-report";
 import {ISpecReport} from "./iSpec-report";
-import {ISpecMethodRunReport} from "../specMethodReport/iSpec-method-report";
+import {ISpecMethodReport} from "../specMethodReport/iSpec-method-report";
+import {SpecRunStatus} from "../spec-run-status";
 
 /**
  * Collection of reports reported for a single exectuion of one Spec
@@ -11,8 +12,10 @@ import {ISpecMethodRunReport} from "../specMethodReport/iSpec-method-report";
  */
 export class SpecReport implements ISpecReport {
 
+
+
   private spec: ISpecContainer;
-  private methodReports = new Array<ISpecMethodRunReport>();
+  private methodReports = new Array<ISpecMethodReport>();
   private validationErrors = new Array<SpecValidationError>();
   private ignoredReason: String = null;
   private executable = true;
@@ -62,6 +65,8 @@ export class SpecReport implements ISpecReport {
       this.executable = true;
   }
 
+
+
   /**
    * returns the specContainer for which the reports are made
    * @return {ISpecContainer}
@@ -71,19 +76,33 @@ export class SpecReport implements ISpecReport {
   }
 
   /**
-   * @return {ISpecMethodRunReport[]} Array of the Reports for the Execution of the SpecMethods
+   * @return {string} Name of the SpecClass
    */
-  getRunReports(): Array<ISpecMethodRunReport> {
+  getSpecClassName(): string {
+    return this.spec.getClassName();
+  }
+
+  /**
+   * @return {string} Description of the reported Method
+   */
+  getSpecDescription(): string {
+    return this.spec.getDescription();
+  }
+
+  /**
+   * @return {ISpecMethodReport[]} Array of the Reports for the Execution of the SpecMethods
+   */
+  getRunReports(): Array<ISpecMethodReport> {
     return this.methodReports;
   }
 
   /**
    * get reports for execution of one specific method
    * @param methodName Name of the asked method
-   * @return {ISpecMethodRunReport[]} reports for the asked method
+   * @return {ISpecMethodReport[]} reports for the asked method
    */
-  getReportsForMethodName(methodName: string): Array<ISpecMethodRunReport> {
-    let returnReports = new Array<ISpecMethodRunReport>();
+  getReportsForMethodName(methodName: string): Array<ISpecMethodReport> {
+    let returnReports = new Array<ISpecMethodReport>();
     this.methodReports.forEach((report) => {
       if (report.getMethodName() == methodName) returnReports.push(report);
     });
@@ -99,10 +118,10 @@ export class SpecReport implements ISpecReport {
 
   /**
    * get only failed reports
-   * @return {ISpecMethodRunReport[]} Array with reports for only failed SpecMethods
+   * @return {ISpecMethodReport[]} Array with reports for only failed SpecMethods
    */
-  getFailReports(): Array<ISpecMethodRunReport> {
-    let failed = Array<ISpecMethodRunReport>();
+  getFailReports(): Array<ISpecMethodReport> {
+    let failed = Array<ISpecMethodReport>();
 
     this.methodReports.forEach((report) => {
       if (!report.isSuccess())
@@ -148,4 +167,21 @@ export class SpecReport implements ISpecReport {
   isExecutable():boolean{
     return this.executable;
   }
+
+  getRunStatus():SpecRunStatus{
+    if(this.isIgnored()){
+      return SpecRunStatus.IGNORED;
+    } else if(!this.isExecutable()){
+      return SpecRunStatus.NOT_EXECUTABLE;
+    } else if( this.isInvalidSpec()){
+      return SpecRunStatus.INVALID;
+    } else if(this.isRunFailed()){
+      return SpecRunStatus.FAILED;
+    } else {
+      return SpecRunStatus.SUCCESSFUL;
+    }
+  }
+
 }
+
+

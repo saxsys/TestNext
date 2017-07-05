@@ -1,11 +1,11 @@
 import {ISpecMethodContainer} from "../../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {SpecMethodType} from "../../../SpecStorage/specContainer/specMethodContainer/spec-method-type";
-import {ISpecMethodRunReport} from "./iSpec-method-report";
+import {ISpecMethodReport} from "./iSpec-method-report";
 
 /**
  * Report of a single execution of a single SpecMethod
  */
-export class SpecMethodReport implements ISpecMethodRunReport {
+export class SpecMethodReport implements ISpecMethodReport {
   private specMethod: ISpecMethodContainer;
   private success: boolean;
   private error: Error;
