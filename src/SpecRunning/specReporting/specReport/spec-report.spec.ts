@@ -102,7 +102,7 @@ describe('SpecReport.getFailReports', () => {
   it('should return [], if no failed Reports exist', () => {
     let report = new SpecReport(spec);
     report.reportRun(spec.getOwnMethod(methodNames[0]), true);
-    expect(report.getRunReports().length).toBe(1, 'Precondition successful report exists');
+    expect(report.getMethodReports().length).toBe(1, 'Precondition successful report exists');
 
     let failedReports = report.getFailReports();
     expect(failedReports instanceof Array).toBeTruthy('returned no Array');

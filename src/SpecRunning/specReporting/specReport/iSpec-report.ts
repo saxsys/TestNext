@@ -55,7 +55,7 @@ export interface ISpecReport {
   /**
    * @return {ISpecMethodReport[]} Array of the Reports for the Execution of the SpecMethods
    */
-  getRunReports():Array<ISpecMethodReport>;
+  getMethodReports():Array<ISpecMethodReport>;
 
   /**
    * get reports for execution of one specific method

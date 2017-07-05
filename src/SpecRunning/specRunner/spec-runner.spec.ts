@@ -93,7 +93,7 @@ describe('specRunner.runSpec', () => {
   });
 
   it('should have logged for all', () => {
-    let methodLogs = specReport.getRunReports();
+    let methodLogs = specReport.getMethodReports();
     expect(methodLogs.length).toEqual(5);
 
     let loggedFunctions = [];
@@ -108,7 +108,7 @@ describe('specRunner.runSpec', () => {
   });
 
   it('should reportRun methods without Error as successful', () => {
-    specReport.getRunReports().forEach((log) => {
+    specReport.getMethodReports().forEach((log) => {
       if (methodsWithoutError.indexOf(log.getMethodName()) > -1) {
         expect(log.isSuccess()).toBeTruthy();
         expect(log.getError()).toBeUndefined();
@@ -117,7 +117,7 @@ describe('specRunner.runSpec', () => {
   });
 
   it('should reportRun methods with AssertionError as not successful and reportRun the error', () => {
-    specReport.getRunReports().forEach((log) => {
+    specReport.getMethodReports().forEach((log) => {
       if (methodsWithAssertError.indexOf(log.getMethodName()) > -1) {
         expect(log.isSuccess()).toBeFalsy();
         expect(log.getError()).not.toBeUndefined();
@@ -152,7 +152,7 @@ describe('specRunner.runSpec', () => {
     expect(report.getValidationErrors()).toContain(
       new SpecValidationError('There must be at lease one @Then or a @ThenThrow in ' + specClassName)
     );
-    expect(report.getRunReports().length).toBe(0);
+    expect(report.getMethodReports().length).toBe(0);
     expect(specRunner.usedObject).toBeNull();
   });
 
@@ -184,7 +184,7 @@ describe('specRunner.runSpec', () => {
   it('should be allowed to run a test multiple times, with different reporters', () => {
     let newSpecReporter = new SpecReporter();
     let specRunner = SpecRunner.runSpec(specEntry, newSpecReporter);
-    expect(specRunner.report.getRunReports()).toEqual(specReport.getRunReports());
+    expect(specRunner.report.getMethodReports()).toEqual(specReport.getMethodReports());
   });
 
   it('should execute also the Inherited Methods', () => {
@@ -368,7 +368,7 @@ describe('specRunner.runSpec', () => {
     let specRunner = SpecRunner.runSpec(specEntry, specReporter);
     let report = specRunner.report;
     expect(report.getValidationErrors().length).toBe(0, 'existing Validation Errors');
-    expect(report.getRunReports().length).toBe(3);
+    expect(report.getMethodReports().length).toBe(3);
     expect(report.isRunFailed()).toBeFalsy();
 
   });

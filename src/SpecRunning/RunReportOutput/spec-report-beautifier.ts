@@ -23,7 +23,7 @@ export class SpecReportBeautifier {
 
     str += SpecReportBeautifier.stringFromValidationErrors(validationErrors, (paddingNumber+1)*2);
 
-    specReport. getRunReports().forEach((log) => {
+    specReport. getMethodReports().forEach((log) => {
       str += SpecReportBeautifier.specMethodReportToString(log, (paddingNumber+1)*2) + '\n';
     });
 

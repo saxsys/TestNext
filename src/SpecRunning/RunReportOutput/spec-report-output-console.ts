@@ -1,10 +1,10 @@
 import {ISpecReportOutput} from "./iSpec-report-output";
 import {ISpecReport} from "../specReporting/specReport/iSpec-report";
 import {ISpecReporter} from "../specReporting/specReporter/iSpec-reporter";
-import {SpecReportBeautifier} from "./spec-report-beautifier";
 import {SpecRunStatus} from "../specReporting/spec-run-status";
-import {config} from './spec-console-config'
 import {SpecReportSorter} from "../specReporting/reportSorter/spec-report-sorter";
+import {ISpecMethodReport} from "../specReporting/specMethodReport/iSpec-method-report";
+import {config} from './spec-console-config'
 
 var style = config.specReportConsoleOutput.style;
 var command = config.specReportConsoleOutput.commands;
@@ -14,10 +14,10 @@ var command = config.specReportConsoleOutput.commands;
  */
 export class SpecReportOutputConsole implements ISpecReportOutput {
 
-  private specReporter:ISpecReporter;
+  private specReporter: ISpecReporter;
   private heading = null;
 
-  private orderBy:OutputOrder = OutputOrder.ALPHABET;
+  private orderBy: OutputOrder = OutputOrder.ALPHABET;
 
   private sFailedOnly = true;
   private sNonExecutable = false;
@@ -26,16 +26,16 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   /**
    * @param specReporter Reporter with Data to print
    */
-  constructor(specReporter: ISpecReporter){
+  constructor(specReporter: ISpecReporter) {
     this.specReporter = specReporter;
   }
 
   /**
    * generate a new Output and print it into the console
    */
-  outputResult(){
-    if(this.heading != null)
-      console.log(command.clearScreenStyle + style.heading + '\n' + this.heading + '\n' + command.resetStyle  + '\n');
+  outputResult() {
+    if (this.heading != null)
+      console.log(command.clearScreenStyle + style.heading + '\n' + this.heading + '\n' + command.resetStyle + '\n');
     //get topics
     let topics = this.specReporter.getTopics();
     //sort Topics by alphabet, no Topic at last
@@ -46,22 +46,19 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     //for each topic
     topics.forEach(topic => {
       let reports = this.specReporter.getReportsOfTopic(topic);
-      if(reports == null || reports.length == 0)
+      if (reports == null || reports.length == 0)
         return;
-      console.log('before:', reports.length);
       let reportFiter = new SpecReportSorter(reports);
-      console.log('in Filter:' + reportFiter.getReports().length);
 
-      if(this.sFailedOnly)
+      if (this.sFailedOnly)
         reportFiter.removeSuccessful();
-      if(!this.sNonExecutable)
+      if (!this.sNonExecutable)
         reportFiter.removeNonExecutable();
-      if(this.hIgnored)
+      if (this.hIgnored)
         reportFiter.removeIgnored();
 
-      console.log('after Filter:' + reportFiter.getReports().length);
 
-      switch (this.orderBy ) {
+      switch (this.orderBy) {
         case OutputOrder.ALPHABET:
           reportFiter.orderReportsByAlphabet();
           break;
@@ -72,19 +69,18 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
           reportFiter.orderReportsByAlphabet();
       }
 
-      console.log('after sort:' + reportFiter.getReports().length);
 
       let padding = 1;
       let remainingReports = reportFiter.getReports();
 
-      if(remainingReports.length == 0){
+      if (remainingReports.length == 0) {
         return;
-      } else if(topicCount === 1 && topic == null) {
+      } else if (topicCount === 1 && topic == null) {
         //if no topic at all is set: not padding and no subheading
         padding = 0;
-      } else if(topic == null){
+      } else if (topic == null) {
         //replace "null" with '# Without Subject" in Subheading
-        console.log(style.subHeading + '# Without Subject'+ command.resetStyle);
+        console.log(style.subHeading + '# Without Subject' + command.resetStyle);
       } else {
         //Topic as Subheading
         console.log(style.subHeading + topic + command.resetStyle);
@@ -101,7 +97,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   /**
    * @param heading for the Spec-Report
    */
-  setHeading(heading:string){
+  setHeading(heading: string) {
     this.heading = heading;
   }
 
@@ -116,26 +112,26 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       this.sFailedOnly = false;
   }
 
-  showNonExecutable(val?:boolean){
-    if(val = null)
+  showNonExecutable(val?: boolean) {
+    if (val = null)
       this.sNonExecutable = true;
     else
       this.sNonExecutable = val;
   }
 
-  hideIgnored(val?:boolean){
-    if(val = null){
+  hideIgnored(val?: boolean) {
+    if (val = null) {
       this.hIgnored = true;
       return;
     }
     this.hIgnored = val;
   }
 
-  orderByExecutionStatus(){
+  orderByExecutionStatus() {
     this.orderBy = OutputOrder.EXECUTION_STATUS
   }
 
-  orderByAlphabet(){
+  orderByAlphabet() {
     this.orderBy = OutputOrder.ALPHABET
   }
 
@@ -145,38 +141,125 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
    * @param paddingNumber
    */
   private printSpecReport(specReport: ISpecReport, paddingNumber?: number) {
+
     if (paddingNumber == null) paddingNumber = 0;
+    let padding = SpecReportOutputConsole.getPaddingString(paddingNumber);
 
     let status = specReport.getRunStatus();
-    let color = this.getColorFor(status);
 
-    let description = this.getSpecDescription(specReport);
+    this.logSpecDescription(specReport, padding);
 
-    console.log(color+description+command.resetStyle);
-    let reportString = SpecReportBeautifier.SpecReportToString(specReport, paddingNumber);
-
-    /*
-    if (specReport.isIgnored() || !specReport.isExecutable())
-      console.log(style.notExecuted + reportString + command.resetStyle);
-    else if (specReport.isInvalidSpec())
-      console.log(style.invalid + reportString + command.resetStyle);
-    else if (specReport.isRunFailed())
-      console.log(style.failedRun + reportString + command.resetStyle);
-    else if (this.sFailedOnly)
-      console.log(style.success + reportString + command.resetStyle);
-     */
+    if (status == SpecRunStatus.IGNORED)
+      this.logIgnored(specReport, padding);
+    if (status == SpecRunStatus.NOT_EXECUTABLE)
+      this.logNotExecutable(specReport, padding);
+    if (status == SpecRunStatus.INVALID)
+      this.logInvalid(specReport, padding);
+    else {
+      specReport.getMethodReports().forEach((methodReport) => {
+        this.logSpecMethodReport(methodReport, padding);
+      });
+    }
   }
 
 
-  private getSpecDescription(specReport:ISpecReport):string{
-    if(specReport.getSpecDescription() != null)
-      return specReport.getSpecDescription() + ' (' + specReport.getSpecClassName() + ')';
+  private logSpecDescription(specReport: ISpecReport, padding?: string) {
+    if (padding == null)
+      padding = '';
+
+    let description;
+    if (specReport.getSpecDescription() != null)
+      description = specReport.getSpecDescription() + ' (' + specReport.getSpecClassName() + ')';
     else
-      return specReport.getSpecClassName();
+      description = specReport.getSpecClassName();
+
+    console.log(
+      '\n' +
+      this.getColorFor(specReport.getRunStatus()) +
+      padding +
+      description +
+      command.resetStyle
+    );
   }
 
-  private getColorFor(runStatus:SpecRunStatus){
-    switch (runStatus){
+  private logIgnored(specReport: ISpecReport, padding?: string) {
+    if (padding == null)
+      padding = '';
+
+    console.log(
+      style.notExecuted +
+      padding + '    ' +
+      'IGNORED: ' + specReport.getIgnoreReason() +
+      command.resetStyle
+    );
+  };
+
+  private logNotExecutable(specReport: ISpecReport, padding?: string) {
+    if (padding == null)
+      padding = '';
+
+    console.log(
+      style.notExecuted,
+      padding, '    ',
+      'Not Executable',
+      command.resetStyle
+    );
+  }
+
+  private logInvalid(specReport: ISpecReport, padding?: string) {
+    if (padding == null)
+      padding = '';
+
+    specReport.getValidationErrors().forEach((error) => {
+      console.log(
+        style.invalid +
+        padding + ' I: ' +
+        error.message +
+        command.resetStyle
+      );
+    });
+  }
+
+  private logSpecMethodReport(specMethodReport: ISpecMethodReport, padding?: string) {
+    if (padding == null)
+      padding = '';
+
+    if (specMethodReport.isSuccess()) {
+      console.log(
+        //this.getColorFor(SpecRunStatus.SUCCESSFUL),
+        padding +
+        '    ' +
+        specMethodReport.getMethodType() + ' ' + specMethodReport.getDescription() +
+        '(' + specMethodReport.getMethodName() + ')' +
+        command.resetStyle
+      );
+    } else {
+      console.log(
+        this.getColorFor(SpecRunStatus.FAILED) +
+        padding + ' X: ' +
+        specMethodReport.getMethodType() + ' ' + specMethodReport.getDescription() +
+        '(' + specMethodReport.getMethodName() + ')' +
+        '\n' +
+        padding + '    ' +
+        specMethodReport.getError().message +
+        command.resetStyle
+      );
+    }
+
+  }
+
+
+  private static getPaddingString(paddingNumber: Number): string {
+    if (paddingNumber == null) return '';
+    let padding = '';
+    for (let i = 0; i < paddingNumber; i++) {
+      padding += '  ';
+    }
+    return padding;
+  }
+
+  private getColorFor(runStatus: SpecRunStatus) {
+    switch (runStatus) {
       case SpecRunStatus.IGNORED:
         return style.notExecuted;
       case SpecRunStatus.NOT_EXECUTABLE:
@@ -190,19 +273,18 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     }
   }
 
-  static sortStringArrayByAlphabet(array:String[]):String[]{
+  static sortStringArrayByAlphabet(array: String[]): String[] {
     return array.sort((a, b) => {
-      if(a == null) return 1;
-      if(b == null) return -1;
-      else if(a.toLowerCase() < b.toLowerCase()) return -1;
-      else if(a.toLowerCase() > b.toLowerCase()) return 1;
+      if (a == null) return 1;
+      if (b == null) return -1;
+      else if (a.toLowerCase() < b.toLowerCase()) return -1;
+      else if (a.toLowerCase() > b.toLowerCase()) return 1;
       else return 0;
     });
   }
 
 
 }
-
 
 
 enum OutputOrder {
