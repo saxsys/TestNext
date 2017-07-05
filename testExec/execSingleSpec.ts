@@ -11,7 +11,7 @@ let specClassName = process.argv[2];
 let showFailedOnlyArg = process.argv[3];
 
 let showFailedOnly = false;
-if(showFailedOnlyArg == 'true')
+if (showFailedOnlyArg == 'true')
   showFailedOnly = true;
 
 let testFiles = [];
@@ -22,24 +22,24 @@ glob.sync('./dist/src/**/*.tstNxt.js').forEach(function (file) {
   testFiles.push(path.resolve(file));
 
 });
-
-//load all test-files, Spec-Classes are getting registered
-testFiles.forEach((file) => {
-  //console.reportRun(file);
-  require(file);
-});
-
-let reporter = new SpecReporter();
-let specRunOutput = new SpecReportOutputConsole(reporter);
-specRunOutput.showFailedOnly(showFailedOnly);
-specRunOutput.setHeading('Spec "' + specClassName + '"');
-
 try {
+  //load all test-files, Spec-Classes are getting registered
+  testFiles.forEach((file) => {
+    //console.reportRun(file);
+    require(file);
+  });
+
+  let reporter = new SpecReporter();
+  let specRunOutput = new SpecReportOutputConsole(reporter);
+  specRunOutput.showFailedOnly(showFailedOnly);
+  specRunOutput.setHeading('Spec "' + specClassName + '"');
+
   SpecExecChooser.execSpec(specRegistry, specClassName, reporter);
-} catch(error){
+  specRunOutput.outputResult();
+} catch (error) {
   console.error('\x1b[1;31m', 'Error: ' + error.message, '\x1b[0m');
 }
-specRunOutput.outputResult();
+
 
 
 

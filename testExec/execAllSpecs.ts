@@ -11,7 +11,7 @@ const path = require('path');
 let showFailedOnlyArg = process.argv[2];
 
 let showFailedOnly = false;
-if(showFailedOnlyArg == 'true')
+if (showFailedOnlyArg == 'true')
   showFailedOnly = true;
 
 let testFiles = [];
@@ -22,20 +22,23 @@ glob.sync('./dist/src/**/*.tstNxt.js').forEach(function (file) {
   testFiles.push(path.resolve(file));
 
 });
+try {
+  //load all test-files, Spec-Classes are getting registered
+  testFiles.forEach((file) => {
+    //console.reportRun(file);
+    require(file);
+  });
 
-//load all test-files, Spec-Classes are getting registered
-testFiles.forEach((file) => {
-  //console.reportRun(file);
-  require(file);
-});
+  let reporter = new SpecReporter();
+  let specRunOutput = new SpecReportOutputConsole(reporter);
+  specRunOutput.showFailedOnly(showFailedOnly);
+  specRunOutput.setHeading('All Specs');
 
-let reporter = new SpecReporter();
-let specRunOutput = new SpecReportOutputConsole(reporter);
-specRunOutput.showFailedOnly(showFailedOnly);
-specRunOutput.setHeading('All Specs');
-
-SpecExecChooser.execAllSpecs(specRegistry, reporter);
-specRunOutput.outputResult();
+  SpecExecChooser.execAllSpecs(specRegistry, reporter);
+  specRunOutput.outputResult();
+} catch (error) {
+  console.error('\x1b[1;31m', 'Error: ' + error.message, '\x1b[0m');
+}
 
 
 
