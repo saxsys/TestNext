@@ -114,7 +114,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   }
 
   showNonExecutable(val?: boolean) {
-    if (val = null)
+    if (val == null)
       this.sNonExecutable = true;
     else
       this.sNonExecutable = val;
