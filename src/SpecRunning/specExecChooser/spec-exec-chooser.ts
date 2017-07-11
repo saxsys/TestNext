@@ -59,10 +59,10 @@ export class SpecExecChooser {
   /**
    * exec all Specs of the Subject
    * @param specRegistry containing the Specs to run
-   * @param subject to run
    * @param specReporter for the Results of the Run
+   * @param subject to run
    */
-  static execSubject(specRegistry:SpecRegistry, subject: string, specReporter: ISpecReporter) {
+  static execSubject(specRegistry: SpecRegistry, specReporter: ISpecReporter, subject: string) {
     let specs = specRegistry.getSpecContainersForSubject(subject);
     if (specs == null) {
       throw new Error('No Subject with Name "' + subject + '" found\n' +
@@ -77,10 +77,10 @@ export class SpecExecChooser {
   /**
    * exec one specific spec by the SpecClassName
    * @param specRegistry containing the Specs to run
-   * @param specClassName of the one Spec to run
    * @param specReporter for the Results of the Run
+   * @param specClassName of the one Spec to run
    */
-  static execSpec(specRegistry:SpecRegistry, specClassName: string, specReporter: ISpecReporter) {
+  static execSpec(specRegistry: SpecRegistry, specReporter: ISpecReporter, specClassName: string) {
     let spec = specRegistry.getSpecContainerByClassName(specClassName);
     if (spec == null) {
       throw new Error('No SpecClasses with Name "' + specClassName + '" found\n' +

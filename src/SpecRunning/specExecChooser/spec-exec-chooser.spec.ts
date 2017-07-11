@@ -93,14 +93,14 @@ describe('SpecExecChooser.runSpec', () => {
     let reporter = new SpecReporter();
 
     expect(() => {
-      SpecExecChooser.execSpec(registry, 'NonExistingSpecName', reporter);
+      SpecExecChooser.execSpec(registry, reporter, 'NonExistingSpecName');
     }).toThrowError(
       new RegExp('No SpecClasses with Name "NonExistingSpecName" found\nwe got: *'));
   });
 
   it('should accept standardSpec', () => {
     let reporter = new SpecReporter();
-    SpecExecChooser.execSpec(registry, standardSpec.getClassName(), reporter);
+    SpecExecChooser.execSpec(registry, reporter, standardSpec.getClassName());
     let reports = reporter.getReports();
     expect(reports.length).toBe(1);
 
@@ -113,7 +113,7 @@ describe('SpecExecChooser.runSpec', () => {
 
     let reporter = new SpecReporter();
 
-    SpecExecChooser.execSpec(registry, ignoredSpec.getClassName(), reporter);
+    SpecExecChooser.execSpec(registry, reporter, ignoredSpec.getClassName());
 
     let reports = reporter.getReports();
     expect(reports.length).toBe(1);
@@ -127,7 +127,7 @@ describe('SpecExecChooser.runSpec', () => {
   it('should accept not executable Specs', () => {
 
     let reporter = new SpecReporter();
-    SpecExecChooser.execSpec(registry, nonExecSpec.getClassName(), reporter);
+    SpecExecChooser.execSpec(registry, reporter, nonExecSpec.getClassName());
 
     let reports = reporter.getReports();
     expect(reports.length).toBe(1, 'not logged for notExecutableSpec');
@@ -138,7 +138,7 @@ describe('SpecExecChooser.runSpec', () => {
 
   it('should for Inherited Specs only use the child', () => {
     let reporter = new SpecReporter();
-    SpecExecChooser.execSpec(registry, inheritedSpec.getClassName(), reporter);
+    SpecExecChooser.execSpec(registry, reporter, inheritedSpec.getClassName());
 
     let reports = reporter.getReports();
     expect(reports.length).toBe(1);
@@ -149,7 +149,7 @@ describe('SpecExecChooser.runSpec', () => {
 
   it('should report subjects, even for Specs with Subject', () => {
     let reporter = new SpecReporter();
-    SpecExecChooser.execSpec(registry, specWithSubject.getClassName(), reporter);
+    SpecExecChooser.execSpec(registry, reporter, specWithSubject.getClassName());
 
     let topics = reporter.getTopics();
     expect(topics.length).toBe(1, 'topics created which should not be');
@@ -177,7 +177,7 @@ describe('SpecExecChooser.execBySubject', () => {
     let reporter = new SpecReporter();
 
     expect(() => {
-      SpecExecChooser.execSubject(registry, 'NonExistentSubject', reporter);
+      SpecExecChooser.execSubject(registry, reporter, 'NonExistentSubject');
     }).toThrowError(
       new RegExp('No Subject with Name "NonExistentSubject" found\nwe got: *')
     );
@@ -186,7 +186,7 @@ describe('SpecExecChooser.execBySubject', () => {
   it('should save Spec into a topic for a Subject used once', () => {
     let reporter = new SpecReporter();
 
-    SpecExecChooser.execSubject(registry, subjectNameUsedOnce, reporter);
+    SpecExecChooser.execSubject(registry, reporter, subjectNameUsedOnce);
 
     let reports = reporter.getReports();
 
@@ -203,7 +203,7 @@ describe('SpecExecChooser.execBySubject', () => {
   it('should save Spec into a topic for a Subject used multiple times', () => {
     let reporter = new SpecReporter();
 
-    SpecExecChooser.execSubject(registry, subjectUsedMultipleTimes, reporter);
+    SpecExecChooser.execSubject(registry, reporter, subjectUsedMultipleTimes);
 
     let reports = reporter.getReports();
 

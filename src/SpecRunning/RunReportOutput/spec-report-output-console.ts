@@ -4,10 +4,10 @@ import {ISpecReporter} from "../specReporting/specReporter/iSpec-reporter";
 import {SpecRunStatus} from "../specReporting/spec-run-status";
 import {SpecReportSorter} from "../specReporting/reportSorter/spec-report-sorter";
 import {ISpecMethodReport} from "../specReporting/specMethodReport/iSpec-method-report";
-import {config} from './spec-console-config'
+import {config} from '../../../testNext-config'
 
-var style = config.specReportConsoleOutput.style;
-var command = config.specReportConsoleOutput.commands;
+let style = config.specReportConsoleOutput.style;
+let command = config.specReportConsoleOutput.commands;
 
 /**
  * Output for Reported Data
@@ -101,6 +101,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     this.heading = heading;
   }
 
+
   /**
    * set if only failed Runs should be printed
    * @param val optional, only false as argument necessary
@@ -120,7 +121,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   }
 
   hideIgnored(val?: boolean) {
-    if (val = null) {
+    if (val == null) {
       this.hIgnored = true;
       return;
     }
@@ -134,6 +135,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   orderByAlphabet() {
     this.orderBy = OutputOrder.ALPHABET
   }
+
 
   /**
    * print a single Spec into the console
