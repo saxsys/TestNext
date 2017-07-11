@@ -9,7 +9,7 @@ export var config = {
       subHeading: "\x1b[47;30m",
     },
     commands: {
-      clearScreenStyle: "\x1b[2J\x1b[1;1H",
+      clearScreenStyle: "\x1b[4A\x1b[0J", /*\x1b[2J\x1b[1;1H*/
       resetStyle: "\x1b[0m",
     }
   }
