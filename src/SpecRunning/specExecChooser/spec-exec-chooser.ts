@@ -50,8 +50,6 @@ export class SpecExecChooser {
     let specWithoutSubject = specRegistry.getSpecContainersWithoutSubject();
     if (specWithoutSubject.length > 0)
       specWithoutSubject.forEach((spec) => {
-        if(!spec.isExecutableSpec())
-          return;
         SpecRunner.runSpec(spec, specReporter);
       });
   }

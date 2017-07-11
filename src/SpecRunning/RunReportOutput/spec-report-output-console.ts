@@ -5,6 +5,7 @@ import {SpecRunStatus} from "../specReporting/spec-run-status";
 import {SpecReportSorter} from "../specReporting/reportSorter/spec-report-sorter";
 import {ISpecMethodReport} from "../specReporting/specMethodReport/iSpec-method-report";
 import {config} from '../../../testNext-config'
+import {SpecReportStatistic} from "../specReporting/specReporter/spec-report-statistic";
 
 let style = config.specReportConsoleOutput.style;
 let command = config.specReportConsoleOutput.commands;
@@ -39,7 +40,13 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     //get topics
     let topics = this.specReporter.getTopics();
     //sort Topics by alphabet, no Topic at last
-    topics = SpecReportOutputConsole.sortStringArrayByAlphabet(topics);
+    topics = topics.sort((a, b) => {
+      if (a == null) return 1;
+      if (b == null) return -1;
+      else if (a.toLowerCase() < b.toLowerCase()) return -1;
+      else if (a.toLowerCase() > b.toLowerCase()) return 1;
+      else return 0;
+    });
 
     let topicCount = topics.length;
 
@@ -48,30 +55,30 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       let reports = this.specReporter.getReportsOfTopic(topic);
       if (reports == null || reports.length == 0)
         return;
-      let reportFiter = new SpecReportSorter(reports);
+      let reportFilter = new SpecReportSorter(reports);
 
       if (this.sFailedOnly)
-        reportFiter.removeSuccessful();
+        reportFilter.removeSuccessful();
       if (!this.sNonExecutable)
-        reportFiter.removeNonExecutable();
+        reportFilter.removeNonExecutable();
       if (this.hIgnored)
-        reportFiter.removeIgnored();
+        reportFilter.removeIgnored();
 
 
       switch (this.orderBy) {
         case OutputOrder.ALPHABET:
-          reportFiter.orderReportsByAlphabet();
+          reportFilter.orderReportsByAlphabet();
           break;
         case OutputOrder.EXECUTION_STATUS:
-          reportFiter.orderReportsByExecutionStatus();
+          reportFilter.orderReportsByExecutionStatus();
           break;
         default:
-          reportFiter.orderReportsByAlphabet();
+          reportFilter.orderReportsByAlphabet();
       }
 
 
       let padding = 1;
-      let remainingReports = reportFiter.getReports();
+      let remainingReports = reportFilter.getReports();
 
       if (remainingReports.length == 0) {
         return;
@@ -92,6 +99,8 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       });
       console.log('\n');
     });
+
+    this.logStatistic(this.specReporter.getStatistic());
   }
 
   /**
@@ -113,6 +122,10 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       this.sFailedOnly = false;
   }
 
+  /**
+   * set if not executable Specs should be printed
+   * @param val optional, only false as argument necessary
+   */
   showNonExecutable(val?: boolean) {
     if (val == null)
       this.sNonExecutable = true;
@@ -120,6 +133,10 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       this.sNonExecutable = val;
   }
 
+  /**
+   * set if ignored Runs should be printed
+   * @param val optional, only false as argument necessary
+   */
   hideIgnored(val?: boolean) {
     if (val == null) {
       this.hIgnored = true;
@@ -128,10 +145,17 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     this.hIgnored = val;
   }
 
+  /**
+   * order the output by the Exec Status
+   * Failed->Invalid->Ignored->Successful->nonExecutable
+   */
   orderByExecutionStatus() {
     this.orderBy = OutputOrder.EXECUTION_STATUS
   }
 
+  /**
+   * order the output by alphabet
+   */
   orderByAlphabet() {
     this.orderBy = OutputOrder.ALPHABET
   }
@@ -145,7 +169,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   private printSpecReport(specReport: ISpecReport, paddingNumber?: number) {
 
     if (paddingNumber == null) paddingNumber = 0;
-    let padding = SpecReportOutputConsole.getPaddingString(paddingNumber);
+    let padding = this.getPaddingString(paddingNumber);
 
     let status = specReport.getRunStatus();
 
@@ -165,6 +189,11 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   }
 
 
+  /**
+   * print the Description of a Spec into the Console, in color matching the run-result
+   * @param specReport
+   * @param padding
+   */
   private logSpecDescription(specReport: ISpecReport, padding?: string) {
     if (padding == null)
       padding = '';
@@ -184,6 +213,11 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     );
   }
 
+  /**
+   * log that a Spec is ignored
+   * @param specReport
+   * @param padding
+   */
   private logIgnored(specReport: ISpecReport, padding?: string) {
     if (padding == null)
       padding = '';
@@ -196,6 +230,11 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     );
   };
 
+  /**
+   * log that a Spec is not executable
+   * @param specReport
+   * @param padding
+   */
   private logNotExecutable(specReport: ISpecReport, padding?: string) {
     if (padding == null)
       padding = '';
@@ -208,6 +247,11 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     );
   }
 
+  /**
+   * log that the spec is invalid
+   * @param specReport
+   * @param padding
+   */
   private logInvalid(specReport: ISpecReport, padding?: string) {
     if (padding == null)
       padding = '';
@@ -222,6 +266,11 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     });
   }
 
+  /**
+   * log the a single MethodDescription and the run result
+   * @param specMethodReport
+   * @param padding
+   */
   private logSpecMethodReport(specMethodReport: ISpecMethodReport, padding?: string) {
     if (padding == null)
       padding = '';
@@ -250,8 +299,21 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
 
   }
 
+  private logStatistic(stat:SpecReportStatistic){
+    console.log(style.failedRun + 'failed:         ' + stat.failed + '/' + stat.executed + command.resetStyle);
+    console.log(style.success + 'successful:     ' + stat.successful + '/' + stat.executed + command.resetStyle);
+    console.log(style.invalid + 'invalid:        ' + stat.invalid + '/' + stat.count + command.resetStyle);
+    console.log(style.notExecuted + 'ignored:        ' + stat.ignored + '/' + stat.count + command.resetStyle);
+    console.log(style.notExecuted + 'not Executable: ' + stat.notExecutable + '/' + stat.count + command.resetStyle);
+    console.log(stat.count +' SpecClasses and ' + stat.topics + ' defined Subjects');
+  }
 
-  private static getPaddingString(paddingNumber: Number): string {
+  /**
+   * return a string with padding
+   * @param paddingNumber
+   * @return {any}
+   */
+  private getPaddingString(paddingNumber: Number): string {
     if (paddingNumber == null) return '';
     let padding = '';
     for (let i = 0; i < paddingNumber; i++) {
@@ -260,7 +322,12 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     return padding;
   }
 
-  private getColorFor(runStatus: SpecRunStatus) {
+  /**
+   * get the color matching a Spec ExecutionState
+   * @param runStatus
+   * @return {string} ansi-color-code
+   */
+  private getColorFor(runStatus: SpecRunStatus):string {
     switch (runStatus) {
       case SpecRunStatus.IGNORED:
         return style.notExecuted;
@@ -274,17 +341,6 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
         return style.success;
     }
   }
-
-  static sortStringArrayByAlphabet(array: String[]): String[] {
-    return array.sort((a, b) => {
-      if (a == null) return 1;
-      if (b == null) return -1;
-      else if (a.toLowerCase() < b.toLowerCase()) return -1;
-      else if (a.toLowerCase() > b.toLowerCase()) return 1;
-      else return 0;
-    });
-  }
-
 
 }
 

@@ -1,5 +1,6 @@
 import {ISpecContainer} from "../../../SpecStorage/specContainer/iSpec-Container";
 import {ISpecReport} from "../specReport/iSpec-report";
+import {SpecReportStatistic} from "./spec-report-statistic";
 
 /**
  * Collecting Reports for multiple Specs
@@ -48,4 +49,10 @@ export interface ISpecReporter {
    * @return {String[]} All Topics with Reports
    */
   getTopics(): Array<String>;
+
+  /**
+   * Statistic for SpecRuns
+   * @return {SpecReportStatistic}
+   */
+  getStatistic(): SpecReportStatistic;
 }

@@ -2,6 +2,7 @@ import {ISpecContainer} from "../../../SpecStorage/specContainer/iSpec-Container
 import {SpecReport} from "../specReport/spec-report";
 import {ISpecReporter} from "./iSpec-reporter";
 import {ISpecReport} from "../specReport/iSpec-report";
+import {SpecReportStatistic} from "./spec-report-statistic";
 
 /**
  * Collecting Reports for multiple Specs
@@ -115,6 +116,10 @@ export class SpecReporter implements ISpecReporter {
     return Array.from(this.topicsAndReports.keys());
   }
 
+  /**
+   * Statistic for SpecRuns
+   * @return {SpecReportStatistic}
+   */
   getStatistic(): SpecReportStatistic{
     let stat = new SpecReportStatistic();
 
@@ -134,31 +139,18 @@ export class SpecReporter implements ISpecReporter {
         stat.failed++;
       }
       else {
-        stat.successful ++;
+        stat.successful++;
       }
 
     });
+    stat.executed =stat.successful + stat.failed;
+    stat.topics = this.topicsAndReports.size-1;
 
     return stat;
 }
 
 
 
-}
-
-/**
- * Statistic for SpecRuns
- */
-export class SpecReportStatistic {
-  count:number = 0;
-
-  ignored:number = 0;
-  notExecutable:number = 0;
-
-  executed:number = 0;
-  successful:number = 0;
-  failed:number = 0;
-  invalid:number = 0;
 }
 
 
