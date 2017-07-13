@@ -47,7 +47,7 @@ if (runMode == null) {
 
     specRunOutput.outputResult();
   } catch (error) {
-    console.error('\x1b[1;31m' + 'Error: ' + error.message + '\x1b[0m');
+    console.error('\x1b[1;31m' + 'Error: ' + error + '\x1b[0m');
   }
 
 
