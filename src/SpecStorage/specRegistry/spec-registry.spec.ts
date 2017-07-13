@@ -365,24 +365,24 @@ describe('SpecRegistry.registerWhenForSpec', () => {
   });
 });
 
-describe('SpecRegistry-registerThenErrorForSpec', () => {
-  class SpecRegistry_regThenError{
+describe('SpecRegistry.registerThenThrowForSpec', () => {
+  class SpecRegistry_regThenThrow{
     public thenError(){}
   }
-  let specClassConstructor = SpecRegistry_regThenError.prototype.constructor;
-  let specClassName = 'SpecRegistry_regThenError';
-  let specName = 'SpecRegistry regThenError';
+  let specClassConstructor = SpecRegistry_regThenThrow.prototype.constructor;
+  let specClassName = 'SpecRegistry_regThenThrow';
+  let specName = 'SpecRegistry regThenThrow';
 
-  let functionName = 'thenError';
+  let functionName = 'thenThrow';
   let description = 'such an Error';
 
 
 
-  it('should register ThenError, for existing Specs', () => {
+  it('should register ThenThrow, for existing Specs', () => {
     let specReg = new SpecRegistry();
 
     specReg.registerSpec(specClassConstructor, specName);
-    specReg.registerThenErrorForSpec(specClassConstructor, functionName, description);
+    specReg.registerThenThrowForSpec(specClassConstructor, functionName, description);
 
     let specEntry = specReg.getSpecContainerByClassName(specClassName);
     expect(specEntry).not.toBeNull();
@@ -392,10 +392,10 @@ describe('SpecRegistry-registerThenErrorForSpec', () => {
     expect(methodEntry.getDescription()).toEqual(description);
   });
 
-  it('should register ThenError, while Spec is not registered', () => {
+  it('should register ThenThrow, while Spec is not registered', () => {
     let specReg = new SpecRegistry();
 
-    specReg.registerThenErrorForSpec(specClassConstructor, functionName, description);
+    specReg.registerThenThrowForSpec(specClassConstructor, functionName, description);
 
     let specEntry = specReg.getSpecContainerByClassName(specClassName);
     expect(specEntry).not.toBeNull();
@@ -405,6 +405,69 @@ describe('SpecRegistry-registerThenErrorForSpec', () => {
     expect(methodEntry.getDescription()).toEqual(description);
   });
 });
+
+describe('SpecRegistry.registerCleanupForSpec', ()=>{
+  let specRegistry;
+
+  class CleanupClass {
+    private a;
+    public aCleanupFunction() {
+      this.a = 0;
+
+    };
+
+    public numericProperty = 0;
+  }
+
+  let specClassConstructor = CleanupClass.prototype.constructor;
+  let specClassName = 'CleanupClass';
+  let specDescription = 'Cleanup';
+
+  let functionName = 'aCleanupFunction';
+  let description = 'clean whatever';
+  let execNumber = 0;
+
+  beforeEach(() => {
+    specRegistry = new SpecRegistry();
+    specRegistry.registerSpec(specClassConstructor, specDescription);
+  });
+
+  it('should accept Cleanup registration for non existent specs', () => {
+    let specRegistry = new SpecRegistry();
+
+    specRegistry.registerCleanupForSpec(specClassConstructor, functionName, description, execNumber);
+    let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
+
+    expect(specEntry).not.toBeUndefined();
+    expect(specEntry.getClassConstructor()).toEqual(specClassConstructor);
+
+    let cleanupEntry = specEntry.getCleanup()[0];
+    expect(cleanupEntry.getName()).toEqual(functionName);
+    expect(cleanupEntry.getDescription()).toEqual(description);
+  });
+
+  it('should refuse to add a Cleanup for a new class-name-duplicate', () => {
+    class CleanupClass {
+      private aFunction() {
+      }
+    }
+    let classDouble2 = CleanupClass.prototype.constructor;
+
+    expect(() => {
+        specRegistry.registerCleanupForSpec(classDouble2, "aFunction", description);
+      }
+    ).toThrowError(SpecRegistryError, 'A different Class with the Name "CleanupClass" is already registered, class-name-duplicates are forbidden');
+  });
+
+  it('should register the Cleanup, while parameters are correct', () => {
+    specRegistry.registerCleanupForSpec(specClassConstructor, functionName, description, execNumber);
+    let specRegEntry = specRegistry.getSpecContainerByClassName(specClassName);
+    let thenRegEntry = specRegEntry.getCleanup()[execNumber];
+    expect(thenRegEntry.getName()).toEqual(functionName);
+    expect(thenRegEntry.getDescription()).toEqual(description);
+  });
+});
+
 
 describe('SpecRegistry.registerSpecForSubject', () => {
   let specRegistry = new SpecRegistry();

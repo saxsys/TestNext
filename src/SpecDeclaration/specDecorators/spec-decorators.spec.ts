@@ -1,4 +1,4 @@
-import {Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow, When} from "./spec-decorators";
+import {Cleanup, Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow, When} from "./spec-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../../SpecStorage/spec-registry-error";
 import {Assert} from "../assert/assert";
@@ -314,16 +314,16 @@ describe('TestDecorators.Then', () => {
   });
 });
 
-describe('TestDecorators.ThenError', () => {
-  it('should register the ThenError-Method for the Spec', () => {
+describe('TestDecorators.ThenThrow', () => {
+  it('should register the ThenThrow-Method for the Spec', () => {
 
-    let specName = 'specClassDecorator ThenError Correct';
-    let className = 'SpecDecorators_ThenError_Correct';
+    let specName = 'specClassDecorator ThenThrow Correct';
+    let className = 'SpecDecorators_ThenThrow_Correct';
     let methodDescription = 'a random Error';
     let methodName = 'randomError';
 
     @Spec(specName)
-    class SpecDecorators_ThenError_Correct {
+    class SpecDecorators_ThenThrow_Correct {
       public val = 3;
 
       @ThenThrow(methodDescription) randomError() {
@@ -336,7 +336,7 @@ describe('TestDecorators.ThenError', () => {
     expect(methodRegEntry.getDescription()).toEqual(methodDescription);
   });
 
-  it('should register the @When without the Class being registered as @Spec', () => {
+  it('should register the @ThenThrow without the Class being registered as @Spec', () => {
 
     let methodDescription = 'A Method, within a Class no registered as Spec';
     let className = 'SpecDecorators_ThenError_notRegistered';
@@ -384,6 +384,99 @@ describe('TestDecorators.ThenError', () => {
       'Only one @ThenThrow allowed on ' + className + ' cannot add ' + methodName2 + ', ' + methodName1 + ' is already @ThenThrow'
     );
 
+  });
+});
+
+describe('TestDecorators.Cleanup', () => {
+  it('should register the Cleanup-Method for the Spec without Parameters', () => {
+
+    let className = 'TestDecorators_Cleanup_Correct_withoutParam';
+    let methodName = 'tidyIt';
+    let specName = 'specClassDecoratorThenCorrect without parameters';
+
+    @Spec(specName)
+    class TestDecorators_Cleanup_Correct_withoutParam {
+      public val = 3;
+
+      @Cleanup() tidyIt() {
+      }
+    }
+
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
+    let methodRegEntry = specRegEntry.getCleanup()[0];
+    expect(methodRegEntry.getName()).toEqual(methodName);
+  });
+
+  it('should register the Cleanup-Method for the Spec with Parameters', () => {
+
+    let className = 'TestDecorators_Cleanup_Correct_withParam';
+    let methodName = 'tidyIt';
+    let specName = 'specClassDecorator Cleanup Correct with Parameters';
+    let methodDescription = 'then a Method is correct';
+
+    @Spec(specName)
+    class TestDecorators_Cleanup_Correct_withParam {
+      public val = 3;
+
+      @Cleanup(methodDescription,1) tidyIt() {
+      }
+    }
+
+    let specRegEntry = specRegistry.getSpecContainerByClassName(className);
+    let methodRegEntry = specRegEntry.getCleanup()[0];
+    expect(methodRegEntry.getName()).toEqual(methodName);
+    expect(methodRegEntry.getDescription()).toEqual(methodDescription);
+  });
+
+  it('should register the @Cleanup without the Class being registered as @Spec', () => {
+
+    let methodDescription = 'A Method, within a Class no registered as Spec';
+    let className = 'TestDecorators_Cleanup_ClassWithoutDecorator';
+    let methodName = 'methodInClassWithoutDeco';
+
+    class TestDecorators_Cleanup_ClassWithoutDecorator {
+      @Cleanup(methodDescription) methodInClassWithoutDeco() {
+      }
+    }
+    let specClassConstructor = TestDecorators_Cleanup_ClassWithoutDecorator.prototype.constructor;
+
+    let entry = specRegistry.getSpecContainerByClassName(className);
+    expect(entry.getDescription()).toBeUndefined();
+    expect(entry.getClassConstructor()).toEqual(specClassConstructor);
+
+    let methodEntry = entry.getCleanup()[0];
+    expect(methodEntry.getDescription()).toEqual(methodDescription);
+    expect(methodEntry.getName()).toEqual(methodName);
+  });
+
+  it('should register multiple @Cleanup for one Spec', () => {
+
+    let className = 'TestDecorators_Cleanup_MultipleThen';
+    let methodName1 = 'method1';
+    let methodName2 = 'method2';
+    let methodDescription1 = 'a Method Description 1';
+    let methodDescription2 = 'a Method Description 2';
+
+    @Spec('Testing MultipleThen')
+    class TestDecorators_Cleanup_MultipleThen {
+      @Cleanup(methodDescription1, 0)method1() {
+      }
+
+      @Cleanup(methodDescription2, 1)method2() {
+      }
+    }
+
+    let regEntry = specRegistry.getSpecContainerByClassName(className);
+    let methodEntries = regEntry.getCleanup();
+    expect(methodEntries.length).toBe(2);
+
+    let methodEntry1 = methodEntries[0];
+    expect(methodEntry1.getName()).toEqual(methodName1);
+    expect(methodEntry1.getDescription()).toEqual(methodDescription1);
+
+    let methodEntry2 = methodEntries[1];
+    expect(methodEntry2.getName()).toEqual(methodName2);
+    expect(methodEntry2.getDescription()).toEqual(methodDescription2);
   });
 });
 

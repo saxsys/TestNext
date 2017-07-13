@@ -26,17 +26,21 @@ export var config = {
       cmd: 'hideIgnored',
       description: 'hides all ignored Specs'
     },
-    sNonEx: {
+    sNonExec: {
       cmd: 'showNonExecutable',
       description: 'show also non executable Specs'
     },
-    oA: {
+    oAlpha: {
       cmd: 'orderByAlphabet',
       description: 'order Results by Alphabet'
     },
-    oExSt: {
+    oExecStat: {
       cmd: 'orderByExecutionStatus',
       description: 'order Results by execution-status'
+    },
+    sClean:{
+      cmd: 'showCleanup',
+      description: 'show also cleanup if not failed'
     }
   },
   runMode:{

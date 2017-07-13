@@ -1,7 +1,7 @@
 ///<reference path="../../SpecDeclaration/specDecorators/spec-decorators.ts"/>
 import {
   Given, Providers, SUT, Then, Spec, When, ThenThrow,
-  Subject
+  Subject, Cleanup
 } from '../../SpecDeclaration/specDecorators/spec-decorators';
 import {Assert} from "../../SpecDeclaration/assert/assert";
 import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
@@ -16,17 +16,29 @@ class CarDrives extends SpecWithSUT{
 
   static startFuel = 10;
   static startUsage = 10;
-  @Given('I have ' + CarDrives.startFuel +'l of fuel',0) fuel10l() {
+  public dirt = 0;
+
+  @Given('I have ' + CarDrives.startFuel +'l of fuel') fuel10l() {
     this.SUT.setFuel(CarDrives.startFuel);
   }
 
-  @Given('I use 10l per 100km',1) fuelUsage10l() {
+  @Given('I use 10l per 100km') fuelUsage10l() {
     this.SUT.setFuelUsage(10);
+  }
+
+  @Given('the car makes dirt')makeDirt(){
+    this.dirt++;
+  }
+
+  @Cleanup('the Environment after the dirty Car', 1) cleanEnv(){
+    this.dirt = 0;
   }
 
   fuelUsageFor(km:number):number{
     return (this.SUT.usagePer100km/100)*km;
   }
+
+
 }
 
 @Subject('Car Drives')

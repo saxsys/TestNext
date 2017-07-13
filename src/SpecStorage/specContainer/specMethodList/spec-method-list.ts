@@ -16,7 +16,7 @@ export class SpecMethodList implements ISpecMethodList{
     this.methodType = methodType;
   }
 
-  addMethod(functionName: string, description: string, execNumber: Number){
+  addMethod(functionName: string, description: string, execNumber?: number){
     if(this.methodList == null) {
       if (execNumber == null) {
         this.methodList = new SpecMethodUnnumberedList(this.className, this.methodType);

@@ -1,37 +1,12 @@
-import {Given, Spec, Then, ThenThrow, When} from "SpecDeclaration/specDecorators/spec-decorators";
 import {SpecValidator} from "./spec-validator";
-import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecValidationError} from "./spec-validation-error";
+import {ExampleSpecFiller} from "../../utils/testData/example-spec-filler";
+import {SpecContainer} from "../../SpecStorage/specContainer/specContainer";
 
-describe('SpecValidator.vaidate', () => {
+describe('SpecValidator.validate', () => {
   it('should accept proper Specs', () => {
 
-    let specClassName = 'SpecValidator_validate_correct';
-    @Spec('a valid Test')
-    class SpecValidator_validate_correct {
-      public runOrder = [];
-
-      @Given('given 0', 0)given0() {
-        this.runOrder.push('given0');
-      }
-
-      @Given('given 1', 1)given1() {
-        this.runOrder.push('given1');
-      }
-
-      @When('the When') theWhen() {
-        this.runOrder.push('theWhen');
-      }
-
-      @Then('then 0', 0) then0() {
-        this.runOrder.push('then0');
-      }
-
-      @Then('then1', 1) then1() {
-        this.runOrder.push('then1');
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getStandardSpec();
 
     expect(() => {
       SpecValidator.validate(spec)
@@ -39,308 +14,186 @@ describe('SpecValidator.vaidate', () => {
   });
 
   it('should refuse specs without @Given', () => {
-    let specClassName = 'SpecValidator_validate_noGiven';
-    @Spec('a invalid Test')
-    class SpecValidator_validate_noGiven {
-      public runOrder = [];
 
-      @When('the When') theWhen() {
-        this.runOrder.push('theWhen');
-      }
-
-      @Then('then 0', 0) then0() {
-        this.runOrder.push('then0');
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getSpecWithoutGiven()
 
     expect(() => {
       SpecValidator.validate(spec)
-    }).toThrowError(SpecValidationError, 'There must be at lease one @Given in ' + specClassName);
+    }).toThrowError(SpecValidationError, 'There must be at lease one @Given in ' + spec.getClassName());
   });
 
   it('should accept Specs with only inherited @Given', () => {
-    let specClassName_parent = 'SpecValidator_validate_inheritGiven_parent';
-    let specClassName_child = 'SpecValidator_validate_inheritGiven_child';
-
 
     class SpecValidator_validate_inheritGiven_parent {
       private thing = 0;
-
-      @Given('given 0') given0() {
+      given0() {
         this.thing = 1;
       }
     }
 
-    @Spec('a invalid Test')
     class SpecValidator_validate_inheritGiven_child extends SpecValidator_validate_inheritGiven_parent {
       public runOrder = [];
-
-      @When('the When') theWhen() {
+      theWhen() {
         this.runOrder.push('theWhen');
       }
-
-      @Then('then 0') then0() {
+      then0() {
         this.runOrder.push('then0');
       }
-
     }
 
-    //let specParent = specRegistry.getSpecContainerByClassName(specClassName_parent);
-    let specChild = specRegistry.getSpecContainerByClassName(specClassName_child);
+    let parentConstructor = SpecValidator_validate_inheritGiven_parent.prototype.constructor;
+    let specParent = new SpecContainer(parentConstructor);
+    specParent.addGiven('given0', 'given0');
+
+    let childConstructor = SpecValidator_validate_inheritGiven_child.prototype.constructor;
+    let specChild = new SpecContainer(childConstructor, specParent);
+    specChild.setDescription('a valid Test');
+    specChild.addWhen('theWhen', 'the When');
+    specChild.addThen('then0', 'then 0');
 
     expect(() => {SpecValidator.validate(specChild);}).not.toThrow();
   });
 
   it('should refuse Specs, when the @Given function does not exist on the Object', () => {
-    let specClassName = 'SpecValidator_validate_givenNotOnObject';
 
-    @Spec('a invalid Test')
-    class SpecValidator_validate_givenNotOnObject {
-      public runOrder = [];
-      @Given('aGiven', 0) aGiven(){}
-      @When('the When') theWhen() {
-        this.runOrder.push('theWhen');
-      }
-      @Then('then1') then() {
-        this.runOrder.push('then1');
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getSpecWithoutGiven();
     spec.addGiven('nonExistGiven', 'does not exist', 1);
 
     expect(() => {
       SpecValidator.validate(spec);
     }).toThrowError(
       SpecValidationError,
-      'On "' + specClassName + '" @Given function "nonExistGiven" does not exist');
+      'On "' + spec.getClassName() + '" @Given function "nonExistGiven" does not exist');
   });
 
 
   it('should refuse specs without @When', () => {
-    let specClassName = 'SpecValidator_validate_noWhen';
-    @Spec('a invalid Test')
-    class SpecValidator_validate_noWhen {
-      public runOrder = [];
 
-      @Given('given 0', 0)given0() {
-        this.runOrder.push('given0');
-      }
-
-      @Given('given 1', 1)given1() {
-        this.runOrder.push('given1');
-      }
-
-      @Then('then 0', 0) then0() {
-        this.runOrder.push('then0');
-      }
-
-      @Then('then1', 1) then1() {
-        this.runOrder.push('then1');
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getSpecWithoutWhen();
 
     expect(() => {
       SpecValidator.validate(spec);
     }).toThrowError(
       SpecValidationError,
-      '@When of "' + specClassName + '" is not set'
+      '@When of "' + spec.getClassName() + '" is not set'
     );
   });
 
   it('should accept Specs with only inherited @When', () => {
-    let specClassName_parent = 'SpecValidator_validate_inheritWhen_parent';
-    let specClassName_child = 'SpecValidator_validate_inheritWhen_child';
-
-
-    class SpecValidator_validate_inheritWhen_parent {
-      private sth = 0;
-      @When('the When') theWhen() {
-        this.sth = 1;
+    class SpecValidator_validate_inheritGiven_parent {
+      public runOrder = [];
+      public thing = 0;
+      theWhen() {
+        this.runOrder.push('theWhen');
       }
     }
 
-    @Spec('a invalid Test')
-    class SpecValidator_validate_inheritWhen_child extends SpecValidator_validate_inheritWhen_parent {
-      public runOrder = [];
-
-      @Given('given 0') given0() {
-        this.runOrder.push('given0');
+    class SpecValidator_validate_inheritGiven_child extends SpecValidator_validate_inheritGiven_parent {
+      given0() {
+        this.thing = 1;
       }
-
-      @Then('then 0') then0() {
+      then0() {
         this.runOrder.push('then0');
       }
-
     }
 
-    //let specParent = specRegistry.getSpecContainerByClassName(specClassName_parent);
-    let specChild = specRegistry.getSpecContainerByClassName(specClassName_child);
+    let parentConstructor = SpecValidator_validate_inheritGiven_parent.prototype.constructor;
+    let specParent = new SpecContainer(parentConstructor);
+    specParent.addWhen('theWhen', 'the When');
+
+    let childConstructor = SpecValidator_validate_inheritGiven_child.prototype.constructor;
+    let specChild = new SpecContainer(childConstructor, specParent);
+    specChild.setDescription('a valid Test');
+    specChild.addGiven('given0', 'given0');
+    specChild.addThen('then0', 'then 0');
 
     expect(() => {SpecValidator.validate(specChild);}).not.toThrow();
   });
 
-  xit('should refuse Specs with own and inherited @When (multiple)', () => {
-    let specClassName_parent = 'SpecValidator_validate_doubleWhen_parent';
-    let specClassName_child = 'SpecValidator_validate_doubleWhen_child';
-
-
-    class SpecValidator_validate_doubleWhen_parent {
-      private sth = 0;
-      @When('the parent When') theParentWhen() {
-        this.sth = 1;
-      }
-    }
-
-    @Spec('a invalid Test')
-    class SpecValidator_validate_doubleWhen_child extends SpecValidator_validate_doubleWhen_parent {
-      public runOrder = [];
-
-      @Given('given 0') given0() {
-        this.runOrder.push('given0');
-      }
-
-      @When('the Child When') theChildWhen() {
-        this.runOrder.push('theChildWhen');
-      }
-
-      @Then('then 0') then0() {
-        this.runOrder.push('then0');
-      }
-
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName_child);
-
-    expect(() => {
-      SpecValidator.validate(spec);
-    }).toThrowError(
-      SpecValidationError,
-      'Spec "' + specClassName_child + '" has multiple @When functions, acquired by inheritance, this is forbidden'
-    );
-  });
 
   it('should refuse Specs, when the @When function does not exist on the Object', () => {
-    let specClassName = 'SpecValidator_validate_whenNotOnObject';
-
-    @Spec('a invalid Test')
-    class SpecValidator_validate_whenNotOnObject {
-      public runOrder = [];
-      @Given('aGiven',) aGiven(){}
-      @Then('then1') then() {
-        this.runOrder.push('then1');
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getSpecWithoutWhen();
     spec.addWhen('nonExistWhen', 'does not exist');
 
     expect(() => {
       SpecValidator.validate(spec);
     }).toThrowError(
       SpecValidationError,
-      'On "' + specClassName + '" @When function "nonExistWhen" does not exist'
+      'On "' + spec.getClassName() + '" @When function "nonExistWhen" does not exist'
     );
   });
 
 
   it('should refuse specs without @Then or @ThenThrow', () => {
-    let specClassName = 'SpecValidator_validate_noThen';
-    @Spec('a invalid Test')
-    class SpecValidator_validate_noThen {
-      public runOrder = [];
-
-      @Given('given 0', 0) given0() {
-        this.runOrder.push('given0');
-      }
-      @When('the When') theWhen() {
-        this.runOrder.push('theWhen');
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getSpecWithoutThen();
 
     expect(() => {
       SpecValidator.validate(spec)
-    }).toThrowError(SpecValidationError, 'There must be at lease one @Then or a @ThenThrow in ' + specClassName);
+    }).toThrowError(SpecValidationError, 'There must be at lease one @Then or a @ThenThrow in ' + spec.getClassName());
   });
 
 
   it('should accept Specs with only inherited @Then', () => {
-    let specClassName_parent = 'SpecValidator_validate_inheritThen_parent';
-    let specClassName_child = 'SpecValidator_validate_inheritThen_child';
+    class SpecValidator_validate_inheritGiven_parent {
+      public runOrder = [];
+      public thing = 0;
+      then0() {
+        this.runOrder.push('then0');
+      }
+    }
 
-
-    class SpecValidator_validate_inheritThen_parent {
-      private thing = 0;
-
-      @Then('then 0') then0() {
+    class SpecValidator_validate_inheritGiven_child extends SpecValidator_validate_inheritGiven_parent {
+      given0() {
         this.thing = 1;
       }
-    }
-
-    @Spec('a inherited Then')
-    class SpecValidator_validate_inheritThen_child extends SpecValidator_validate_inheritThen_parent {
-      public runOrder = [];
-
-      @Given('given 0') given0() {
-        this.runOrder.push('given0');
-      }
-
-      @When('the When') theWhen() {
+      theWhen() {
         this.runOrder.push('theWhen');
       }
-
     }
 
-    //let specParent = specRegistry.getSpecContainerByClassName(specClassName_parent);
-    let specChild = specRegistry.getSpecContainerByClassName(specClassName_child);
+    let parentConstructor = SpecValidator_validate_inheritGiven_parent.prototype.constructor;
+    let specParent = new SpecContainer(parentConstructor);
+    specParent.addThen('then0', 'then 0');
+
+    let childConstructor = SpecValidator_validate_inheritGiven_child.prototype.constructor;
+    let specChild = new SpecContainer(childConstructor, specParent);
+    specChild.setDescription('a valid Test');
+    specChild.addGiven('given0', 'given 0');
+    specChild.addWhen('theWhen', 'the When');
 
     expect(() => {SpecValidator.validate(specChild);}).not.toThrow();
   });
 
   it('should refuse Specs, when the @Then function does not exist on the Object', () => {
-    let specClassName = 'SpecValidator_validate_thenNotOnObject';
-
-    @Spec('a then missing on Obj')
-    class SpecValidator_validate_thenNotOnObject {
-      public runOrder = [];
-      @Given('aGiven') aGiven(){}
-      @When('the When') theWhen() {
-        this.runOrder.push('theWhen');
-      }
-      @Then('then1',0) then() {
-        this.runOrder.push('then1');
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getSpecWithoutThen()
     spec.addThen('nonExistThen', 'does not exist', 1);
 
     expect(() => {
       SpecValidator.validate(spec);
     }).toThrowError(
       SpecValidationError,
-      'On "' + specClassName + '" @Then function "nonExistThen" does not exist');
+      'On "' + spec.getClassName() + '" @Then function "nonExistThen" does not exist');
   });
 
   it('should accept Specs with @ThenThrow', () => {
-    let specClassName = 'SpecValidator_validate_validThenThrow';
-    @Spec('a invalid Test')
-    class SpecValidator_validate_validThenThrow {
-      public runOrder = [];
 
-      @Given('given 0', 0) given0() {
-        this.runOrder.push('given0');
-      }
-      @When('the When') theWhen() {
-        this.runOrder.push('theWhen');
-      }
-      @ThenThrow('a Error') aError(){
-        throw new Error('aError')
-      }
-    }
-    let spec = specRegistry.getSpecContainerByClassName(specClassName);
+    let spec = ExampleSpecFiller.getErrorThrowingExpectingSpec();
     expect(()=>{
       SpecValidator.validate(spec);
     }).not.toThrow();
   });
 
+  it('should refuse Spec, when @Cleanup function does not exist on the Object', ()=> {
+
+
+    let spec = ExampleSpecFiller.getSpecWithoutCleanup();
+    spec.addCleanup('nonExistCleanup', 'does not exist');
+
+    expect(() => {
+      SpecValidator.validate(spec);
+    }).toThrowError(
+      SpecValidationError,
+      'On "' + spec.getClassName() + '" @Cleanup function "nonExistCleanup" does not exist'
+    );
+  });
 });

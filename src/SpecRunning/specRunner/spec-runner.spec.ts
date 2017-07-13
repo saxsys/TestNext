@@ -1,4 +1,5 @@
 import {
+  Cleanup,
   Given, Ignore, Providers, Spec, SUT, Then, ThenThrow,
   When
 } from "../../SpecDeclaration/specDecorators/spec-decorators";
@@ -49,8 +50,8 @@ describe('specRunner.runSpec', () => {
   let specReporter;
 
   let specClassName = 'SpecRunner_runSpec';
-  let methodNamesInOrder = ['given0', 'given1', 'theWhen', 'then0', 'then1'];
-  let methodsWithoutError = ['given0', 'given2', 'theWhen', 'then0'];
+  let methodNamesInOrder = ['given0', 'given1', 'theWhen', 'then0', 'then1', 'cleanup'];
+  let methodsWithoutError = ['given0', 'given2', 'theWhen', 'then0', 'cleanup'];
   let methodsWithAssertError = ['then1'];
   let randomError = new Error('Random Error');
   let anyAssertionError = new AssertionError(1, 2, AssertProportion.EQUAL, 'Number', 'otherNumber');
@@ -79,6 +80,11 @@ describe('specRunner.runSpec', () => {
       this.runOrder.push('then1');
       throw anyAssertionError;
     }
+
+    @Cleanup('cleanup') cleanup(){
+      this.runOrder.push('cleanup');
+
+    }
   }
 
   beforeAll(() => {
@@ -94,7 +100,7 @@ describe('specRunner.runSpec', () => {
 
   it('should have logged for all', () => {
     let methodLogs = specReport.getMethodReports();
-    expect(methodLogs.length).toEqual(5);
+    expect(methodLogs.length).toEqual(6);
 
     let loggedFunctions = [];
     //get FunctionNames
@@ -202,6 +208,10 @@ describe('specRunner.runSpec', () => {
       @Then('then 0') then0() {
         this.runOrder.push('then0');
       }
+
+      @Cleanup() cleanup(){
+        this.runOrder.push('cleanup');
+      }
     }
 
     @Spec('a inherited Then')
@@ -214,6 +224,7 @@ describe('specRunner.runSpec', () => {
     expect(specRunner.usedObject.runOrder).toContain('given0');
     expect(specRunner.usedObject.runOrder).toContain('theWhen');
     expect(specRunner.usedObject.runOrder).toContain('then0');
+    expect(specRunner.usedObject.runOrder).toContain('cleanup');
   });
 
   it('should not run a Spec marked as @Ignore, return before validation', () => {

@@ -5,8 +5,10 @@ export class ExampleSpecFiller {
 
   static getStandardSpec():SpecContainer{
     class StandardSpec {
+      private dirtybit = 0;
       //@Given('some Stuff is given',0)
       someGivenStuff() {
+        this.dirtybit = 1;
       }
 
       //@Given('it is this Way around',1)
@@ -25,6 +27,11 @@ export class ExampleSpecFiller {
       checkOtherHappened() {
         Assert.that(1, 'a number').equals(1, 'otherNumber');
       }
+
+      //@Cleanup()
+      cleaning(){
+        this.dirtybit = 0;
+      }
     }
 
     let specClassConstructor = StandardSpec.prototype.constructor;
@@ -39,6 +46,45 @@ export class ExampleSpecFiller {
     spec.addWhen('triggerStuff', 'something is triggered');
     spec.addThen('checkHappened', 'something should have happened', 0);
     spec.addThen('checkOtherHappened', 'influenced this', 1);
+    spec.addCleanup('cleaning');
+
+    return spec;
+  }
+
+  static getErrorThrowingExpectingSpec():SpecContainer{
+    class ErrorThrowingExpectingSpec {
+      public error = new Error('error');
+      //@Given('some Stuff is given',0)
+      someGivenStuff() {
+      }
+
+      //@Given('it is this Way around',1)
+      moreSetStuff() {
+      }
+
+      //@When('something is triggered')
+      triggerStuff() {
+        throw this.error;
+      }
+
+
+      //@ThenThrow('throws')
+      thenThrowIt() {
+        throw this.error;
+      }
+    }
+
+    let specClassConstructor = ErrorThrowingExpectingSpec.prototype.constructor;
+
+    let spec = new SpecContainer(specClassConstructor);
+
+    spec.setDescription('a Spec of one Test');
+    spec.addSubject('Error Throwing Tests');
+
+    spec.addGiven('someGivenStuff', 'some Stuff is given', 0);
+    spec.addGiven('moreSetStuff', 'it is this Way around', 1);
+    spec.addWhen('triggerStuff', 'something is triggered');
+    spec.addThenThrow('thenThrowIt', 'throws');
 
     return spec;
   }
@@ -261,6 +307,48 @@ export class ExampleSpecFiller {
 
     spec.addGiven('noThen', 'there is no Then');
     spec.addWhen('itIsCalledNevertheless', 'it is called Nevertheless');
+
+    return spec;
+  }
+
+  static getSpecWithoutCleanup():SpecContainer{
+    class SpecWithoutCleanup {
+      private dirtybit = 0;
+      //@Given('some Stuff is given',0)
+      someGivenStuff() {
+        this.dirtybit = 1;
+      }
+
+      //@Given('it is this Way around',1)
+      moreSetStuff() {
+      }
+
+      //@When('something is triggered')
+      triggerStuff() {
+      }
+
+      //@Then('something should have happened', 0)
+      checkHappened() {
+      }
+
+      //@Then('influenced this', 1)
+      checkOtherHappened() {
+        Assert.that(1, 'a number').equals(1, 'otherNumber');
+      }
+    }
+
+    let specClassConstructor = SpecWithoutCleanup.prototype.constructor;
+
+    let spec = new SpecContainer(specClassConstructor);
+
+    spec.setDescription('a Spec of one Test');
+    spec.addSubject('Standard Tests');
+
+    spec.addGiven('someGivenStuff', 'some Stuff is given', 0);
+    spec.addGiven('moreSetStuff', 'it is this Way around', 1);
+    spec.addWhen('triggerStuff', 'something is triggered');
+    spec.addThen('checkHappened', 'something should have happened', 0);
+    spec.addThen('checkOtherHappened', 'influenced this', 1);
 
     return spec;
   }

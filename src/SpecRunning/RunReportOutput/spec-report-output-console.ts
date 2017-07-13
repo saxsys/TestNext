@@ -4,8 +4,9 @@ import {ISpecReporter} from "../specReporting/specReporter/iSpec-reporter";
 import {SpecRunStatus} from "../specReporting/spec-run-status";
 import {SpecReportSorter} from "../specReporting/reportSorter/spec-report-sorter";
 import {ISpecMethodReport} from "../specReporting/specMethodReport/iSpec-method-report";
-import {config} from '../../../testNext-config'
+import {config} from '../../../testNext.config'
 import {SpecReportStatistic} from "../specReporting/specReporter/spec-report-statistic";
+import {SpecMethodType} from "../../SpecStorage/specContainer/specMethodContainer/spec-method-type";
 
 let style = config.specReportConsoleOutput.style;
 let command = config.specReportConsoleOutput.commands;
@@ -23,6 +24,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   private sFailedOnly = true;
   private sNonExecutable = false;
   private hIgnored = false;
+  private sCleanup = false;
 
   /**
    * @param specReporter Reporter with Data to print
@@ -131,6 +133,13 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       this.sNonExecutable = true;
     else
       this.sNonExecutable = val;
+  }
+
+  showCleanup(val?:boolean){
+    if(val == null)
+      this.sCleanup = true;
+    else
+      this.sCleanup = val;
   }
 
   /**
@@ -274,6 +283,9 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   private logSpecMethodReport(specMethodReport: ISpecMethodReport, padding?: string) {
     if (padding == null)
       padding = '';
+
+    if(specMethodReport.getMethodType() == SpecMethodType.CLEANUP && specMethodReport.isSuccess() && this.sCleanup == false)
+      return;
 
     if (specMethodReport.isSuccess()) {
       console.log(

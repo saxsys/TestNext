@@ -19,7 +19,7 @@ export function Spec(description: string) {
  * Containing class gets registered so the Method can Be inherited, SpecClass will not necessarily be executed.
  *
  * @param description
- * @param execNumber Number for execution-order. Must be set, when multiple Given-Methods exist, must unique for Given in the SpecClass.
+ * @param execNumber Number for execution-order. Set, when the order of execution matters, if you set one you must set it unique and for all Given-Methods
  */
 export function Given(description: string, execNumber?: number) {
   return (target: any, key: string) => {
@@ -52,7 +52,7 @@ export function When(description: string) {
  * Containing class gets registered so the Method can be inherited, but the SpecClass will not necessarily be executed.
  *
  * @param description
- * @param execNumber Number for execution-order. Must be set, when multiple Then-Methods exist, must unique for Given in the SpecClass.
+ * @param execNumber Number for execution-order. Set, when the order of execution matters, if you set one you must set it unique and for all Then-Methods.
  */
 export function Then(description: string, execNumber?: number) {
   return (target: any, key: string) => {
@@ -73,9 +73,27 @@ export function Then(description: string, execNumber?: number) {
 export function ThenThrow(description: string) {
   return (target: any, key: string) => {
     let constructor = target.constructor;
-    specRegistry.registerThenErrorForSpec(constructor, key, description,);
+    specRegistry.registerThenThrowForSpec(constructor, key, description,);
   }
 }
+
+/**
+ * Method-Decorator
+ * Marks method to do the Cleanup  after the Spec was executed.
+ * (Method will be stored as Cleanup-Method)
+ * There can be multiple @Cleanup per SpecClass
+ * Containing class gets registered so the Method can be inherited, but the SpecClass will not necessarily be executed.
+ *
+ * @param description (optional)
+ * @param execNumber (optional), Number for execution-order. Set, when the order of execution matters, if you set one you must set it unique and for all Cleanup-Methods.
+ */
+export function Cleanup(description?: string, execNumber?: number) {
+  return (target: any, key: string) => {
+    let constructor = target.constructor;
+    specRegistry.registerCleanupForSpec(constructor, key, description, execNumber);
+  }
+}
+
 
 /**
  * Class-Decorator

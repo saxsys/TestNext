@@ -26,6 +26,7 @@ export class SpecValidator {
     SpecValidator.validateWhenOf(specContainer, specObject);
     SpecValidator.validateGivenOf(specContainer, specObject);
     SpecValidator.validateThensOf(specContainer, specObject);
+    SpecValidator.validateCleanup(specContainer, specObject);
 
   }
 
@@ -87,6 +88,16 @@ export class SpecValidator {
       throw new SpecValidationError('On "' + specContainer.getClassName() + '" @Then function "' + specContainer.getThenThrow().getName() + '" does not exist');
     if(method.length > 0)
       throw new SpecValidationError('@ThenThrow "' + specContainer.getClassName() + '.' + specContainer.getThenThrow().getName() + '" has constructor Arguments, this is forbidden');
+  }
+
+  private static validateCleanup(specContainer:ISpecContainer, specObject: any){
+    specContainer.getCleanup().forEach( specMethod => {
+      let method = specObject[specMethod.getName()];
+      if (method == null || typeof method != 'function')
+        throw new SpecValidationError('On "' + specContainer.getClassName() + '" @Cleanup function "' + specMethod.getName() + '" does not exist');
+      if(method.length > 0)
+        throw new SpecValidationError('@Cleanup "' + specContainer.getClassName() + '.' + specMethod.getName() + '" has constructor Arguments, this is forbidden');
+    });
   }
 
 }

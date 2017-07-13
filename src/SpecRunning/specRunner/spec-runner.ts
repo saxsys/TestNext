@@ -97,7 +97,7 @@ export class SpecRunner {
       expectedError = error
     }
 
-
+    //Handle and thrown and expected Errors
     if(thrownError == null && expectedError != null){
       let errorReport =
         new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error',
@@ -117,13 +117,15 @@ export class SpecRunner {
       this.report.reportRun(thenThrow, false, errorReport);
     }
 
+    this.runCleanup();
+
   }
 
   private runWithNormalThen(){
     this.runGiven();
     this.runWhen();
     this.runThen();
-
+    this.runCleanup();
   }
 
   private validateSpec():boolean{
@@ -157,6 +159,14 @@ export class SpecRunner {
   private runWhen() {
     this.runMethod(this.specContainer.getWhen())
   }
+
+  private runCleanup() {
+    let methodArray = this.specContainer.getCleanup();
+    methodArray.forEach((method: ISpecMethodContainer) => {
+      this.runMethod(method);
+    });
+  }
+
 
   private runMethod(method: ISpecMethodContainer){
     let execClass = this.usedObject;

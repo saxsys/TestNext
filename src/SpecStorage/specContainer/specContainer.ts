@@ -29,6 +29,7 @@ export class SpecContainer implements ISpecContainer{
   private when: SpecMethodContainer;
   private then:SpecMethodList;
   private thenThrow: SpecMethodContainer;
+  private cleanup: SpecMethodList;
 
   /**
    *
@@ -45,6 +46,7 @@ export class SpecContainer implements ISpecContainer{
 
     this.given = new SpecMethodList(specClassConstructor.name, SpecMethodType.GIVEN);
     this.then = new SpecMethodList(specClassConstructor.name, SpecMethodType.THEN);
+    this.cleanup = new SpecMethodList(specClassConstructor.name, SpecMethodType.CLEANUP);
   }
 
   /**
@@ -109,7 +111,7 @@ export class SpecContainer implements ISpecContainer{
    *
    * @param functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier), must be public.
    * @param description
-   * @param execNumber Number for execution-order. Must be set, when multiple Given-Methods exist, must unique for Given in the SpecClass.
+   * @param execNumber (optional) execNumber Number for execution-order. Can be set, when execution order of multiple Given-Methods matters. When used for one Given, the others need one (unique), too.
    */
   addGiven(functionName: string, description: string, execNumber?: number) {
     if(this.getOwnMethod(functionName) != null)
@@ -140,7 +142,7 @@ export class SpecContainer implements ISpecContainer{
    *
    * @param functionName functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier) and must be public.
    * @param description
-   * @param execNumber execNumber Number for execution-order. Must be set, when multiple Then-Methods exist, must unique for Then in the SpecClass.
+   * @param execNumber (optional) execNumber Number for execution-order. Can be set, when execution order of multiple Then-Methods matters. when used for one Then, the others need one (unique), too.
    */
   addThen(functionName: string, description: string, execNumber?: number) {
     if(this.getOwnMethod(functionName) != null)
@@ -154,7 +156,7 @@ export class SpecContainer implements ISpecContainer{
    * @param functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier) and must be public:
    * @param description
    */
-  addThenError(functionName: string, description: string){
+  addThenThrow(functionName: string, description: string){
     if(this.thenThrow != null)
       throw new SpecRegistryError(
         'Only one @ThenThrow allowed on ' + this.getClassName() + ' cannot add ' + functionName +
@@ -167,6 +169,20 @@ export class SpecContainer implements ISpecContainer{
         functionName
       );
     this.thenThrow = new SpecMethodContainer(functionName, description, SpecMethodType.THEN_ERROR);
+  }
+
+  /**
+   * Add a function that does the cleanup after the spec is run
+   * @param functionName Name of the function in the SpecClass, must be unique in the SpecClass (independent from modifier) and must be public
+   * @param description (optional)
+   * @param execNumber (optional) execNumber Number for execution-order. Can be set, when execution order of multiple Cleanup-Methods matters. When used for one Cleanup, the others need one (unique), too.
+   */
+  addCleanup(functionName:string, description?:string, execNumber?:number){
+    if(this.getOwnMethod(functionName) != null)
+      throw new SpecRegistryError('Multiple Methods with same Name on ' + this.getClassName() + '.' + functionName, this.getClassName(), functionName);
+    if(description == null)
+      description = '';
+    this.cleanup.addMethod(functionName, description, execNumber);
   }
 
   /**
@@ -293,6 +309,7 @@ export class SpecContainer implements ISpecContainer{
     returnMethods = returnMethods.concat(this.getOwnGiven());
     return returnMethods;
   }
+
   /**
    *
    * @returns the ISpecMethodContainer, containing the When-Method,  set either in this Spec or inherited from a Parent-Spec
@@ -302,6 +319,7 @@ export class SpecContainer implements ISpecContainer{
       return this.when;
     if(this.parent != null)
       return this.parent.getWhen();
+    return null;
   }
 
   /**
@@ -328,6 +346,17 @@ export class SpecContainer implements ISpecContainer{
       return this.parent.getThenThrow();
   }
 
+  /**
+   * @returns the Array of ISpecMethodContainer, containing the Cleanup-Methods set in this Spec and inherited from a Parent-Spec
+   */
+  getCleanup():Array<ISpecMethodContainer>{
+    let returnMethods = new Array<ISpecMethodContainer>();
+    if(this.parent != null)
+      returnMethods = returnMethods.concat(this.parent.getCleanup());
+    returnMethods = returnMethods.concat(this.getOwnCleanup());
+
+    return returnMethods;
+  }
 
   /**
    *
@@ -394,6 +423,10 @@ export class SpecContainer implements ISpecContainer{
    */
   private getOwnThenThrow():ISpecMethodContainer{
     return this.thenThrow;
+  }
+
+  private getOwnCleanup():Array<ISpecMethodContainer> {
+    return this.cleanup.getMethods();
   }
 
   /**

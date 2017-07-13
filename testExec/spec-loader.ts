@@ -4,7 +4,7 @@ import 'reflect-metadata';
 
 import {SpecRegistry} from "SpecStorage/specRegistry/spec-registry";
 import {specRegistry} from "../src/SpecStorage/specRegistry/spec-registry-storage";
-import {config} from '../testNext-config';
+import {config} from '../testNext.config';
 
 
 export class SpecLoader {
