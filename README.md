@@ -23,41 +23,65 @@ Example
 * one Spec-description (argument for Spec) can be used multiple times
 * The class-name of a SpecClass must be unique in the whole project
 
-####Given
-* Given-methods will be executed first, when in a SpecClass
-  * the containing class does not have to be marked as @Spec, look Inheritance
-* They are marked with @Given('description')
-* When there are multiple Given-methods they need an execution-number, to schedule the execution-order
-  * @Given('given description', 1)
-* again the description can be used multiple times, the method-name only once per SpecClass(even with 'static'-modifier)
+####Spec-Methods
+* Spec-Methods are marked with Decorators
+  * Spec-Methods can be used in each class, the Class does not need to have a @Spec-Decorator (look Inheritance)
+* The Spec-methods will be executed in a specific order
+  * Given --> When --> Then/ThenThrow --> Cleanup
+* the methods
+  * the method-name is a identifier and can only be used once per SpecClass (even with 'static'-modifier)
+  * The methods must not have arguments
+* Spec-Method-Description
+  * Spec-Methods get a description, as first Argument in the Decorator
+  * one description can be used multiple times
+* ExecNumber
+  * optional
+  * for Spec-Method-Types which can appear multiple times in on Spec a execNumber can be given as second decorator-argument 
+  * useful, when the execution order of the Spec-Methods matters
+  
+#####Given
+* Given-methods will be executed first, while executing the SpecClass
+* There must be at least one Given-method, multiple are possible
+* They are marked with @Given('description') or @Given('description', 1) 
 
-####When
-* Then When-methods will be executed second, when in a SpecClass  
-  * the containing class does not have to be marked as @Spec, look Inheritance
-* there can only be one When-method
+#####When
+* Then When-methods will be executed second, while executing the SpecClass
+* There can only be one When-method
 * it is marked with @When('description')
-* again the description can be used multiple times, the method-name only once per SpecClass (even with 'static'-modifier)
 
-####Then
-* Then-methods will be executed third, when in a SpecClass
-  * the containing class does not have to be marked as @Spec, look Inheritance
-* They are marked with @Then('description')
-* When there are multiple There-methods they need an execution-number, to schedule the execution-order
-  * @There('given description', 1)
-* again the description can be used multiple times, the method-name only once per SpecClass(even with 'static'-modifier)
+#####Then
+* Then-methods will be executed third, while executing the SpecClass
+* There must be at least one Then-method, multiple are possible
+* They are marked with @Then('description') or @Then('description', 1) 
+
+#####ThenThrow
+* The ThenThrow-method is an alternative to then Then-methods
+* It is used, when the When-method is expected to throw an Error
+* in the Method an Error should be thrown (this is not forced but would you use it otherwise)
+* there can ony be one ThenThrow-method
+* The error-type and the message are compared
+
+#####Cleanup
+* The Cleanup-methods are executed als last-method, while executing the SpecClass, even when the methods before failed
+  * useful for example, when cleaning up a Database in the end
+* It is optional, there can be multiple
+* They are marked with @Cleanup()
+  * a description is optional and can be given with @Cleanup('description')
+  * an execNumber is optional and can be given with @Cleanup('description', 1)
 
 ###Inheritance
 * A SpecClass can be extended and inherit
-* All the Given-, When- and Then-methods are inherited
 * The extended Class do not have to be a SpecClass (must not be marked with  @Spec)
   * the child-SpecClasses will be Executed as long as the have the @Spec-Decorator
-* In the end The inheriting SpecClass must have at least one Given, exactly one When and at least one Then
-* The execution-order is:
-  * all Parent-Given --> all Child-Given --> Parent/Child-When --> all Parent-Then --> all Child-Then
+* All the methods can be inherited (Given, When, Then, ThenThrow, Cleanup)
+  * If there can only one method of the type (as in When), the parents method is only used, wenn the child does not have an own
+  * In the end The inheriting SpecClass must have at least one Given, exactly one When and at least one Then
+* Execution-order
+  * the usual method Order remains as it was, but the parent-Methods are executed before the Child Methods 
+  * e.g. first all Parent-Given, then all Child-Given, then the Parents When or the child When
   * the execution-numbers only refer to the methods inside the SpecClass (so parent and child separated)
 * Careful when inheriting:
-  * a When in each, the parent- and child-class is invalid
-  * overriding methods can cause trouble
+  * overriding methods by their name can cause trouble
   
 ####Subject
 * For a better overview SpecClasses can be assigned to Subjects
@@ -65,36 +89,69 @@ Example
 * one SpecClass can be assigned to multiple Subjects
 * A Subject is assigned to a SpecClass with @Subject('Subject Name')
 
-#### Take Care
+####Take Care
 * Use unique SpecClass-Names
 * overriding SpecMethods can cause Errors
 * if you use variables in the Decorator-descriptions, they must be from static
 
-### Asserts
+###Asserts
 // TODO
 
-### CLI
-#### run all specs
+###CLI
 ```shell
-npm run tNxt -- <showFailedOnly>
+npm run tNxt <runMode> [<runModeArguments>] <outputModifier[...]>
 ```
-* showFailedOnly - only show failed Specs, default=false
-
-#### run all Specs
-```shell
-npm run tNxt:spec -- <SpecClassName> <showFailedOnly>
-```
-* SpecClassName - Name of the SpecClass to run
-* showFailedOnly - only show failed Specs, default=false 
-
-#### run Specs By Subject (all Subjects)
-```shell
-npm run tNxt:allSubjects <showFailedOnly>
-```
-* showFailedOnly - only show failed Specs, default=false
-
-#### run all Specs of one Subject
-```shell
-npm run tNxt:subject -- \<SubjectName> <showFailedOnly>
-```
-* showFailedOnly - only show failed Specs, default=false
+* use `npm run tNxt` for help 
+####RunModes
+* `AllSpecs`
+  * execute all Specs
+  * no additional Arguments
+* `AllSubjects`
+  * execute all Specs by their Subject
+    * Print them ordered by the Subject
+    * each Spec will only executed once (but printed for each Subject) 
+  * no additional Arguments
+  * Specs without Subject will also be executed, as '# Without Subject'
+* `Subject`
+  * runModeArgument: `SubjectName`
+  * execute all Specs of the given Subject
+* `Spec`
+  * runModeArgument: `<SpecClassName>`
+    * name of the Class with the Spec to Execute, not the description
+  * the one Spec with the ClassName will be executed
+  * inherited classes will not be executed separately
+  
+ ####outputModifier
+ * change the output hand have no influence on the running
+ * the Modifier can be combined freely
+ * by standard
+  * only failed and invalid Specs are shown
+  * Specs are ordered by their heading and then alphabet
+ 
+ #####show all
+ * `sAll`
+ * show all results of executable Specs (including ignored Specs)
+ 
+ #####hide ignored
+  * `hIgn`
+  * useful in addition to `sAll`
+  * hides ignored Specs
+ 
+  #####show non Executable
+  * `sNonExec`
+  * show also non Executable SpecClasses (Classes having without @Spec, but other Spec-Decorator, e.g. a Given Method for inheritance)
+  * useful for debugging 
+  
+  #####hide Cleanup
+  * `hClean`
+  * hides the Cleanup-Description, when not failed
+  * useful, when output needs to be shortened
+  
+  #####order by Alphabet
+  * `oAlpha`
+  * order output by alphabet
+ 
+ #####order by ExecutionStatus
+   * `oExecStat`
+   * order output by ExecutionStatus/Success
+    * Failed-->Invalid-->Successful-->Ignored-->nonExecutable

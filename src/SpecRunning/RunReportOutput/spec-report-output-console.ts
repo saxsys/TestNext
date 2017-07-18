@@ -24,7 +24,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
   private sFailedOnly = true;
   private sNonExecutable = false;
   private hIgnored = false;
-  private sCleanup = false;
+  private sCleanup = true;
 
   /**
    * @param specReporter Reporter with Data to print
@@ -135,11 +135,15 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       this.sNonExecutable = val;
   }
 
-  showCleanup(val?:boolean){
+  /**
+   * set if Cleanup-method sould be hidden
+   * @param val
+   */
+  hideCleanup(val?:boolean){
     if(val == null)
-      this.sCleanup = true;
+      this.sCleanup = false;
     else
-      this.sCleanup = val;
+      this.sCleanup = !val;
   }
 
   /**

@@ -30,6 +30,10 @@ export var config = {
       cmd: 'showNonExecutable',
       description: 'show also non executable Specs'
     },
+    hClean:{
+      cmd: 'hideCleanup',
+      description: 'hide cleanup if not failed'
+    },
     oAlpha: {
       cmd: 'orderByAlphabet',
       description: 'order Results by Alphabet'
@@ -38,10 +42,7 @@ export var config = {
       cmd: 'orderByExecutionStatus',
       description: 'order Results by execution-status'
     },
-    sClean:{
-      cmd: 'showCleanup',
-      description: 'show also cleanup if not failed'
-    }
+
   },
   runMode:{
     AllSpecs:{
