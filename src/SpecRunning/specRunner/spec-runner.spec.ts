@@ -163,7 +163,7 @@ describe('specRunner.runSpec', () => {
   });
 
 
-  it('should stop executing the test, if an error is thrown (which is not an AssertionError/ValidationError/expected', () => {
+  xit('should stop executing the test, if an error is thrown (which is not an AssertionError/ValidationError/expected', () => {
 
     @Spec('a test with Error')
     class SpecRunner_runSpec_WithRandomError {

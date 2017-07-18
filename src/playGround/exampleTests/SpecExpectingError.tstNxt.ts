@@ -18,19 +18,19 @@ class CarDrives extends SpecWithSUT{
   static startUsage = 10;
   public dirt = 0;
 
-  @Given('I have ' + CarDrives.startFuel +'l of fuel') fuel10l() {
+  @Given('I have ' + CarDrives.startFuel +'l of fuel',0) fuel10l() {
     this.SUT.setFuel(CarDrives.startFuel);
   }
 
-  @Given('I use 10l per 100km') fuelUsage10l() {
+  @Given('I use 10l per 100km',1) fuelUsage10l() {
     this.SUT.setFuelUsage(10);
   }
 
-  @Given('the car makes dirt')makeDirt(){
+  @Given('the car makes dirt',2)makeDirt(){
     this.dirt++;
   }
 
-  @Cleanup('the Environment after the dirty Car', 1) cleanEnv(){
+  @Cleanup('the Environment after the dirty Car') cleanEnv(){
     this.dirt = 0;
   }
 

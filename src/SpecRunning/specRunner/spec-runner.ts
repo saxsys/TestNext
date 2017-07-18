@@ -175,11 +175,7 @@ export class SpecRunner {
     try {
       execClass[method.getName()]();
     } catch (error) {
-      if(error instanceof AssertionError) {
-        this.report.reportRun(method, false, error);
-      } else {
-        throw error;
-      }
+      this.report.reportRun(method, false, error);
       return;
     }
 

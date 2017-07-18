@@ -10,7 +10,7 @@ import {Engine} from "../injectionTestfied/engine";
 @Providers([Engine, Car, Taxi, PassengerCar])
 class CarDrivesEnoughFuel extends SpecWithSUT{
 
-  @Given('I habe 50l of fule',0) fuel50l() {
+  @Given('I have 50l of fuel',0) fuel50l() {
     this.SUT.setFuel(50)
   }
 
@@ -25,6 +25,4 @@ class CarDrivesEnoughFuel extends SpecWithSUT{
   @Then('the car should have 46fuel') shouldHave46lLeft() {
     Assert.that(this.SUT.fuel).equals(46);
   }
-
 }
-
