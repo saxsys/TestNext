@@ -67,66 +67,11 @@ export class SpecRunner {
 
     specRunner.usedObject =  specContainer.getNewSpecObject();
 
-    if(specContainer.isExpectingErrors())
-      specRunner.runExpectingError();
-    else
-      specRunner.runWithNormalThen();
+    specRunner.runAndLog()
 
     return specRunner;
   }
 
-  private runExpectingError(){
-    let execClass = this.usedObject;
-    let when = this.specContainer.getWhen();
-    let thenThrow = this.specContainer.getThenThrow();
-    let thrownError;
-    let expectedError;
-
-    this.runGiven();
-
-    //run When
-    try {
-      execClass[when.getName()]();
-    } catch (error){
-      thrownError = error;
-    }
-    //run ThenThrow
-    try {
-      execClass[thenThrow.getName()]();
-    } catch(error){
-      expectedError = error
-    }
-
-    //Handle and thrown and expected Errors
-    if(thrownError == null && expectedError != null){
-      let errorReport =
-        new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error',
-          'No Error was thrown, expected "' + expectedError.message + '"');
-      this.report.reportRun(thenThrow, false, errorReport);
-      return;
-    } else if(expectedError == null){
-      this.report.reportValidationError(new SpecValidationError('@ThenThrow() of ' + this.specContainer.getClassName()+'.'+thenThrow.getName() + ' does not throw an error'));
-    }else if(thrownError.message == expectedError.message){
-      //compare Errors
-      this.report.reportRun(when, true);
-      this.report.reportRun(thenThrow, true);
-    } else {
-      this.report.reportRun(when, false, thrownError);
-      let errorReport =
-        new AssertionError(thrownError, expectedError, AssertProportion.EQUAL,'thrown Error', 'expected Error');
-      this.report.reportRun(thenThrow, false, errorReport);
-    }
-
-    this.runCleanup();
-
-  }
-
-  private runWithNormalThen(){
-    this.runGiven();
-    this.runWhen();
-    this.runThen();
-    this.runCleanup();
-  }
 
   private validateSpec():boolean{
     try{
@@ -142,6 +87,62 @@ export class SpecRunner {
     return true;
   }
 
+  private runAndLog(){
+    let when = this.specContainer.getWhen();
+    let thenThrow = this.specContainer.getThenThrow();
+    let thrownWhenError;
+    let expectedWhenError;
+
+    this.runGiven();
+
+    thrownWhenError = this.runWhen();
+
+    if(this.specContainer.isExpectingErrors()){
+      expectedWhenError = this.runThenThrow();
+
+      //Handle and thrown and expected Errors
+      if(thrownWhenError == null && expectedWhenError != null){
+        //No Error Thrown
+        let errorReport =
+          new AssertionError(thrownWhenError, expectedWhenError, AssertProportion.EQUAL,'thrown Error', 'expected Error',
+            'No Error was thrown, expected "' + expectedWhenError.message + '"');
+        this.report.reportRun(thenThrow, false, errorReport);
+        return;
+      } else if(expectedWhenError == null){
+        //ThenThrow did not throw an Error
+        this.report.reportValidationError(new SpecValidationError('@ThenThrow() of ' + this.specContainer.getClassName()+'.'+thenThrow.getName() + ' does not throw an error'));
+      }else if(thrownWhenError.message == expectedWhenError.message){
+        //Thrown Error was expected
+        this.report.reportRun(when, true);
+        this.report.reportRun(thenThrow, true);
+      } else {
+        //Different Errors thrown than expected
+        this.report.reportRun(when, false, thrownWhenError);
+        let errorReport =
+          new AssertionError(thrownWhenError, expectedWhenError, AssertProportion.EQUAL,'thrown Error', 'expected Error');
+        this.report.reportRun(thenThrow, false, errorReport);
+      }
+
+    } else {
+      if(thrownWhenError != null){
+        //Error was thrown, but none was expected
+        this.report.reportRun(when, false, thrownWhenError);
+        this.specContainer.getThen().forEach((then) => {
+          //log Thens as failed, do not run them
+          this.report.reportRun(then, false, null);
+        }) ;
+      } else {
+        this.report.reportRun(when, true);
+        this.runThen();
+      }
+    }
+
+    this.runCleanup();
+
+  }
+
+
+
   private runGiven() {
     let methodArray = this.specContainer.getGiven();
     methodArray.forEach((method: ISpecMethodContainer) => {
@@ -156,8 +157,22 @@ export class SpecRunner {
     });
   }
 
-  private runWhen() {
-    this.runMethod(this.specContainer.getWhen())
+  private runWhen():Error {
+    try {
+      this.usedObject[this.specContainer.getWhen().getName()]();
+    } catch (error){
+      return error;
+    }
+    return null;
+  }
+
+  private runThenThrow():Error{
+    try {
+      this.usedObject[this.specContainer.getThenThrow().getName()]();
+    } catch (error){
+      return error;
+    }
+    return null;
   }
 
   private runCleanup() {
@@ -168,7 +183,7 @@ export class SpecRunner {
   }
 
 
-  private runMethod(method: ISpecMethodContainer){
+  private runMethod(method: ISpecMethodContainer):Error{
     let execClass = this.usedObject;
     if(execClass[method.getName()] == null)
       throw Error('test-Runner method ' + method.getName() + ' not found on Class ' + this.specContainer.getClassName());
@@ -176,10 +191,12 @@ export class SpecRunner {
       execClass[method.getName()]();
     } catch (error) {
       this.report.reportRun(method, false, error);
-      return;
+      return error;
     }
 
     this.report.reportRun(method, true);
+
+    return null;
   }
 
 }

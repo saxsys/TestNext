@@ -12,6 +12,7 @@ import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
 import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
 import {SpecReporter} from "../specReporting/specReporter/spec-reporter";
+import {ExampleSpecFiller} from "../../utils/testData/example-spec-filler";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {
@@ -417,7 +418,7 @@ describe('specRunner.runSpec', () => {
 
   });
 
-  it('should report, when not Error is thrown', () => {
+  it('should report, when Error expected, but none is thrown', () => {
     let specClassName = 'SpecRunner_runSpec_ExpectError_NoError';
     let firstError = new Error('some Error');
     let otherError = new Error('different');
@@ -448,5 +449,24 @@ describe('specRunner.runSpec', () => {
 
   });
 
+  it('should not run then, if Error in "When", report all then as failed, execute cleanup', () => {
+    let specContainer = ExampleSpecFiller.getSpecWithFailingWhen();
+    let reporter = new SpecReporter();
+
+    let specRunner = SpecRunner.runSpec(specContainer, specReporter);
+    let runOrderNames = specRunner.usedObject.runned;
+
+    expect(runOrderNames).toEqual(['given1', 'given2', 'when1', 'cleanup1']);
+    expect(runOrderNames).not.toContain('then1');
+
+    let methodReport = specRunner.report.getMethodReports();
+    let reportedMethods = methodReport.map((repo) => {return repo.getMethodName()});
+    expect(reportedMethods).toEqual(['given1', 'given2', 'when1', 'then1', 'cleanup1']);
+
+  });
+
+  it('should execute all then, even if one fails', () => {
+
+  });
 
 });

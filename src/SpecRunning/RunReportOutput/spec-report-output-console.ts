@@ -273,7 +273,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
       console.log(
         style.invalid +
         padding + ' I: ' +
-        error.message +
+        (error == null? '':error.message) +
         command.resetStyle
       );
     });
@@ -306,9 +306,7 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
         padding + ' X: ' +
         specMethodReport.getMethodType() + ' ' + specMethodReport.getDescription() +
         '(' + specMethodReport.getMethodName() + ')' +
-        '\n' +
-        padding + '    ' +
-        specMethodReport.getError().message +
+        (specMethodReport.getError() == null? '':('\n' +padding + '    '+specMethodReport.getError().message)) +
         command.resetStyle
       );
     }

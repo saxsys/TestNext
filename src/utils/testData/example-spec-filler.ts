@@ -439,4 +439,101 @@ export class ExampleSpecFiller {
 
     return spec;
   }
+
+  static getSpecWitFailingWhen(){
+    class SpecWithFailingThen {
+      private dirtybit = 0;
+      //@Given('some Stuff is given',0)
+      someGivenStuff() {
+        this.dirtybit = 1;
+      }
+
+      //@Given('it is this Way around',1)
+      moreSetStuff() {
+      }
+
+      //@When('something is triggered')
+      triggerStuff() {
+      }
+
+      //@Then('it should fail', 0)
+      failingThen() {
+        throw new Error('something fails');
+      }
+
+      //@Then('influenced this', 1)
+      checkOtherHappened() {
+      }
+
+      //@Cleanup()
+      cleaning(){
+        this.dirtybit = 0;
+      }
+    }
+
+    let specClassConstructor = SpecWithFailingThen.prototype.constructor;
+
+    let spec = new SpecContainer(specClassConstructor);
+
+    spec.setDescription('a Spec with one then failing');
+    spec.addSubject('Failing Tests');
+
+    spec.addGiven('someGivenStuff', 'some Stuff is given', 0);
+    spec.addGiven('moreSetStuff', 'it is this Way around', 1);
+    spec.addWhen('triggerStuff', 'something is triggered');
+    spec.addThen('failingThen', 'it should fail', 0);
+    spec.addThen('checkOtherHappened', 'influenced this', 1);
+    spec.addCleanup('cleaning');
+
+    return spec;
+  }
+
+  static getSpecWithFailingWhen(){
+    class SpecWithFailingWhen {
+      private dirtybit = 0;
+      public runned = [];
+      //@Given('some Stuff is given')
+      given1() {
+        this.dirtybit = 1;
+        this.runned.push('given1');
+      }
+
+      //@Given('it is this Way around')
+      given2() {
+        this.runned.push('given2');
+      }
+
+      //@When('something is triggered')
+      when1() {
+        this.runned.push('when1');
+        throw new Error('this When should fail');
+      }
+
+      //@Then('influenced this')
+      then1() {
+        this.runned.push('then1');
+      }
+
+      //@Cleanup()
+      cleanup1(){
+        this.dirtybit = 0;
+        this.runned.push('cleanup1')
+      }
+    }
+
+    let specClassConstructor = SpecWithFailingWhen.prototype.constructor;
+
+    let spec = new SpecContainer(specClassConstructor);
+
+    spec.setDescription('a Spec with failing when');
+    spec.addSubject('Failing Tests');
+
+    spec.addGiven('given1', 'some Stuff is given');
+    spec.addGiven('given2', 'it is this Way around');
+    spec.addWhen('when1', 'the when fails');
+    spec.addThen('then1', 'influenced this', 1);
+    spec.addCleanup('cleanup1');
+
+    return spec;
+  }
 }
