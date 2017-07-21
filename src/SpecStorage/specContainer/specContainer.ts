@@ -8,6 +8,8 @@ import {SpecMethodType} from "./specMethodContainer/spec-method-type";
 import {SpecRegistryError} from "../spec-registry-error";
 import * as _ from "underscore";
 import {SpecMethodList} from "./specMethodList/spec-method-list";
+import {SpecActionList} from "./specActionList/spec-action-list";
+import {ISpecActionContainer} from "../actionContainer/iSpec-action-container";
 
 /**
  * Class to contain a SpecClass and store additional information on the Spec (such as Given-, When-, Then-Methods, Ignored or the SUT)
@@ -24,12 +26,13 @@ export class SpecContainer implements ISpecContainer{
   private sut:Provider;
   private providers =  new Array<Provider>();
 
-  //private given = new Map<number, SpecMethodContainer>(); // exec-Number, MethodName
   private given:SpecMethodList;
   private when: SpecMethodContainer;
   private then:SpecMethodList;
   private thenThrow: SpecMethodContainer;
   private cleanup: SpecMethodList;
+
+  private actions:SpecActionList;
 
   /**
    *
@@ -78,15 +81,6 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
-   * Add a Subject of the Spec, multiple can be saved.
-   * @param subject
-   */
-  addSubject(subject:string){
-    if(!this.subjects.includes(subject))
-      this.subjects.push(subject);
-  }
-
-  /**
    * Providers for automated SUT creation are added.
    * Make sure providing classes are decorated with '@Injectable()' if necessary.
    * @param newProviders Array of Providers for SUT (use the Class directly)
@@ -97,12 +91,25 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
+   * Add a Subject of the Spec, multiple can be saved.
+   * @param subject
+   */
+  addSubject(subject:string){
+    if(!this.subjects.includes(subject))
+      this.subjects.push(subject);
+  }
+
+  /**
    * Mark a Spec as ignored, give a reason
    * @param reason why the specTypes should not be run
    */
   setIgnored(reason:string){
     this.ignored = true;
     this.ignoreReason = reason;
+  }
+
+  addAction(propertyName:string, actionContainer:ISpecActionContainer){
+    this.actions.addAction(propertyName, actionContainer);
   }
 
   /**
@@ -184,6 +191,9 @@ export class SpecContainer implements ISpecContainer{
       description = '';
     this.cleanup.addMethod(functionName, description, execNumber);
   }
+
+
+
 
   /**
    *
@@ -294,6 +304,38 @@ export class SpecContainer implements ISpecContainer{
 
 
     return providers;
+  }
+
+  /**
+   * get all Actions used in the Spec
+   * @return {Array<SpecActionContainer>}
+   */
+  getActions():Array<ISpecActionContainer>{
+    return this.actions.getActions();
+  }
+
+  /**
+   * get a Map with Actions ordered to Property of the Spec, which uses it
+   * @return {Map<string, ISpecActionContainer>}
+   */
+  getPropertiesWithAction():Map<string,ISpecActionContainer>{
+    return this.actions.getPropertiesWithAction();
+  }
+
+  /**
+   * get all used General Actions
+   * @return {Array<ISpecActionContainer>}
+   */
+  getGeneralActions():Array<ISpecActionContainer>{
+    return this.actions.getGeneralActions();
+  }
+
+  /**
+   * get all used Individual Actions
+   * @return {Array<ISpecActionContainer>}
+   */
+  getIndividualActions():Array<ISpecActionContainer>{
+    return this.actions.getIndividualActions();
   }
 
   /**
