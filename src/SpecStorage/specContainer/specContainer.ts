@@ -243,34 +243,6 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
-   * Creates a new Object of the SpecClass, on which the Spec-Methods can be executed.
-   * Creates and sets the SUT in the Object, if one is set or inherited.
-   * @returns a new Object of the SpecClass.
-   */
-  getNewSpecObject(): any{
-    if(this.specClassConstructor == null)
-      throw new SpecRegistryError('Class of ' + this.getClassName() + 'is not set', this.getClassName());
-    if(this.specClassConstructor.length > 0)
-      throw new SpecRegistryError('Class of "' + this.getClassName() + '" has constructor-arguments, this is forbidden', this.getClassName());
-
-    let object =  new this.specClassConstructor;
-
-    try {
-      let sut = this.getSUT();
-      if (sut != null) {
-        let injector = ReflectiveInjector.resolveAndCreate(this.getProviders());
-        object['SUT'] = injector.get(sut);
-      }
-    } catch(error){
-      throw new SpecRegistryError(error.message, this.getClassName());
-    }
-
-
-
-    return object;
-  };
-
-  /**
    *
    * @returns whether the Spec is marked as ignored.
    */
@@ -504,6 +476,35 @@ export class SpecContainer implements ISpecContainer{
     method = this.getOwnThenByName(methodName);
     return method;
   }
+
+  /**
+   * Creates a new Object of the SpecClass, on which the Spec-Methods can be executed.
+   * Creates and sets the SUT in the Object, if one is set or inherited.
+   * @returns a new Object of the SpecClass.
+   */
+  getNewSpecObject(): any{
+    if(this.specClassConstructor == null)
+      throw new SpecRegistryError('Class of ' + this.getClassName() + 'is not set', this.getClassName());
+    if(this.specClassConstructor.length > 0)
+      throw new SpecRegistryError('Class of "' + this.getClassName() + '" has constructor-arguments, this is forbidden', this.getClassName());
+    //Create SUT
+    let object =  new this.specClassConstructor;
+
+    //set SUT
+    try {
+      let sut = this.getSUT();
+      if (sut != null) {
+        let injector = ReflectiveInjector.resolveAndCreate(this.getProviders());
+        object['SUT'] = injector.get(sut);
+      }
+    } catch(error){
+      throw new SpecRegistryError(error.message, this.getClassName());
+    }
+
+    //TODO set Actions
+
+    return object;
+  };
 }
 
 

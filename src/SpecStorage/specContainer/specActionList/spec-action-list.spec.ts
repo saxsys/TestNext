@@ -18,7 +18,7 @@ describe('specActionList.addAction', () => {
     let actionList = new SpecActionList('ASpecClass');
     let actionContainer = ExampleActionContainerFiller.getStandardAction();
 
-    actionList.addAction(actionContainer, 'aProperty');
+    actionList.addAction('aProperty', actionContainer);
 
     expect(actionList.getPropertiesWithAction().get('aProperty')).toEqual(actionContainer);
   });
@@ -27,10 +27,10 @@ describe('specActionList.addAction', () => {
     let actionList = new SpecActionList('ASpecClass');
     let actionContainer = ExampleActionContainerFiller.getStandardAction();
 
-    actionList.addAction(actionContainer, 'aProperty');
+    actionList.addAction('aProperty',actionContainer);
 
     expect(()=>{
-      actionList.addAction(actionContainer, 'aProperty');
+      actionList.addAction('aProperty', actionContainer);
     }).toThrowError(SpecRegistryError, 'One Property with multiple Actions: ASpecClass.aProperty');
   });
 });
