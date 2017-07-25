@@ -4,7 +4,7 @@ import {ISpecReporter} from "../specReporting/specReporter/iSpec-reporter";
 import {SpecRunStatus} from "../specReporting/spec-run-status";
 import {SpecReportSorter} from "../specReporting/reportSorter/spec-report-sorter";
 import {ISpecMethodReport} from "../specReporting/specMethodReport/iSpec-method-report";
-import {config} from '../../../testNext.config'
+import {config} from '../../testNext.config';
 import {SpecReportStatistic} from "../specReporting/specReporter/spec-report-statistic";
 import {SpecMethodType} from "../../SpecStorage/specContainer/specMethodContainer/spec-method-type";
 

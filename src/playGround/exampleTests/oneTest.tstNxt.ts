@@ -1,4 +1,4 @@
-import {Given, Spec, Subject, Then, When} from "../../SpecDeclaration/specDecorators/spec-decorators";
+import {Given, Spec, Subject, Then, When} from "../../../testNext/SpecDeclaration/specDecorators/spec-decorators";
 
 @Spec('a Spec of one Test')
 @Subject('TestingTest')

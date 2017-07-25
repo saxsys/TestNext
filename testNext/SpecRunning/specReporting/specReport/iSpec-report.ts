@@ -1,6 +1,6 @@
 import {ISpecMethodContainer} from "../../../SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
 import {SpecValidationError} from "../../specValidator/spec-validation-error";
-import {ISpecContainer} from "SpecStorage/specContainer/iSpec-Container";
+import {ISpecContainer} from "../../../SpecStorage/specContainer/iSpec-Container";
 import {ISpecMethodReport} from "../specMethodReport/iSpec-method-report";
 import {SpecRunStatus} from "../spec-run-status";
 

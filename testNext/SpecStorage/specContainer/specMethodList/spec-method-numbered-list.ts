@@ -1,4 +1,4 @@
-import {ISpecMethodList} from "SpecStorage/specContainer/specMethodList/iSpec-method-list";
+import {ISpecMethodList} from "./iSpec-method-list";
 import {SpecRegistryError} from "../../spec-registry-error";
 import {SpecMethodContainer} from "../specMethodContainer/spec-method-container";
 import {SpecMethodType} from "../specMethodContainer/spec-method-type";

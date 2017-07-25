@@ -1,9 +1,9 @@
 import {SpecLoader} from "./spec-loader";
-import {SpecReportOutputConsole} from "../src/SpecRunning/RunReportOutput/spec-report-output-console";
-import {SpecReporter} from "../src/SpecRunning/specReporting/specReporter/spec-reporter";
+import {SpecReportOutputConsole} from "../SpecRunning/RunReportOutput/spec-report-output-console";
+import {SpecReporter} from "../SpecRunning/specReporting/specReporter/spec-reporter";
 import {SpecExecArgumentParser} from "./spec-exec-argument-parser";
 import {config} from "../testNext.config";
-import {SpecExecChooser} from "../src/SpecRunning/specExecChooser/spec-exec-chooser";
+import {SpecExecChooser} from "../SpecRunning/specExecChooser/spec-exec-chooser";
 
 let args = process.argv.slice(2);
 let runMode = null;

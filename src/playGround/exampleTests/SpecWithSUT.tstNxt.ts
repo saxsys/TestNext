@@ -1,6 +1,6 @@
-import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
-import {Given, Providers, Spec, SUT, Then, When} from "../../SpecDeclaration/specDecorators/spec-decorators";
-import {Assert} from "../../SpecDeclaration/assert/assert";
+import {SpecWithSUT} from "../../../testNext/SpecDeclaration/specTypes/spec-with-sut";
+import {Given, Providers, Spec, SUT, Then, When} from "../../../testNext/SpecDeclaration/specDecorators/spec-decorators";
+import {Assert} from "../../../testNext/SpecDeclaration/assert/assert";
 import {Car, PassengerCar, Taxi} from "../injectionTestfied/car";
 import {Engine} from "../injectionTestfied/engine";
 

@@ -1,4 +1,4 @@
-import {Cleanup, Given, Spec, Subject, Then, When} from "../../SpecDeclaration/specDecorators/spec-decorators";
+import {Cleanup, Given, Spec, Subject, Then, When} from "../../../testNext/SpecDeclaration/specDecorators/spec-decorators";
 
 
 @Subject('Specs with Different Errors')

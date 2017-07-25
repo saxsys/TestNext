@@ -1,4 +1,4 @@
-import {ISpecReportOutput} from "../src/SpecRunning/RunReportOutput/iSpec-report-output";
+import {ISpecReportOutput} from "../SpecRunning/RunReportOutput/iSpec-report-output";
 import {config} from "../testNext.config";
 
 export class SpecExecArgumentParser{

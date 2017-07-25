@@ -1,4 +1,4 @@
-import {ISpecMethodContainer} from "SpecStorage/specContainer/specMethodContainer/iSpec-method-Container";
+import {ISpecMethodContainer} from "../specMethodContainer/iSpec-method-Container";
 
 export interface ISpecMethodList{
   addMethod(functionName: string, description: string, execNumber: Number);

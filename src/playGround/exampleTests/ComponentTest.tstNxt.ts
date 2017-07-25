@@ -1,7 +1,7 @@
-import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
-import {Given, Spec, SUT, Then, When} from "../../SpecDeclaration/specDecorators/spec-decorators";
+import {SpecWithSUT} from "../../../testNext/SpecDeclaration/specTypes/spec-with-sut";
+import {Given, Spec, SUT, Then, When} from "../../../testNext/SpecDeclaration/specDecorators/spec-decorators";
 import {AppComponent} from '../../app/app.component';
-import {Assert} from "../../SpecDeclaration/assert/assert";
+import {Assert} from "../../../testNext/SpecDeclaration/assert/assert";
 
 @Spec('Testing to set up da Test for a Component')
 @SUT(AppComponent)

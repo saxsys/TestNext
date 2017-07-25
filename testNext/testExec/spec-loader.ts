@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as glob from 'glob';
 import 'reflect-metadata';
 
-import {SpecRegistry} from "SpecStorage/specRegistry/spec-registry";
-import {specRegistry} from "../src/SpecStorage/specRegistry/spec-registry-storage";
+import {SpecRegistry} from "../SpecStorage/specRegistry/spec-registry";
+import {specRegistry} from "../SpecStorage/specRegistry/spec-registry-storage";
 import {config} from '../testNext.config';
 
 
