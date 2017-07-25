@@ -1,18 +1,33 @@
 import {ISpecActionRunner} from "./iSpec-action-runner";
-import {SpecActionContainer} from "../../SpecStorage/actionContainer/action-container";
-import set = Reflect.set;
+import {ISpecAction} from "../../SpecStorage/actionContainer/iSpec-action";
+import {SpecActionValidator} from "../specActionValidator/spec-action-validator";
+import {ISpecActionContainer} from "../../SpecStorage/actionContainer/iSpec-action-container";
 
 export class SpecGeneralActionRunner implements  ISpecActionRunner{
-  private actionContainer:SpecActionContainer;
+
+  private actionContainer:ISpecActionContainer;
   private actionObject;
   private returnValue;
 
-  constructor(actionContainer:SpecActionContainer){
+  /**
+   * create a new Runner for a SpecGeneralAction
+   * @param {SpecActionContainer} actionContainer Container of the Action which should be executed
+   */
+  constructor(actionContainer:ISpecActionContainer){
     this.actionContainer = actionContainer;
   }
 
-  createActionObject(){
-    this.actionObject = this.actionContainer.getNewActionObject();
+  validateAction(){
+    SpecActionValidator.validateAction(this.actionContainer);
+  }
+
+  createActionObject():ISpecAction{
+    if(this.actionObject == null) {
+      this.validateAction();
+      let constructor = this.actionContainer.getActionClassConstructor();
+      this.actionObject = new constructor;
+    }
+    return this.actionObject;
   }
 
   getActionResult():any{
@@ -32,5 +47,13 @@ export class SpecGeneralActionRunner implements  ISpecActionRunner{
   executeCleanup(){
     //TODO implement
     throw Error('not Implemented');
+  }
+
+  getActionObject():any{
+    return this.actionObject;
+  }
+
+  getActionClassName(): string {
+    return this.actionContainer.getActionClassName();
   }
 }

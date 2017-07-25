@@ -1,5 +1,6 @@
 import {ISpecMethodContainer} from "./specMethodContainer/iSpec-method-Container";
 import {Provider} from "@angular/core";
+import {ISpecActionContainer} from "../actionContainer/iSpec-action-container";
 
 export interface ISpecContainer{
 
@@ -36,12 +37,13 @@ export interface ISpecContainer{
    *
    * @returns the constructor-function of the SpecClass
    */
-  getClassConstructor():Function;
+  getClassConstructor():any;
 
   /**
    * Creates a new Object of the SpecClass, on which the Spec-Methods can be executed.
    * Creates and sets the SUT in the Object, if one is set or inherited.
    * @returns a new Object of the SpecClass.
+   * @deprecated cannot create actions properly
    */
   getNewSpecObject(): any;
 
@@ -56,6 +58,29 @@ export interface ISpecContainer{
    */
   getProviders():Array<Provider>;
 
+  /**
+   * get all Actions used in the Spec
+   * @return {Array<SpecActionContainer>}
+   */
+  getActions():Array<ISpecActionContainer>;
+
+  /**
+   * get a Map with Actions ordered to Property of the Spec, which uses it
+   * @return {Map<string, ISpecActionContainer>}
+   */
+  getPropertiesWithAction():Map<string,ISpecActionContainer>;
+
+  /**
+   * get all used General Actions
+   * @return {Array<ISpecActionContainer>}
+   */
+  getGeneralActions():Array<ISpecActionContainer>
+
+  /**
+   * get all used Individual Actions
+   * @return {Array<ISpecActionContainer>}
+   */
+  getIndividualActions():Array<ISpecActionContainer>;
 
   /**
    *

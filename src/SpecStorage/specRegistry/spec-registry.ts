@@ -2,11 +2,13 @@ import {SpecContainer} from "../specContainer/specContainer";
 import {SpecRegistryError} from "../spec-registry-error";
 import * as _ from "underscore";
 import {Provider} from "@angular/core/core";
+import {SpecActionContainer} from "../actionContainer/action-container";
 
 export class SpecRegistry {
 
   private specClasses = new Map<string, SpecContainer>();
   private subject_specNames = new Map<string, Array<string>>();
+  private actions = new Map<string, SpecActionContainer>();
 
   /**
    * Creates and saves a SpecContainer for the Spec as such, sets the description and marks it so as executable
@@ -15,11 +17,8 @@ export class SpecRegistry {
    * @param specDescription Description of the Spec
    */
   registerSpec(specClassConstructor: Function, specDescription: string) {
-    let specClassName = specClassConstructor.name;
-
     let registryEntry = this.getOrRegisterSpecContainerForClass(specClassConstructor);
     registryEntry.setDescription(specDescription);
-
   }
 
   /**
@@ -80,6 +79,15 @@ export class SpecRegistry {
     specRegEntry.addThenThrow(functionName, description);
   }
 
+  /**
+   * Registers the method in the SpecContainer as Cleanup-Method for the Spec
+   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
+   * No Validation happens at this point, whether the methods exists on SpecClass or throws an error
+   * @param specClass
+   * @param functionName
+   * @param description
+   * @param execNumber
+   */
   registerCleanupForSpec(specClass: Function, functionName: string, description: string, execNumber?: number) {
     let specRegEntry = this.getOrRegisterSpecContainerForClass(specClass);
     specRegEntry.addCleanup(functionName, description, execNumber);
@@ -145,6 +153,18 @@ export class SpecRegistry {
     spec.addProviders(providers);
   }
 
+  /**
+   * Registers an ActionClass as Action used in the SpecContainer
+   * @param specClassConstructor
+   * @param propertyName
+   * @param actionClassConstructor
+   */
+  registerActionForSpec(specClassConstructor: Function, propertyName: string, actionClassConstructor: Function) {
+    let specContainer = this.getOrRegisterSpecContainerForClass(specClassConstructor);
+    let actionContainer = this.getOrRegisterSpecActionForClass(actionClassConstructor);
+
+    specContainer.addAction(propertyName, actionContainer);
+  }
 
   /**
    * @return {string[]} with all the names of all SpecClasses in this registry
@@ -229,7 +249,16 @@ export class SpecRegistry {
   }
 
   /**
-   *  returns the SpecConatainer for the SpecClass, creates it if not existant, does not mark  ir as executable
+   * Register an Class as Action, which can later be uses as Actions in Specs
+   * @param specActionConstructor
+   * @return {SpecActionContainer}
+   */
+  private registerAction(specActionConstructor: Function): SpecActionContainer {
+    return this.getOrRegisterSpecActionForClass(specActionConstructor)
+  }
+
+  /**
+   *  returns the SpecContainer for the SpecClass, creates it if not existent, does not mark  it as executable
    * @param specClassConstructor Constructor of the SpecClass
    * @return {SpecContainer}
    */
@@ -249,14 +278,27 @@ export class SpecRegistry {
 
       specRegEntry = new SpecContainer(specClassConstructor, parentSpec);
       this.specClasses.set(specClassName, specRegEntry);
-    } else {
-      if (specRegEntry.getClassConstructor() != specClassConstructor) {
-        throw new SpecRegistryError('A different Class with the Name "' + specClassName + '" is already registered, class-name-duplicates are forbidden', specClassName);
-      }
+    } else if (specRegEntry.getClassConstructor() != specClassConstructor) {
+      throw new SpecRegistryError('A different Class with the Name "' + specClassName + '" is already registered, class-name-duplicates are forbidden', specClassName);
     }
     return specRegEntry;
   }
 
-  //TODO Register Actions
-  //TODO Register Action for Spec
+  /**
+   *  returns the SpecActionContainer for the ActionClass, creates it if not existent
+   * @param specActionConstructor Constructor of the SpecAction
+   * @return {SpecActionContainer}
+   */
+  private getOrRegisterSpecActionForClass(specActionConstructor: Function): SpecActionContainer {
+    let actionClassName = specActionConstructor.name;
+
+    let actionRegEntry = this.actions.get(actionClassName);
+    if (actionRegEntry == null) {
+      actionRegEntry = new SpecActionContainer(specActionConstructor);
+      this.actions.set(actionClassName, actionRegEntry);
+    } else if (actionRegEntry.getActionClassConstructor() != specActionConstructor) {
+      throw new SpecRegistryError('A different Class with the Name "' + actionClassName + '" is already registered as Action, class-name-duplicates are forbidden', actionClassName);
+    }
+    return actionRegEntry;
+  }
 }

@@ -1,4 +1,3 @@
-import {ISpecAction} from "./iSpec-action";
 import {ISpecActionContainer} from "./iSpec-action-container";
 import {SpecActionType} from "./spec-action-type";
 
@@ -17,7 +16,7 @@ export class SpecActionContainer implements ISpecActionContainer {
   }
 
 
-  getActionClassConstructor(): Function {
+  getActionClassConstructor(): any {
     return this.actionClassConstructor;
   }
 
@@ -25,9 +24,8 @@ export class SpecActionContainer implements ISpecActionContainer {
     return this.actionType;
   }
 
-
-  getNewActionObject(): ISpecAction {
-    return new this.actionClassConstructor;
+  getActionClassName(): string {
+    return this.actionClassConstructor.name;
   }
 
 }

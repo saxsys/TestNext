@@ -14,13 +14,17 @@ export class SpecValidator {
    */
   public static validate(specContainer: ISpecContainer) {
 
-    let specObject;
+    let constructor = specContainer.getClassConstructor();
 
-    try {
-      specObject = specContainer.getNewSpecObject();
-    } catch (error) {
-      throw new SpecValidationError(error.message);
+    if(constructor == null) {
+      throw new SpecValidationError('Class of ' + specContainer.getClassName() + 'is not set');
     }
+    if(constructor.length > 0) {
+      throw new SpecValidationError('Class of "' + specContainer.getClassName() + '" has constructor-arguments, this is forbidden');
+
+    }
+
+    let specObject =  new constructor;
 
 
     SpecValidator.validateWhenOf(specContainer, specObject);

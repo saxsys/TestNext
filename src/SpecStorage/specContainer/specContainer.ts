@@ -50,6 +50,7 @@ export class SpecContainer implements ISpecContainer{
     this.given = new SpecMethodList(specClassConstructor.name, SpecMethodType.GIVEN);
     this.then = new SpecMethodList(specClassConstructor.name, SpecMethodType.THEN);
     this.cleanup = new SpecMethodList(specClassConstructor.name, SpecMethodType.CLEANUP);
+    this.actions = new SpecActionList(this.getClassName());
   }
 
   /**
@@ -238,7 +239,7 @@ export class SpecContainer implements ISpecContainer{
    *
    * @returns the constructor-function of the SpecClass
    */
-  getClassConstructor():Function {
+  getClassConstructor():any {
     return this.specClassConstructor;
   }
 
@@ -481,6 +482,7 @@ export class SpecContainer implements ISpecContainer{
    * Creates a new Object of the SpecClass, on which the Spec-Methods can be executed.
    * Creates and sets the SUT in the Object, if one is set or inherited.
    * @returns a new Object of the SpecClass.
+   * @deprecated cannot create actions properly
    */
   getNewSpecObject(): any{
     if(this.specClassConstructor == null)

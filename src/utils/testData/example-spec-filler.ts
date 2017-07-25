@@ -1,5 +1,7 @@
 import {SpecContainer} from "../../SpecStorage/specContainer/specContainer";
 import {Assert} from "../../SpecDeclaration/assert/assert";
+import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
+import {Injectable} from "@angular/core";
 
 export class ExampleSpecFiller {
 
@@ -531,6 +533,122 @@ export class ExampleSpecFiller {
     spec.addGiven('given1', 'some Stuff is given');
     spec.addGiven('given2', 'it is this Way around');
     spec.addWhen('when1', 'the when fails');
+    spec.addThen('then1', 'influenced this', 1);
+    spec.addCleanup('cleanup1');
+
+    return spec;
+  }
+
+  static getSpecWithSUT(){
+
+    @Injectable()
+    class Asut{
+      private dirtybit = 0;
+    }
+
+    class ASpecWithSUT extends SpecWithSUT{
+
+      public runned = [];
+      //@Given('some Stuff is given')
+      given1() {
+        this.SUT.dirtrybit = 1;
+        this.runned.push('given1');
+      }
+
+      //@Given('it is this Way around')
+      given2() {
+        this.runned.push('given2');
+      }
+
+      //@When('something is triggered')
+      when1() {
+        this.runned.push('when1');
+      }
+
+      //@Then('influenced this')
+      then1() {
+        this.runned.push('then1');
+      }
+
+      //@Cleanup()
+      cleanup1(){
+        this.runned.push('cleanup1')
+      }
+    }
+
+    let specClassConstructor = ASpecWithSUT.prototype.constructor;
+
+    let spec = new SpecContainer(specClassConstructor);
+
+    spec.setDescription('a Spec with SUT');
+    spec.addSubject('Specs With SUT');
+    spec.setSUT(Asut);
+
+    spec.addGiven('given1', 'some Stuff is given');
+    spec.addGiven('given2', 'it is this Way around');
+    spec.addWhen('when1', 'the when is alright');
+    spec.addThen('then1', 'influenced this', 1);
+    spec.addCleanup('cleanup1');
+
+    return spec;
+  }
+
+  static getSpecWithFailingSUT(){
+    @Injectable()
+    class Asut{
+      private dirtybit = 0;
+      private dep;
+      constructor(dep:DependencyOfSUT){
+        this.dep = dep;
+      }
+    }
+
+    @Injectable()
+    class DependencyOfSUT{
+
+    }
+
+    class ASpecWithSUT extends SpecWithSUT{
+
+      public runned = [];
+      //@Given('some Stuff is given')
+      given1() {
+        this.SUT.dirtrybit = 1;
+        this.runned.push('given1');
+      }
+
+      //@Given('it is this Way around')
+      given2() {
+        this.runned.push('given2');
+      }
+
+      //@When('something is triggered')
+      when1() {
+        this.runned.push('when1');
+      }
+
+      //@Then('influenced this')
+      then1() {
+        this.runned.push('then1');
+      }
+
+      //@Cleanup()
+      cleanup1(){
+        this.runned.push('cleanup1')
+      }
+    }
+
+    let specClassConstructor = ASpecWithSUT.prototype.constructor;
+
+    let spec = new SpecContainer(specClassConstructor);
+
+    spec.setDescription('a Spec with failing SUT');
+    spec.addSubject('Specs With SUT');
+    spec.setSUT(Asut);
+
+    spec.addGiven('given1', 'some Stuff is given');
+    spec.addGiven('given2', 'it is this Way around');
+    spec.addWhen('when1', 'the when is alright');
     spec.addThen('then1', 'influenced this', 1);
     spec.addCleanup('cleanup1');
 

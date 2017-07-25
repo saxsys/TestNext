@@ -1,8 +1,7 @@
-import {ISpecAction} from "./iSpec-action";
 import {SpecActionType} from "./spec-action-type";
 
 export interface ISpecActionContainer{
-  getActionClassConstructor(): Function;
+  getActionClassConstructor(): any;
   getActionType(): SpecActionType;
-  getNewActionObject(): ISpecAction;
+  getActionClassName():string;
 }

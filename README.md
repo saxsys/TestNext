@@ -11,7 +11,7 @@ Test-framework for the usage on different levels of abstraction, in Angular/Type
 * the Spec will be executed in Order Given --> When --> Then
 * class-names using TestNext in any way must be unique
   
-####Spec Classes
+#### Spec Classes
 * A class with the decorator `@Spec('Spec-description')` is a SpecClass and will be executed as Spec.
 Example
 ```
@@ -23,7 +23,7 @@ Example
 * one Spec-description (argument for Spec) can be used multiple times
 * The class-name of a SpecClass must be unique in the whole project
 
-####Spec-Methods
+#### Spec-Methods
 * Spec-Methods are marked with Decorators
   * Spec-Methods can be used in each class, the Class does not need to have a Spec-Decorator (look Inheritance)
 * The Spec-methods will be executed in a specific order
@@ -39,22 +39,22 @@ Example
   * for Spec-Method-Types which can appear multiple times in on Spec a execNumber can be given as second decorator-argument 
   * useful, when the execution order of the Spec-Methods matters
   
-#####Given
+##### Given
 * Given-methods will be executed first, while executing the SpecClass
 * There must be at least one Given-method, multiple are possible
 * They are marked with `@Given('description')` or `@Given('description', 1)` 
 
-#####When
+##### When
 * Then When-methods will be executed second, while executing the SpecClass
 * There can only be one When-method
 * it is marked with `@When('description')`
 
-#####Then
+##### Then
 * Then-methods will be executed third, while executing the SpecClass
 * There must be at least one Then-method, multiple are possible
 * They are marked with `@Then('description')` or `@Then('description', 1)` 
 
-#####ThenThrow
+##### ThenThrow
 * The ThenThrow-method is an alternative to then Then-methods
 * It is used, when the When-method is expected to throw an Error
 * in the Method an Error should be thrown (this is not forced but would you use it otherwise)
@@ -62,7 +62,7 @@ Example
 * The error-type and the message are compared
 * They are marked with `@ThenThrow('an error')`
 
-#####Cleanup
+##### Cleanup
 * The Cleanup-methods are executed als last-method, while executing the SpecClass, even when the methods before failed
   * useful for example, when cleaning up a Database in the end
 * It is optional, there can be multiple
@@ -70,13 +70,13 @@ Example
   * a description is optional and can be given with `@Cleanup('description')`
   * an execNumber is optional and can be given with `@Cleanup('description', 1)`
 
-####Subject
+#### Subject
 * For a better overview SpecClasses can be assigned to Subjects
 * One Subject can contain multiple SpecClasses
 * one SpecClass can be assigned to multiple Subjects
 * A Subject is assigned to a SpecClass with `@Subject('Subject Name')`
 
-####Inheritance
+#### Inheritance
 * A SpecClass can be extended and inherit
 * The extended Class do not have to be a SpecClass (must not be marked with  `@Spec()`)
   * the child-SpecClasses will be Executed as long as the have the @Spec-Decorator
@@ -90,28 +90,28 @@ Example
 * Careful when inheriting:
   * overriding methods by their name can cause trouble
   
-####SUT
+#### SUT
 * The SUT (System under Test) can be created automatically
   * Use the Decorator `@SUT(ClassToTest)` as Decorator for the SpecClass
   * Give all dependencies in `@Providers([DependencyClass, OtherDependencyClass])`
   * extend the Class `SpecWithSUT` (or declare an own public field SUT)
 * use the SUT in the SpecClass by calling `this.SUT`
 
-####Take Care
+#### Take Care
 * Use unique SpecClass-Names
 * overriding SpecMethods can cause Errors
 * if you use variables in the Decorator-descriptions, they must be from static
 
-###Asserts
+### Asserts
 // TODO
 
-###Run Tests
-####CLI
+### Run Tests
+#### CLI
 ```shell
 npm run tNxt <runMode> [<runModeArguments>] <outputModifier[...]>
 ```
 * use `npm run tNxt` for help 
-#####RunModes
+##### RunModes
 * `AllSpecs`
   * execute all Specs
   * no additional Arguments
@@ -130,37 +130,37 @@ npm run tNxt <runMode> [<runModeArguments>] <outputModifier[...]>
   * the one Spec with the ClassName will be executed
   * inherited classes will not be executed separately
   
- #####outputModifier
+ ##### outputModifier
  * change the output hand have no influence on the running
  * the Modifier can be combined freely
  * by standard
   * only failed and invalid Specs are shown
   * Specs are ordered by their heading and then alphabet
  
- ######show all
+ ###### show all
  * `sAll`
  * show all results of executable Specs (including ignored Specs)
  
- ######hide ignored
+ ###### hide ignored
   * `hIgn`
   * useful in addition to `sAll`
   * hides ignored Specs
  
-  ######show non Executable
+  ###### show non Executable
   * `sNonExec`
   * show also non Executable SpecClasses (Classes having without @Spec, but other Spec-Decorator, e.g. a Given Method for inheritance)
   * useful for debugging 
   
-  ######hide Cleanup
+  ###### hide Cleanup
   * `hClean`
   * hides the Cleanup-Description, when not failed
   * useful, when output needs to be shortened
   
-  ######order by Alphabet
+  ###### order by Alphabet
   * `oAlpha`
   * order output by alphabet
  
- ######order by ExecutionStatus
+ ###### order by ExecutionStatus
    * `oExecStat`
    * order output by ExecutionStatus/Success
     * Failed-->Invalid-->Successful-->Ignored-->nonExecutable
