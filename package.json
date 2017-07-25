@@ -9,7 +9,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "tNxt": "rimraf ./dist && tsc -p tsconfig.json && node dist/testNext/testExec/execSpecs.js"
+    "tNxt": "rimraf ./dist && ntsc -p tsconfig.json --skipLibCheck && node dist/testNext/testExec/execSpecs.js"
   },
   "private": true,
   "dependencies": {
