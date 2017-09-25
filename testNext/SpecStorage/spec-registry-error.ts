@@ -1,12 +1,12 @@
 export class SpecRegistryError extends Error{
 
-  private className;
-  private functionName;
+  public className;
+  public propertyName;
 
-  constructor(message:string, className: string, functionName?:string){
+  constructor(message:string, className: string, propertyName?:string){
     super(message);
     this.className = className;
-    this.functionName = functionName;
+    this.propertyName = propertyName;
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, SpecRegistryError.prototype);
   }

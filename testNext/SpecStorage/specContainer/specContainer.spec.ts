@@ -121,6 +121,7 @@ describe('SpecContainer.setProviders', () => {
 describe('SpecContainer.getNewSpecObject', () => {
 
   class SpecContainer_SpecObject {
+    public generatedProp;
   }
   let specClassConstructor = SpecContainer_SpecObject.prototype.constructor;
 
@@ -137,8 +138,28 @@ describe('SpecContainer.getNewSpecObject', () => {
     }
   }
 
+  @Injectable()
+  class ADependency{
+    mock:false;
+  }
+
+  @Injectable()
+  class AThingToGenerate{
+    public dep;
+
+    constructor(dep:ADependency){
+      this.dep = dep;
+    }
+  }
+
   let SUT = SomeSUT;
   let provider = SutDependency;
+  let genProviders = [{
+    provide:ADependency,
+    mock:{
+      mock:true
+    }
+  }];
 
   it('it should return a valid Object of the Class', () => {
     let specContainer = new SpecContainer(specClassConstructor);
@@ -212,6 +233,61 @@ describe('SpecContainer.getNewSpecObject', () => {
     expect(childSpecObj.SUT).not.toBeUndefined();
     expect(childSpecObj.SUT.dep).not.toBeUndefined();
     expect(childSpecObj.SUT.dep.str).toEqual('abc');
+
+  });
+
+  it('should generate the Properties which should be generated, not mocked by default', ()=>{
+    let specContainer = new SpecContainer(specClassConstructor);
+    let genProviders = [{
+      provide:ADependency,
+      mock:{
+        mockDep:true
+      }
+    }];
+
+    specContainer.setDescription('SpecContainer a with Generate');
+
+    specContainer.addGeneratorOnProperty('generatedProp', AThingToGenerate, genProviders);
+
+    let obj = specContainer.getNewSpecObject();
+
+    expect(obj.generatedProp).not.toBeNull('is null');
+    expect(obj.generatedProp).not.toBeUndefined('is undefined');
+    expect(obj.generatedProp instanceof AThingToGenerate).toBeTruthy('not real instance');
+    expect(obj.generatedProp.dep).not.toBeNull('dependency not solved');
+    expect(obj.generatedProp.dep.mock).toBeFalsy('mocked');
+  });
+
+  it('should generate the Properties which should be generated, it should mock, when called with Parameter', ()=>{
+    let specContainer = new SpecContainer(specClassConstructor);
+
+
+    specContainer.setDescription('SpecContainer a with Generate');
+
+    specContainer.addGeneratorOnProperty('generatedProp', AThingToGenerate, genProviders);
+
+    let obj = specContainer.getNewSpecObject(true);
+
+    expect(obj.generatedProp).not.toBeNull('is null');
+    expect(obj.generatedProp).not.toBeUndefined('is undefined');
+    expect(obj.generatedProp instanceof AThingToGenerate).toBeTruthy('not real instance');
+    expect(obj.generatedProp.dep).not.toBeNull('dependency not solved');
+    expect(obj.generatedProp.dep.mock).toBeTruthy('did not mock');
+  });
+
+  it('should generate inherited dependencies, too', ()=>{
+    class SpecContainer_SpecObject_Inherit extends SpecContainer_SpecObject{}
+    let parentContainer = new SpecContainer(specClassConstructor);
+    parentContainer.addGeneratorOnProperty('generatedProp', AThingToGenerate, genProviders);
+    let specContainer = new SpecContainer(SpecContainer_SpecObject_Inherit.prototype.constructor, parentContainer);
+    let obj = specContainer.getNewSpecObject();
+
+    expect(obj.generatedProp).not.toBeNull('is null');
+    expect(obj.generatedProp).not.toBeUndefined('is undefined');
+    expect(obj.generatedProp instanceof AThingToGenerate).toBeTruthy('not real instance');
+    expect(obj.generatedProp.dep).not.toBeNull('dependency not solved');
+
+
 
   });
 });
@@ -831,5 +907,55 @@ describe('SpecContainer.getCleanup', () => {
     expect(methodArray[2].getName()).toEqual(childMethodName1);
     expect(methodArray[3].getName()).toEqual(childMethodName2);
   });
+});
+
+describe('SpecContainer.addGeneratorOnProperty', ()=>{
+  class SpecContainer_GenerateProperty{
+    public prop;
+  }
+  let specConstr = SpecContainer_GenerateProperty.prototype.constructor;
+  let genPropName = 'prop';
+  let genType = AThingToGenerate;
+  let genProviders = [{
+      provide:ADependency,
+      mock:{
+        mockDep:true
+      }
+    }];
+
+  @Injectable()
+  class ADependency{
+
+  }
+
+  @Injectable()
+  class AThingToGenerate{
+    public dep;
+
+    constructor(dep:ADependency){
+      this.dep = dep;
+    }
+  }
+
+  it('should add the Entry', ()=>{
+    let specContainer = new SpecContainer(specConstr);
+    specContainer.addGeneratorOnProperty(genPropName, genType, genProviders);
+
+    let generator = specContainer.getGeneratorOfProperty(genPropName);
+    expect(generator.getTypeToGenerate()).toEqual(genType);
+    expect(generator.getDependencies()).toEqual(genProviders);
+  });
+
+  it('should not allow multiple Generates on on Property', ()=>{
+    let specContainer = new SpecContainer(specConstr);
+    specContainer.addGeneratorOnProperty(genPropName, genType, genProviders);
+
+    expect(()=> {
+      specContainer.addGeneratorOnProperty(genPropName, genType, genProviders);
+    }).toThrowError(SpecRegistryError,
+      'Cannot Generate multiple times on one Property: SpecContainer_GenerateProperty.prop');
+  });
+
+
 });
 

@@ -1,5 +1,6 @@
 import {ISpecMethodContainer} from "./specMethodContainer/iSpec-method-Container";
 import {Provider} from "@angular/core";
+import {SpecGeneratorOfProperty} from "./SpecDependency/SpecDependency";
 
 export interface ISpecContainer{
 
@@ -56,6 +57,11 @@ export interface ISpecContainer{
    */
   getProviders():Array<Provider>;
 
+  /**
+   * Gives Information about the Values to be generated on the Properties
+   * @return {Array<SpecGeneratorOfProperty>}
+   */
+  getGeneratorOnProperties():Array<SpecGeneratorOfProperty>;
 
   /**
    *

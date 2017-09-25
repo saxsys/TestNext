@@ -154,3 +154,9 @@ export function Providers(providers:Provider[]){
   }
 }
 
+export function Generate(typeToGenerate:any){
+  return (target: any, key: string) => {
+    let constructor = target.constructor;
+    specRegistry.registerGenerate(constructor, key, typeToGenerate)
+  }
+}

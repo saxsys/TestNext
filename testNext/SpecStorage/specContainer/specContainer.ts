@@ -8,6 +8,8 @@ import {SpecMethodType} from "./specMethodContainer/spec-method-type";
 import {SpecRegistryError} from "../spec-registry-error";
 import * as _ from "underscore";
 import {SpecMethodList} from "./specMethodList/spec-method-list";
+import {SpecGenerationProvider} from "./SpecDependency/SpecGenerateProvider";
+import {SpecGeneratorOfProperty} from "./SpecDependency/SpecDependency";
 
 /**
  * Class to contain a SpecClass and store additional information on the Spec (such as Given-, When-, Then-Methods, Ignored or the SUT)
@@ -23,7 +25,7 @@ export class SpecContainer implements ISpecContainer{
   private parent: ISpecContainer;
   private sut:Provider;
   private providers =  new Array<Provider>();
-
+  private generatorsOnProperties = new Map<string, SpecGeneratorOfProperty>();
   //private given = new Map<number, SpecMethodContainer>(); // exec-Number, MethodName
   private given:SpecMethodList;
   private when: SpecMethodContainer;
@@ -237,7 +239,7 @@ export class SpecContainer implements ISpecContainer{
    * Creates and sets the SUT in the Object, if one is set or inherited.
    * @returns a new Object of the SpecClass.
    */
-  getNewSpecObject(): any{
+  getNewSpecObject(mock?:boolean): any{
     if(this.specClassConstructor == null)
       throw new SpecRegistryError('Class of ' + this.getClassName() + 'is not set', this.getClassName());
     if(this.specClassConstructor.length > 0)
@@ -256,6 +258,14 @@ export class SpecContainer implements ISpecContainer{
     }
 
 
+    this.getGeneratorOnProperties().forEach((generator)=>{
+      let propName = generator.getPropertyName();
+      if(mock != null || mock == true) {
+        object[propName] = generator.generateWithMock();
+      } else {
+        object[propName] = generator.generateReal();
+      }
+    });
 
     return object;
   };
@@ -377,6 +387,26 @@ export class SpecContainer implements ISpecContainer{
     return false;
   }
 
+  /**
+   * get Generators for Properties
+   * @return {Array<SpecGeneratorOfProperty>}
+   */
+  getGeneratorOnProperties():Array<SpecGeneratorOfProperty> {
+    let allGenerators = [].concat(Array.from(this.generatorsOnProperties.values()));
+
+
+
+    //get parent Properties
+    if (this.parent != null) {
+      this.parent.getGeneratorOnProperties().forEach((generator) => {
+        //add only when no other Generator on same Property is added on Child
+        if (this.generatorsOnProperties.get(generator.getPropertyName()) == null)
+          allGenerators.push(generator);
+      });
+    }
+    return allGenerators;
+
+  }
 
   /**
    * @param methodName
@@ -461,6 +491,22 @@ export class SpecContainer implements ISpecContainer{
 
     method = this.getOwnThenByName(methodName);
     return method;
+  }
+
+  addGeneratorOnProperty(propertyName:string, typeToGenerate:any, providers:SpecGenerationProvider[]){
+
+    if(this.generatorsOnProperties.get(propertyName) != null)
+      throw new SpecRegistryError('Cannot Generate multiple times on one Property: '+this.getClassName()+'.'+propertyName, this.getClassName(), propertyName);
+
+    let generateProp = new SpecGeneratorOfProperty(this.getClassName(), propertyName);
+    generateProp.setTypeToGenerate(typeToGenerate);
+    generateProp.addDependencies(providers);
+
+    this.generatorsOnProperties.set(propertyName, generateProp);
+  }
+
+  getGeneratorOfProperty(propertyName:string):SpecGeneratorOfProperty{
+    return this.generatorsOnProperties.get(propertyName);
   }
 }
 

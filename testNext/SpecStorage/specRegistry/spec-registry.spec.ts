@@ -771,3 +771,23 @@ describe('SpecRegistry.setProviders', () => {
   });
 
 });
+
+describe('SpecRegistry.registerGenerate', ()=> {
+  let specReg = new SpecRegistry();
+
+  class ASpecClass{
+    public prop;
+  }
+  class AClassToGenerate{}
+
+  let constructorSpecClass = ASpecClass.prototype.constructor;
+  let constructorGenerate = AClassToGenerate.prototype.constructor;
+
+  it('should register a Generate', () => {
+    specReg.registerGenerate(constructorSpecClass, 'prop', ASpecClass);
+
+
+
+  });
+
+});

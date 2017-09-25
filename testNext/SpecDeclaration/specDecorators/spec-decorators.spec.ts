@@ -1,4 +1,7 @@
-import {Cleanup, Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow, When} from "./spec-decorators";
+import {
+  Cleanup, Generate, Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow,
+  When
+} from "./spec-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../../SpecStorage/spec-registry-error";
 import {Assert} from "../assert/assert";
@@ -732,5 +735,19 @@ describe('TestDecorators.parentSpec', () => {
     expect(ownGivenFromParent.length).toEqual(1);
     expect(allGivenFromChild[0]).toEqual(ownGivenFromParent[0]);
   });
+
+});
+
+describe('TestDecorators - Mocking',()=>{
+
+  it('should allow a Generate Decorator', ()=>{
+
+    class AClass{}
+
+    class ClassWithGenerate{
+      @Generate(AClass)
+      public property:any;
+    }
+  })
 
 });

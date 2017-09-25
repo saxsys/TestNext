@@ -258,4 +258,10 @@ export class SpecRegistry {
   }
 
 
+  registerGenerate(constructor: any, key: string, typeToGenerate: Provider):SpecContainer {
+    let specContainer = this.getOrRegisterSpecContainerForClass(constructor);
+    //TODO register it
+    return specContainer
+
+  }
 }
