@@ -493,20 +493,22 @@ export class SpecContainer implements ISpecContainer{
     return method;
   }
 
-  addGeneratorOnProperty(propertyName:string, typeToGenerate:any, providers:SpecGenerationProvider[]){
+  addGeneratorOnProperty(propertyName:string, typeToGenerate:any, providers?:SpecGenerationProvider[]){
 
     if(this.generatorsOnProperties.get(propertyName) != null)
       throw new SpecRegistryError('Cannot Generate multiple times on one Property: '+this.getClassName()+'.'+propertyName, this.getClassName(), propertyName);
 
     let generateProp = new SpecGeneratorOfProperty(this.getClassName(), propertyName);
     generateProp.setTypeToGenerate(typeToGenerate);
-    generateProp.addDependencies(providers);
-
+    if(providers) {
+      generateProp.addProviders(providers);
+    }
     this.generatorsOnProperties.set(propertyName, generateProp);
   }
 
   getGeneratorOfProperty(propertyName:string):SpecGeneratorOfProperty{
-    return this.generatorsOnProperties.get(propertyName);
+    let allGenerates = this.getGeneratorOnProperties();
+    return allGenerates.find((gen)=>{return gen.getPropertyName() == propertyName})
   }
 }
 

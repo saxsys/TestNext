@@ -1,5 +1,6 @@
 import {SpecRegistry} from "./spec-registry";
 import {SpecRegistryError} from "../spec-registry-error";
+import {Injectable} from "@angular/core";
 
 
 describe('SpecRegistry.registerSpec()', () => {
@@ -773,20 +774,69 @@ describe('SpecRegistry.setProviders', () => {
 });
 
 describe('SpecRegistry.registerGenerate', ()=> {
-  let specReg = new SpecRegistry();
-
-  class ASpecClass{
+  class SpecContainer_GenerateProperty{
     public prop;
+    public otherProp;
   }
-  class AClassToGenerate{}
+  let specConstr = SpecContainer_GenerateProperty.prototype.constructor;
+  let genPropName = 'prop';
+  let genType = AThingToGenerate;
+  let genProviders = [{
+    provide:ADependency,
+    mock:{
+      mockDep:true
+    }
+  }];
 
-  let constructorSpecClass = ASpecClass.prototype.constructor;
-  let constructorGenerate = AClassToGenerate.prototype.constructor;
+  @Injectable()
+  class ADependency{
 
-  it('should register a Generate', () => {
-    specReg.registerGenerate(constructorSpecClass, 'prop', ASpecClass);
+  }
 
+  @Injectable()
+  class AThingToGenerate{
+    public dep;
 
+    constructor(dep:ADependency){
+      this.dep = dep;
+    }
+  }
+
+  it('should register a Generate for existing Spec', () => {
+    let specReg = new SpecRegistry();
+    specReg.registerSpec(specConstr, 'ASpec');
+    let specContainer = specReg.registerGenerate(specConstr, genPropName, genType, genProviders);
+
+    let gens = specContainer.getGeneratorOnProperties();
+    expect(gens.length).toBe(1);
+    expect(gens[0].getPropertyName()).toEqual('prop');
+  });
+
+  it('should register a Generate for new Spec', () => {
+    let specReg = new SpecRegistry();
+    let specContainer = specReg.registerGenerate(specConstr, genPropName, genType, genProviders);
+
+    let gens = specContainer.getGeneratorOnProperties();
+    expect(gens.length).toBe(1);
+    expect(gens[0].getPropertyName()).toEqual('prop');
+  });
+
+  it('should register multiple Generates on different Properties', ()=>{
+    let specReg = new SpecRegistry();
+
+    let specContainer = specReg.registerGenerate(specConstr, genPropName, genType, genProviders);
+    specReg.registerGenerate(specConstr,'otherProp', genType, genProviders);
+    let allProps = specContainer.getGeneratorOnProperties();
+
+    expect(allProps.length).toBe(2);
+
+    let generator = specContainer.getGeneratorOfProperty(genPropName);
+    expect(generator.getTypeToGenerate()).toEqual(genType);
+    expect(generator.getDependencies()).toEqual(genProviders);
+
+    let otherGenerator = specContainer.getGeneratorOfProperty('otherProp');
+    expect(otherGenerator.getTypeToGenerate()).toEqual(genType);
+    expect(otherGenerator.getDependencies()).toEqual(genProviders);
 
   });
 

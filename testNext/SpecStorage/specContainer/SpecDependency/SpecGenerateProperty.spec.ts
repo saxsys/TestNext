@@ -52,7 +52,7 @@ describe('SpecGeneratorOfProperty.setDependencies', () => {
       mock: {}
     };
 
-    specDep.addDependencies([depProv]);
+    specDep.addProviders([depProv]);
 
     let retType = specDep.getDependencies();
     expect(retType).toEqual([depProv]);
@@ -109,7 +109,7 @@ describe('SpecGeneratorOfProperty.generateWithMock', () => {
   it('should generate the Type with real Dependency, when mock does not exist', () => {
     let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
     specDep.setTypeToGenerate(TypeToGenerateWithDep);
-    specDep.addDependencies([{provide: ADependency}, {provide: OtherDependency}, {provide:NestedDependency}]);
+    specDep.addProviders([{provide: ADependency}, {provide: OtherDependency}, {provide:NestedDependency}]);
     let retObj = specDep.generateWithMock();
 
     expect(retObj).not.toBeNull();
@@ -121,7 +121,7 @@ describe('SpecGeneratorOfProperty.generateWithMock', () => {
   it('should generate the Type with real Dependency, with Mock', () => {
     let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
     specDep.setTypeToGenerate(TypeToGenerateWithDep);
-    specDep.addDependencies([
+    specDep.addProviders([
       {provide:ADependency, mock:{depVal:8}},
       {provide:OtherDependency, mock:{}},
       {provide:NestedDependency, mock:{}}
@@ -136,7 +136,7 @@ describe('SpecGeneratorOfProperty.generateWithMock', () => {
   it('should prefer Mocks over real Implementation', ()=>{
     let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
     specDep.setTypeToGenerate(TypeToGenerateWithDep);
-    specDep.addDependencies([
+    specDep.addProviders([
       {provide:ADependency},
       {provide:OtherDependency, mock:{mock:true}},
       {provide:NestedDependency, mock:{}}
@@ -197,7 +197,7 @@ describe('SpecGeneratorOfProperty.generateReal', () => {
   it('should generate the Type with real Dependency', () => {
     let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
     specDep.setTypeToGenerate(TypeToGenerateWithDep);
-    specDep.addDependencies([{provide: ADependency}, {provide: OtherDependency}, {provide:NestedDependency}]);
+    specDep.addProviders([{provide: ADependency}, {provide: OtherDependency}, {provide:NestedDependency}]);
     let retObj = specDep.generateReal();
 
     expect(retObj).not.toBeNull();

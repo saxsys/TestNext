@@ -912,6 +912,7 @@ describe('SpecContainer.getCleanup', () => {
 describe('SpecContainer.addGeneratorOnProperty', ()=>{
   class SpecContainer_GenerateProperty{
     public prop;
+    public otherProp;
   }
   let specConstr = SpecContainer_GenerateProperty.prototype.constructor;
   let genPropName = 'prop';
@@ -946,7 +947,7 @@ describe('SpecContainer.addGeneratorOnProperty', ()=>{
     expect(generator.getDependencies()).toEqual(genProviders);
   });
 
-  it('should not allow multiple Generates on on Property', ()=>{
+  it('should not allow multiple Generates on one Property', ()=>{
     let specContainer = new SpecContainer(specConstr);
     specContainer.addGeneratorOnProperty(genPropName, genType, genProviders);
 
@@ -956,6 +957,76 @@ describe('SpecContainer.addGeneratorOnProperty', ()=>{
       'Cannot Generate multiple times on one Property: SpecContainer_GenerateProperty.prop');
   });
 
+  it('should allow multiple Generates on different Properties', ()=>{
+    let specContainer = new SpecContainer(specConstr);
+    specContainer.addGeneratorOnProperty(genPropName, genType, genProviders);
+    specContainer.addGeneratorOnProperty('otherProp', genType, genProviders);
+    let allProps = specContainer.getGeneratorOnProperties()
 
+    expect(allProps.length).toBe(2);
+
+    let generator = specContainer.getGeneratorOfProperty(genPropName);
+    expect(generator.getTypeToGenerate()).toEqual(genType);
+    expect(generator.getDependencies()).toEqual(genProviders);
+
+    let otherGenerator = specContainer.getGeneratorOfProperty('otherProp');
+    expect(otherGenerator.getTypeToGenerate()).toEqual(genType);
+    expect(otherGenerator.getDependencies()).toEqual(genProviders);
+
+  });
 });
 
+describe('SpecContainer.getGeneratorOnProperties', ()=>{
+  class SpecContainer_getGeneratorProp{
+    public prop;
+  }
+
+  class SpecContainer_getGeneratorProp_Inherit extends  SpecContainer_getGeneratorProp {}
+
+  class TypeToGenerate{}
+  class OtherTypeToGenerate{}
+
+  let constructor = SpecContainer_getGeneratorProp.prototype.constructor;
+  let inheritConstructor = SpecContainer_getGeneratorProp_Inherit.prototype.constructor;
+
+  it('should get own PropertyGenerators', ()=>{
+    let specContainer = new SpecContainer(constructor);
+    specContainer.addGeneratorOnProperty('prop', TypeToGenerate);
+
+    let retArray = specContainer.getGeneratorOnProperties();
+
+    expect(retArray.length).toBe(1);
+    let retVal = retArray[0];
+    expect(retVal.getPropertyName()).toEqual('prop');
+    expect(retVal.getTypeToGenerate()).toEqual(TypeToGenerate);
+  });
+
+  it('should get inherited PropertyGenerators', ()=>{
+    let parentSpec = new SpecContainer(constructor);
+    parentSpec.addGeneratorOnProperty('prop', TypeToGenerate);
+
+    let specContainer = new SpecContainer(inheritConstructor, parentSpec);
+
+    let retArray = specContainer.getGeneratorOnProperties();
+
+    expect(retArray.length).toBe(1);
+    let retVal = retArray[0];
+    expect(retVal.getPropertyName()).toEqual('prop');
+    expect(retVal.getTypeToGenerate()).toEqual(TypeToGenerate);
+  });
+
+  it('should get own generators, when a propery has an inherited Generator and an own one', ()=>{
+    let parentSpec = new SpecContainer(constructor);
+    parentSpec.addGeneratorOnProperty('prop', TypeToGenerate);
+
+    let specContainer = new SpecContainer(inheritConstructor, parentSpec);
+    specContainer.addGeneratorOnProperty('prop', OtherTypeToGenerate);
+
+    let retArray = specContainer.getGeneratorOnProperties();
+
+    expect(retArray.length).toBe(1);
+    let retVal = retArray[0];
+    expect(retVal.getPropertyName()).toEqual('prop');
+    expect(retVal.getTypeToGenerate()).toEqual(OtherTypeToGenerate);
+  });
+});

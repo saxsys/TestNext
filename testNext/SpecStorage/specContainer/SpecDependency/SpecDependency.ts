@@ -6,7 +6,7 @@ export class SpecGeneratorOfProperty {
   private specClassName: string;
   private propertyName: string;
   private typeToGenerate: Provider;
-  private dependencies: Map<string, SpecGenerationProvider> = new Map<string, SpecGenerationProvider>();
+  private providers: Map<string, SpecGenerationProvider> = new Map<string, SpecGenerationProvider>();
 
   constructor(specClassName: string, propertyName: string) {
     this.specClassName = specClassName;
@@ -19,12 +19,12 @@ export class SpecGeneratorOfProperty {
     this.typeToGenerate = typeToGenerate;
   }
 
-  addDependencies(providers: Array<SpecGenerationProvider>) {
+  addProviders(providers: Array<SpecGenerationProvider>) {
     providers.forEach((prov: SpecGenerationProvider) => {
-      if (this.dependencies.get(prov.provide) != null)
+      if (this.providers.get(prov.provide) != null)
         return;
 
-      this.dependencies.set(prov.provide, prov);
+      this.providers.set(prov.provide, prov);
     });
   }
 
@@ -36,13 +36,13 @@ export class SpecGeneratorOfProperty {
   }
 
   getDependencies(): Array<SpecGenerationProvider> {
-    return Array.from(this.dependencies.values());
+    return Array.from(this.providers.values());
   }
 
   generateWithMock(): any {
     let providers = [this.typeToGenerate];
 
-    this.dependencies.forEach((prov) => {
+    this.providers.forEach((prov) => {
       if (prov.mock != null)
         providers.push({provide: prov.provide, useValue: prov.mock});
       else
@@ -57,7 +57,7 @@ export class SpecGeneratorOfProperty {
   generateReal():any {
     let providers = [this.typeToGenerate];
 
-    this.dependencies.forEach((prov) => {
+    this.providers.forEach((prov) => {
         providers.push({provide: prov.provide, useClass: prov.provide});
     });
 

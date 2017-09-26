@@ -1,5 +1,6 @@
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {Provider} from "@angular/core";
+import {SpecGenerationProvider} from "../../SpecStorage/specContainer/SpecDependency/SpecGenerateProvider";
 
 /**
  * Class-Decorator
@@ -154,9 +155,9 @@ export function Providers(providers:Provider[]){
   }
 }
 
-export function Generate(typeToGenerate:any){
+export function Generate(ofType:any, withProviders?:Array<SpecGenerationProvider>){
   return (target: any, key: string) => {
     let constructor = target.constructor;
-    specRegistry.registerGenerate(constructor, key, typeToGenerate)
+    specRegistry.registerGenerate(constructor, key, ofType, withProviders);
   }
 }

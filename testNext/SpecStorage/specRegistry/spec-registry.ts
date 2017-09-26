@@ -2,6 +2,7 @@ import {SpecContainer} from "../specContainer/specContainer";
 import {SpecRegistryError} from "../spec-registry-error";
 import * as _ from "underscore";
 import {Provider} from "@angular/core/core";
+import {SpecGenerationProvider} from "../specContainer/SpecDependency/SpecGenerateProvider";
 
 export class SpecRegistry {
 
@@ -258,9 +259,9 @@ export class SpecRegistry {
   }
 
 
-  registerGenerate(constructor: any, key: string, typeToGenerate: Provider):SpecContainer {
+  registerGenerate(constructor: any, property: string, typeToGenerate: Provider, providers?:Array<SpecGenerationProvider>):SpecContainer {
     let specContainer = this.getOrRegisterSpecContainerForClass(constructor);
-    //TODO register it
+    specContainer.addGeneratorOnProperty(property, typeToGenerate, providers);
     return specContainer
 
   }
