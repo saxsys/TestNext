@@ -5,6 +5,7 @@ import {
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRegistryError} from "../../SpecStorage/spec-registry-error";
 import {Assert} from "../assert/assert";
+import {Injectable} from "@angular/core";
 
 
 describe('TestDecorators.Spec', () => {
@@ -13,6 +14,7 @@ describe('TestDecorators.Spec', () => {
 
     let specName = 'to Test Spec';
     let specClassName = 'TestDecorators_Spec_Correct';
+
     @Spec(specName)
     class TestDecorators_Spec_Correct {
 
@@ -56,7 +58,8 @@ describe('TestDecorators.Spec', () => {
     expect(() => {
       @Spec('Spec with ConstructorArguments')
       class TestDecorators_Spec_ConstructorArguments {
-        constructor(anArgument:any){}
+        constructor(anArgument: any) {
+        }
       }
     }).toThrowError(SpecRegistryError,
       'Spec "TestDecorators_Spec_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
@@ -74,13 +77,16 @@ describe('TestDecorators.Given', () => {
     let methodName = 'aCorrectMethodIsGiven';
     let specName = 'specClassDecoratorGivenCorrect';
     let methodDescription = 'a correct Method is given';
+
     @Spec(specName)
     class TestDecorators_Given_Correct {
       public val = 3;
 
-      @Given(methodDescription, 0) aCorrectMethodIsGiven() {
+      @Given(methodDescription, 0)
+      aCorrectMethodIsGiven() {
       }
     }
+
     let specRegEntry = specRegistry.getSpecContainerByClassName(className);
     let methodRegEntry = specRegEntry.getGiven()[0];
     expect(methodRegEntry.getName()).toEqual(methodName);
@@ -92,10 +98,13 @@ describe('TestDecorators.Given', () => {
     let methodDescription = 'A Method, within a Class no registered as Spec';
     let className = 'TestDecorators_Given_ClassWithoutDecorator';
     let methodName = 'methodInClassWithoutDeco';
+
     class TestDecorators_Given_ClassWithoutDecorator {
-      @Given(methodDescription) methodInClassWithoutDeco() {
+      @Given(methodDescription)
+      methodInClassWithoutDeco() {
       }
     }
+
     let givenClassConstructor = TestDecorators_Given_ClassWithoutDecorator.prototype.constructor;
     let entry = specRegistry.getSpecContainerByClassName(className);
     expect(entry.getDescription()).toBeUndefined();
@@ -115,10 +124,12 @@ describe('TestDecorators.Given', () => {
 
     @Spec('Testing MultipleGiven')
     class TestDecorators_Given_MultipleGiven {
-      @Given(methodDescription1, 0)method1() {
+      @Given(methodDescription1, 0)
+      method1() {
       }
 
-      @Given(methodDescription2, 1)method2() {
+      @Given(methodDescription2, 1)
+      method2() {
       }
     }
 
@@ -137,19 +148,25 @@ describe('TestDecorators.Given', () => {
 
   xit('should refuse methods with arguments', () => {
     expect(() => {
-      class TestDecorators_Given_MethodArguments{
-        @Given('A Method with Arguments') aMethodWithArguments(sth:any){}
+      class TestDecorators_Given_MethodArguments {
+        @Given('A Method with Arguments')
+        aMethodWithArguments(sth: any) {
+        }
       }
     }).toThrowError(SpecRegistryError,
-    '@Given-method "TestDecorators_Given_MethodArguments.aMethodWithArguments" has arguments, this is forbidden for @Given-methods'
+      '@Given-method "TestDecorators_Given_MethodArguments.aMethodWithArguments" has arguments, this is forbidden for @Given-methods'
     );
   });
 
   xit('should refuse classes with constructor-arguments', () => {
     expect(() => {
       class TestDecorators_Given_ConstructorArguments {
-        constructor(anArgument:any){}
-        @Given('Given of Class with Constructor-Arguments') justAMethod(){}
+        constructor(anArgument: any) {
+        }
+
+        @Given('Given of Class with Constructor-Arguments')
+        justAMethod() {
+        }
       }
     }).toThrowError(SpecRegistryError,
       'Spec "TestDecorators_Given_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
@@ -165,13 +182,16 @@ describe('TestDecorators.When', () => {
     let className = 'SpecDecorators_When_Correct';
     let methodDescription = 'when it is a correct method';
     let methodName = 'whenItIsACorrectMethod';
+
     @Spec(specName)
     class SpecDecorators_When_Correct {
       public val = 3;
 
-      @When(methodDescription) whenItIsACorrectMethod() {
+      @When(methodDescription)
+      whenItIsACorrectMethod() {
       }
     }
+
     let specRegEntry = specRegistry.getSpecContainerByClassName(className);
     let methodRegEntry = specRegEntry.getWhen();
     expect(methodRegEntry.getName()).toEqual(methodName);
@@ -183,10 +203,13 @@ describe('TestDecorators.When', () => {
     let methodDescription = 'A Method, within a Class no registered as Spec';
     let className = 'TestDecorators_When_ClassWithoutDecorator';
     let methodName = 'methodInClassWithoutDeco';
+
     class TestDecorators_When_ClassWithoutDecorator {
-      @When(methodDescription) methodInClassWithoutDeco() {
+      @When(methodDescription)
+      methodInClassWithoutDeco() {
       }
     }
+
     let specClassConstructor = TestDecorators_When_ClassWithoutDecorator.prototype.constructor;
     let entry = specRegistry.getSpecContainerByClassName(className);
     expect(entry.getDescription()).toBeUndefined();
@@ -209,10 +232,12 @@ describe('TestDecorators.When', () => {
     expect(() => {
       @Spec(specDescription)
       class TestDecorator_When_multipleWhen {
-        @When(methodDescription1)somethingHappens() {
+        @When(methodDescription1)
+        somethingHappens() {
         }
 
-        @When(methodDescription2)somethingElseHappens() {
+        @When(methodDescription2)
+        somethingElseHappens() {
         }
       }
     }).toThrowError(SpecRegistryError,
@@ -236,7 +261,8 @@ describe('TestDecorators.Then', () => {
     class TestDecorators_Then_Correct {
       public val = 3;
 
-      @Then(methodDescription, 0) thenAMethodIsCorrect() {
+      @Then(methodDescription, 0)
+      thenAMethodIsCorrect() {
       }
     }
 
@@ -253,9 +279,11 @@ describe('TestDecorators.Then', () => {
     let methodName = 'methodInClassWithoutDeco';
 
     class TestDecorators_Then_ClassWithoutDecorator {
-      @Then(methodDescription) methodInClassWithoutDeco() {
+      @Then(methodDescription)
+      methodInClassWithoutDeco() {
       }
     }
+
     let specClassConstructor = TestDecorators_Then_ClassWithoutDecorator.prototype.constructor;
     let entry = specRegistry.getSpecContainerByClassName(className);
     expect(entry.getDescription()).toBeUndefined();
@@ -275,10 +303,12 @@ describe('TestDecorators.Then', () => {
 
     @Spec('Testing MultipleThen')
     class TestDecorators_Then_MultipleThen {
-      @Then(methodDescription1, 0)method1() {
+      @Then(methodDescription1, 0)
+      method1() {
       }
 
-      @Then(methodDescription2, 1)method2() {
+      @Then(methodDescription2, 1)
+      method2() {
       }
     }
 
@@ -297,8 +327,10 @@ describe('TestDecorators.Then', () => {
 
   xit('should refuse methods with arguments', () => {
     expect(() => {
-      class TestDecorators_Then_MethodArguments{
-        @Then('A Method with Arguments') aMethodWithArguments(sth:any){}
+      class TestDecorators_Then_MethodArguments {
+        @Then('A Method with Arguments')
+        aMethodWithArguments(sth: any) {
+        }
       }
     }).toThrowError(SpecRegistryError,
       '@Then-method "TestDecorators_Then_MethodArguments.aMethodWithArguments" has arguments, this is forbidden for @Then-methods'
@@ -308,8 +340,12 @@ describe('TestDecorators.Then', () => {
   xit('should refuse classes with constructor-arguments', () => {
     expect(() => {
       class TestDecorators_Then_ConstructorArguments {
-        constructor(anArgument:any){}
-        @Then('When of Class with Constructor-Arguments') aThenFunction(){}
+        constructor(anArgument: any) {
+        }
+
+        @Then('When of Class with Constructor-Arguments')
+        aThenFunction() {
+        }
       }
     }).toThrowError(SpecRegistryError,
       'Spec "TestDecorators_Then_ConstructorArguments" has constructor-arguments, this is forbidden in Spec-classes'
@@ -329,10 +365,12 @@ describe('TestDecorators.ThenThrow', () => {
     class SpecDecorators_ThenThrow_Correct {
       public val = 3;
 
-      @ThenThrow(methodDescription) randomError() {
+      @ThenThrow(methodDescription)
+      randomError() {
         throw new Error('Random Error');
       }
     }
+
     let specRegEntry = specRegistry.getSpecContainerByClassName(className);
     let methodRegEntry = specRegEntry.getThenThrow();
     expect(methodRegEntry.getName()).toEqual(methodName);
@@ -348,7 +386,8 @@ describe('TestDecorators.ThenThrow', () => {
     class SpecDecorators_ThenError_notRegistered {
       public val = 3;
 
-      @ThenThrow(methodDescription) randomError() {
+      @ThenThrow(methodDescription)
+      randomError() {
         throw new Error('Random Error');
       }
     }
@@ -375,11 +414,13 @@ describe('TestDecorators.ThenThrow', () => {
     expect(() => {
       @Spec(specDescription)
       class TestDecorator_ThenThrow_multipleWhen {
-        @ThenThrow(methodDescription1)oneError() {
+        @ThenThrow(methodDescription1)
+        oneError() {
           throw new Error('one Error');
         }
 
-        @ThenThrow(methodDescription2)errorAfterwards() {
+        @ThenThrow(methodDescription2)
+        errorAfterwards() {
           throw new Error('error Afterwards')
         }
       }
@@ -401,7 +442,8 @@ describe('TestDecorators.Cleanup', () => {
     class TestDecorators_Cleanup_Correct_withoutParam {
       public val = 3;
 
-      @Cleanup() tidyIt() {
+      @Cleanup()
+      tidyIt() {
       }
     }
 
@@ -421,7 +463,8 @@ describe('TestDecorators.Cleanup', () => {
     class TestDecorators_Cleanup_Correct_withParam {
       public val = 3;
 
-      @Cleanup(methodDescription,1) tidyIt() {
+      @Cleanup(methodDescription, 1)
+      tidyIt() {
       }
     }
 
@@ -438,9 +481,11 @@ describe('TestDecorators.Cleanup', () => {
     let methodName = 'methodInClassWithoutDeco';
 
     class TestDecorators_Cleanup_ClassWithoutDecorator {
-      @Cleanup(methodDescription) methodInClassWithoutDeco() {
+      @Cleanup(methodDescription)
+      methodInClassWithoutDeco() {
       }
     }
+
     let specClassConstructor = TestDecorators_Cleanup_ClassWithoutDecorator.prototype.constructor;
 
     let entry = specRegistry.getSpecContainerByClassName(className);
@@ -462,10 +507,12 @@ describe('TestDecorators.Cleanup', () => {
 
     @Spec('Testing MultipleThen')
     class TestDecorators_Cleanup_MultipleThen {
-      @Cleanup(methodDescription1, 0)method1() {
+      @Cleanup(methodDescription1, 0)
+      method1() {
       }
 
-      @Cleanup(methodDescription2, 1)method2() {
+      @Cleanup(methodDescription2, 1)
+      method2() {
       }
     }
 
@@ -488,6 +535,7 @@ describe('TestDecorators.Subject', () => {
   it('should register one Subject for Spec', () => {
     let specClassName = 'SpecDecorators_Subject_OneSubPerSpec';
     let subjectName = 'TestDecorators.Subject.OneSubPerSpec';
+
     @Spec('SpecDecorators_Subject_OneSubPerSpec')
     @Subject(subjectName)
     class SpecDecorators_Subject_OneSubPerSpec {
@@ -503,6 +551,7 @@ describe('TestDecorators.Subject', () => {
     let specClassName = 'SpecDecorators_Subject_MultiSubPerSpec';
     let subjectName1 = 'TestDecorators.Subject.MultiSubPerSpec.1';
     let subjectName2 = 'TestDecorators.Subject.MultiSubPerSpec.2';
+
     @Spec('SpecDecorators_Subject_MultiSubPerSpec')
     @Subject(subjectName1)
     @Subject(subjectName2)
@@ -540,10 +589,18 @@ describe('TestDecorators.Subject', () => {
 
     @Spec('CompleteSpecClass')
     @Subject(subjectName)
-    class SpecDecorators_Subject_CompleteSpecClass{
-      @Given('a given') aGiven(){}
-      @When('the when') theWhen(){}
-      @Then('a then') aThen(){}
+    class SpecDecorators_Subject_CompleteSpecClass {
+      @Given('a given')
+      aGiven() {
+      }
+
+      @When('the when')
+      theWhen() {
+      }
+
+      @Then('a then')
+      aThen() {
+      }
     }
 
     let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
@@ -572,13 +629,13 @@ describe('TestDecorators.Subject', () => {
     let specClassName = 'SpecDecorators_Subject_ConstructorArguments';
     let subjectName = 'TestDecorators.Subject.ConstructorArguments';
 
-    expect(()=> {
+    expect(() => {
       @Subject(subjectName)
       class SpecDecorators_Subject_ConstructorArguments {
         constructor(argument: number) {
         }
       }
-    }).toThrowError(SpecRegistryError, 'Spec "' + specClassName +'" has constructor-arguments, this is forbidden in Spec-classes');
+    }).toThrowError(SpecRegistryError, 'Spec "' + specClassName + '" has constructor-arguments, this is forbidden in Spec-classes');
   });
 
 });
@@ -591,7 +648,8 @@ describe('TestDecorators.Ignore', () => {
     let specName = 'specClassDecoratorIgnoredNotIgnored';
 
     @Spec(specName)
-    class TestDecorators_Ignored_NotIgnored {}
+    class TestDecorators_Ignored_NotIgnored {
+    }
 
     let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
@@ -607,7 +665,8 @@ describe('TestDecorators.Ignore', () => {
 
     @Ignore(ignoreReason)
     @Spec(specName)
-    class TestDecorators_Ignored_Correct {}
+    class TestDecorators_Ignored_Correct {
+    }
 
     let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
@@ -622,7 +681,8 @@ describe('TestDecorators.Ignore', () => {
     let ignoreReason = 'simply not possible';
 
     @Ignore(ignoreReason)
-    class TestDecorators_Ignored_NoSpec {}
+    class TestDecorators_Ignored_NoSpec {
+    }
 
     let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
@@ -638,7 +698,8 @@ describe('TestDecorators.Ignore', () => {
     @Ignore(ignoreReason1)
     @Ignore(ignoreReason2)
     @Spec(specName)
-    class TestDecorators_Ignored_MultiIgnore {}
+    class TestDecorators_Ignored_MultiIgnore {
+    }
 
     let specRegEntry = specRegistry.getSpecContainerByClassName(className);
 
@@ -650,11 +711,12 @@ describe('TestDecorators.Ignore', () => {
 
 describe('TestDecorators.SUT', () => {
 
-  class TestDecorators_SUT_SUT{}
+  class TestDecorators_SUT_SUT {
+  }
 
   @Spec('TestDecorators SUT')
   @SUT(TestDecorators_SUT_SUT)
-  class TestDecorators_SUT_Spec{
+  class TestDecorators_SUT_Spec {
 
   }
 
@@ -669,15 +731,20 @@ describe('TestDecorators.SUT', () => {
 
 describe('TestDecorators.Providers', () => {
 
-  class TestDecorators_Providers_Provider1{}
-  class TestDecorators_Providers_Provider2{}
-  class TestDecorators_Providers_Provider3{}
+  class TestDecorators_Providers_Provider1 {
+  }
+
+  class TestDecorators_Providers_Provider2 {
+  }
+
+  class TestDecorators_Providers_Provider3 {
+  }
 
 
   @Spec('TestDecorators Providers')
   @Providers([TestDecorators_Providers_Provider1, TestDecorators_Providers_Provider2])
-    @Providers([TestDecorators_Providers_Provider3])
-  class TestDecorators_Providers_Spec{
+  @Providers([TestDecorators_Providers_Provider3])
+  class TestDecorators_Providers_Spec {
 
   }
 
@@ -685,7 +752,7 @@ describe('TestDecorators.Providers', () => {
 
   let specContainer = specRegistry.getSpecContainerByClassName(specClassName);
 
-  it('should register Providers for Spec', ()=> {
+  it('should register Providers for Spec', () => {
     expect(specContainer.getProviders().length).toBe(3);
     expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider1);
     expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider2);
@@ -695,20 +762,25 @@ describe('TestDecorators.Providers', () => {
 
 
 describe('TestDecorators.parentSpec', () => {
-  class TestDecorators_ParentSpec_ParentSpecClass{
+  class TestDecorators_ParentSpec_ParentSpecClass {
     protected valueToInherit = 0;
-    @Given('valueToInherit gets set',0) setValueToInherit(){
+
+    @Given('valueToInherit gets set', 0)
+    setValueToInherit() {
       this.valueToInherit = 1;
     }
 
   }
 
   @Spec('Given-Inheritance')
-  class TestDecorators_parentSpec_ChildSpecClass extends TestDecorators_ParentSpec_ParentSpecClass{
-    @When('I extend a Parent Class') extendClass(){
+  class TestDecorators_parentSpec_ChildSpecClass extends TestDecorators_ParentSpec_ParentSpecClass {
+    @When('I extend a Parent Class')
+    extendClass() {
 
     }
-    @Then('Given of parent should have been exectuted') givenShouldBeExecuted(){
+
+    @Then('Given of parent should have been exectuted')
+    givenShouldBeExecuted() {
       Assert.that(this.valueToInherit).equals(1);
     }
   }
@@ -738,16 +810,111 @@ describe('TestDecorators.parentSpec', () => {
 
 });
 
-describe('TestDecorators - Mocking',()=>{
+describe('TestDecorators - Mocking', () => {
 
-  it('should allow a Generate Decorator', ()=>{
+  it('should allow a Generate Decorator without Dependencies', () => {
 
-    class AClass{}
-
-    class ClassWithGenerate{
-      @Generate(AClass)
-      public property:any;
+    class AClass {
+      public something = 'sth'
     }
-  })
+
+    class ClassWithGenerate {
+      @Generate(AClass)
+      public property: any;
+    }
+
+    let specContainer = specRegistry.getSpecContainerByClassName('ClassWithGenerate');
+
+    expect(specContainer).not.toBeNull('SpecContainer not returned by Registry');
+    expect(specContainer).not.toBeUndefined('SpecContainer not returned by Registry');
+
+    let specObject = specContainer.getNewSpecObject();
+
+    expect(specObject.property).not.toBeUndefined();
+    expect(specObject.property).not.toBeNull();
+    expect(specObject.property instanceof AClass).toBeTruthy('not right Type');
+    expect(specObject.property.something).toEqual('sth', 'Property of Generated not set');
+  });
+
+  it('should allow a Generate Decorator with Dependencies', () => {
+    @Injectable()
+    class Dependency {
+      public mock = false;
+    }
+
+    @Injectable()
+    class AClass {
+      public something = 'sth';
+      public dep;
+
+      constructor(dep: Dependency) {
+        this.dep = dep;
+      }
+    }
+
+    class ClassWithGenerateAndDep {
+      @Generate(AClass, [
+          {provide:Dependency, mock:{mock:true}}
+      ])
+      public property: any;
+    }
+
+    let specContainer = specRegistry.getSpecContainerByClassName('ClassWithGenerateAndDep');
+
+    expect(specContainer).not.toBeNull('SpecContainer not returned by Registry');
+    expect(specContainer).not.toBeUndefined('SpecContainer not returned by Registry');
+
+    let specObject = specContainer.getNewSpecObject();
+
+    expect(specObject.property).not.toBeUndefined();
+    expect(specObject.property).not.toBeNull();
+    expect(specObject.property instanceof AClass).toBeTruthy('not right Type');
+    expect(specObject.property.something).toEqual('sth', 'Property of Generated not set');
+
+    expect(specObject.property.dep).not.toBeUndefined('dep undefined');
+    expect(specObject.property.dep.mock).toBeFalsy('used Mock');
+  });
+
+
+  it('should allow a Generate Decorator with mocking Dependencies', () => {
+    @Injectable()
+    class Dependency {
+      public mock = false;
+    }
+
+    @Injectable()
+    class AClass {
+      public something = 'sth';
+      public dep;
+
+      constructor(dep: Dependency) {
+        this.dep = dep;
+      }
+    }
+
+    class ClassWithGenerateAndDepMock {
+      @Generate(AClass, [
+        {provide:Dependency, mock:{mock:true}}
+      ])
+      public property: any;
+    }
+
+    let specContainer = specRegistry.getSpecContainerByClassName('ClassWithGenerateAndDepMock');
+
+    expect(specContainer).not.toBeNull('SpecContainer not returned by Registry');
+    expect(specContainer).not.toBeUndefined('SpecContainer not returned by Registry');
+
+    let specObject = specContainer.getNewSpecObject(true);
+
+    expect(specObject.property).not.toBeUndefined();
+    expect(specObject.property).not.toBeNull();
+    expect(specObject.property instanceof AClass).toBeTruthy('not right Type');
+    expect(specObject.property.something).toEqual('sth', 'Property of Generated not set');
+
+    expect(specObject.property.dep).not.toBeUndefined('dep undefined');
+    expect(specObject.property.dep.mock).toBeTruthy('not used Mock');
+  });
+
+
 
 });
