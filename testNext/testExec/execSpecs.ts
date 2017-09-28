@@ -7,12 +7,14 @@ import {SpecExecChooser} from "../SpecRunning/specExecChooser/spec-exec-chooser"
 
 let args = process.argv.slice(2);
 let runMode = null;
+let mock = false;
 if (args[0] != null && args[0] != 'help') {
 //configure Run Mode from arguments
   runMode = config.runMode[args[0]];
 }
 
 if (runMode == null) {
+  console.log('<RunMode> <RunMode-argument> <mock?> <output-arguments>');
   let modeNames = [];
   for (let modeName in config.runMode)
     modeNames.push(modeName);
@@ -21,6 +23,7 @@ if (runMode == null) {
   modeNames.forEach((modeName) => {
     console.log('   ' + modeName + ': ' + config.runMode[modeName].heading);
   });
+  console.log('\n if you want to "mock" dependencies, add a: mock after the RunMode-Arguments');
   console.log('\n optionally modify the output with: ');
   for (let outputMod in config.outputParameters) {
     console.log('   ' + outputMod + ': ' + config.outputParameters[outputMod].description);
@@ -28,26 +31,33 @@ if (runMode == null) {
 
 } else
   try {
-    let additionalArguments = args.slice(1, 1 + runMode.additionalArgumentCount);
-
-    let argsOutput = args.slice(1 + runMode.additionalArgumentCount);
+    let outputArgs;
+    let runModeArguments = args.slice(1, 1 + runMode.additionalArgumentCount);
+    //look if should be mocked
+    if(args[runMode.additionalArgumentCount+1] == 'mock'){
+      mock = true;
+      //outputArgs are all after Runmode, RunMode-Arguments and mock-trigger
+      outputArgs = args.slice(2+runMode.additionalArgumentCount);
+    } else{
+      outputArgs = args.slice(1 + runMode.additionalArgumentCount);
+    }
 
     let reporter = new SpecReporter();
-    let argParser = new SpecExecArgumentParser(argsOutput);
+    let argParser = new SpecExecArgumentParser(outputArgs);
     let specRunOutput = new SpecReportOutputConsole(reporter);
     argParser.applyOnOutput(specRunOutput);
 
-    specRunOutput.setHeading(runMode.heading + ' ' + additionalArguments);
+    specRunOutput.setHeading(runMode.heading + ' ' + runModeArguments);
 
     //load specs into Registry
     let registry = SpecLoader.loadSpecs();
 
     //execute Method
-    SpecExecChooser[runMode.methodName](registry, reporter, ...additionalArguments);
+    SpecExecChooser[runMode.methodName](registry, reporter, ...runModeArguments, mock);
 
     specRunOutput.outputResult();
   } catch (error) {
-    console.error('\x1b[1;31m' + 'Error: ' + error + '\n' + error.stack +'\x1b[0m');
+    console.error('\x1b[1;31m' + 'Error: ' + error + '\n' + error.stack + '\x1b[0m');
   }
 
 

@@ -19,7 +19,7 @@ class CarDrives extends SpecWithSUT{
   public dirt = 0;
 
   @Given('I have ' + CarDrives.startFuel +'l of fuel',0) fuel10l() {
-    this.SUT.setFuel(CarDrives.startFuel);
+    this.SUT.setFuelSpace(CarDrives.startFuel);
   }
 
   @Given('I use 10l per 100km',1) fuelUsage10l() {

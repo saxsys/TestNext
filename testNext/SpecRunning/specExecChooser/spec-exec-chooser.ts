@@ -12,11 +12,10 @@ export class SpecExecChooser {
    * @param specRegistry containing the Specs to run
    * @param specReporter for the Results of the Run
    */
-  static execAllSpecs(specRegistry:SpecRegistry, specReporter: ISpecReporter) {
+  static execAllSpecs(specRegistry:SpecRegistry, specReporter: ISpecReporter, useMocks?:boolean){
     let specs = specRegistry.getAllSpecContainer();
-
     specs.forEach((spec) => {
-      SpecRunner.runSpec(spec, specReporter);
+      SpecRunner.runSpec(spec, specReporter, useMocks);
     });
   }
 
@@ -25,7 +24,7 @@ export class SpecExecChooser {
    * @param specRegistry containing the Specs to run
    * @param specReporter for the Results of the Run
    */
-  static execBySubjects(specRegistry:SpecRegistry, specReporter: ISpecReporter) {
+  static execAllSubjects(specRegistry:SpecRegistry, specReporter: ISpecReporter, useMocks?:boolean) {
     let subjects = specRegistry.getSubjects();
 
     //for each existing Subject
@@ -40,7 +39,7 @@ export class SpecExecChooser {
           specReporter.addReportToTopic(existSpecReport, subject)
         } else {
           //if spec is not already run, run it and add it to the subject-topic
-          let specRunner = SpecRunner.runSpec(spec, specReporter);
+          let specRunner = SpecRunner.runSpec(spec, specReporter, useMocks);
           specReporter.addReportToTopic(specRunner.report, subject);
         }
       });
@@ -50,7 +49,7 @@ export class SpecExecChooser {
     let specWithoutSubject = specRegistry.getSpecContainersWithoutSubject();
     if (specWithoutSubject.length > 0)
       specWithoutSubject.forEach((spec) => {
-        SpecRunner.runSpec(spec, specReporter);
+        SpecRunner.runSpec(spec, specReporter, useMocks);
       });
   }
 
@@ -60,14 +59,14 @@ export class SpecExecChooser {
    * @param specReporter for the Results of the Run
    * @param subject to run
    */
-  static execSubject(specRegistry: SpecRegistry, specReporter: ISpecReporter, subject: string) {
+  static execSubject(specRegistry: SpecRegistry, specReporter: ISpecReporter, subject: string, useMocks?:boolean) {
     let specs = specRegistry.getSpecContainersForSubject(subject);
     if (specs == null) {
       throw new Error('No Subject with Name "' + subject + '" found\n' +
         'we got: ' + specRegistry.getSubjects());
     }
     specs.forEach((spec) => {
-      let specRunner = SpecRunner.runSpec(spec, specReporter);
+      let specRunner = SpecRunner.runSpec(spec, specReporter, useMocks);
       specReporter.addReportToTopic(specRunner.report, subject);
     });
   }
@@ -78,14 +77,14 @@ export class SpecExecChooser {
    * @param specReporter for the Results of the Run
    * @param specClassName of the one Spec to run
    */
-  static execSpec(specRegistry: SpecRegistry, specReporter: ISpecReporter, specClassName: string) {
+  static execSpec(specRegistry: SpecRegistry, specReporter: ISpecReporter, specClassName: string, useMocks?:boolean) {
     let spec = specRegistry.getSpecContainerByClassName(specClassName);
     if (spec == null) {
       throw new Error('No SpecClasses with Name "' + specClassName + '" found\n' +
         'we got: ' + specRegistry.getSpecClassNames());
     }
 
-    SpecRunner.runSpec(spec, specReporter);
+    SpecRunner.runSpec(spec, specReporter, useMocks);
   }
 
 

@@ -453,7 +453,7 @@ export class SpecContainer implements ISpecContainer{
 
     this.getGeneratorOnProperties().forEach((generator)=>{
       let propName = generator.getPropertyName();
-      if(mock != null || mock == true) {
+      if(mock == true) {
         object[propName] = generator.generateWithMock();
       } else {
         object[propName] = generator.generateReal();

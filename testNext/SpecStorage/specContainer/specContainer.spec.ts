@@ -673,19 +673,6 @@ describe('SpecContainer.getCleanup', () => {
 });
 //Generator on Property
 describe('SpecContainer.addGeneratorOnProperty', ()=>{
-  class SpecContainer_GenerateProperty{
-    public prop;
-    public otherProp;
-  }
-  let specConstr = SpecContainer_GenerateProperty.prototype.constructor;
-  let genPropName = 'prop';
-  let genType = AThingToGenerate;
-  let genProviders = [{
-      provide:ADependency,
-      mock:{
-        mockDep:true
-      }
-    }];
 
   @Injectable()
   class ADependency{
@@ -700,6 +687,20 @@ describe('SpecContainer.addGeneratorOnProperty', ()=>{
       this.dep = dep;
     }
   }
+
+  class SpecContainer_GenerateProperty{
+    public prop;
+    public otherProp;
+  }
+  let specConstr = SpecContainer_GenerateProperty.prototype.constructor;
+  let genPropName = 'prop';
+  let genType = AThingToGenerate;
+  let genProviders = [{
+      provide:ADependency,
+      mock:{
+        mockDep:true
+      }
+    }];
 
   it('should add the Entry', ()=>{
     let specContainer = new SpecContainer(specConstr);
@@ -740,14 +741,17 @@ describe('SpecContainer.addGeneratorOnProperty', ()=>{
 });
 
 describe('SpecContainer.getGeneratorOnProperties', ()=>{
+
+  class TypeToGenerate{}
+  class OtherTypeToGenerate{}
+
   class SpecContainer_getGeneratorProp{
     public prop;
   }
 
   class SpecContainer_getGeneratorProp_Inherit extends  SpecContainer_getGeneratorProp {}
 
-  class TypeToGenerate{}
-  class OtherTypeToGenerate{}
+
 
   let constructor = SpecContainer_getGeneratorProp.prototype.constructor;
   let inheritConstructor = SpecContainer_getGeneratorProp_Inherit.prototype.constructor;

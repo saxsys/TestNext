@@ -11,7 +11,7 @@ import {Engine} from "../injectionTestfied/engine";
 class CarDrivesEnoughFuel extends SpecWithSUT{
 
   @Given('I have 50l of fuel',0) fuel50l() {
-    this.SUT.setFuel(50)
+    this.SUT.setFuelSpace(50)
   }
 
   @Given('I use 8l per 100km',1) fuelUsage8l() {

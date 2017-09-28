@@ -774,19 +774,11 @@ describe('SpecRegistry.setProviders', () => {
 });
 
 describe('SpecRegistry.registerGenerate', ()=> {
+
   class SpecContainer_GenerateProperty{
     public prop;
     public otherProp;
   }
-  let specConstr = SpecContainer_GenerateProperty.prototype.constructor;
-  let genPropName = 'prop';
-  let genType = AThingToGenerate;
-  let genProviders = [{
-    provide:ADependency,
-    mock:{
-      mockDep:true
-    }
-  }];
 
   @Injectable()
   class ADependency{
@@ -801,6 +793,18 @@ describe('SpecRegistry.registerGenerate', ()=> {
       this.dep = dep;
     }
   }
+
+  let specConstr = SpecContainer_GenerateProperty.prototype.constructor;
+  let genPropName = 'prop';
+  let genType = AThingToGenerate;
+  let genProviders = [{
+    provide:ADependency,
+    mock:{
+      mockDep:true
+    }
+  }];
+
+
 
   it('should register a Generate for existing Spec', () => {
     let specReg = new SpecRegistry();

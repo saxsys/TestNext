@@ -76,6 +76,35 @@ describe('SpecExecChooser.execAllSpecs', () => {
 
   });
 
+  it('should use real Implementation of Generated Dependencies by default', ()=>{
+    let registry = new SpecRegistry();
+    let specWithGenerate = ExampleRegistryFiller.addSpecWithGenerateTo(registry);
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execAllSpecs(registry, reporter);
+    let reports = reporter.getReports();
+    expect(reports.length).toBe(registry.getAllSpecContainer().length, 'number of reports differ from number of registered Specs');
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did not use Mock', 'did Use Mock');
+  });
+
+  it('should use Mock of Generated Dependencies, when given', ()=>{
+    let registry = new SpecRegistry();
+    let specWithGenerate = ExampleRegistryFiller.addSpecWithGenerateTo(registry);
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execAllSpecs(registry, reporter, true);
+    let reports = reporter.getReports();
+    expect(reports.length).toBe(registry.getAllSpecContainer().length, 'number of reports differ from number of registered Specs');
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did use Mock instead of Real', 'did not Use Mock');
+  });
 });
 
 describe('SpecExecChooser.runSpec', () => {
@@ -155,14 +184,47 @@ describe('SpecExecChooser.runSpec', () => {
     expect(topics.length).toBe(1, 'topics created which should not be');
     expect(topics[0]).toEqual(null, 'topic with Name created');
   })
+
+  it('should use real Implementation of Generated Dependencies by default', ()=>{
+    let registry = new SpecRegistry();
+    let specWithGenerate = ExampleRegistryFiller.addSpecWithGenerateTo(registry);
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execSpec(registry, reporter, specWithGenerate.getClassName());
+
+    let reports = reporter.getReports();
+    expect(reports.length).toBe(1, 'number of reports differ from number of registered Specs');
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did not use Mock', 'did Use Mock');
+  });
+
+  it('should use Mock of Generated Dependencies, when given', ()=>{
+    let registry = new SpecRegistry();
+    let specWithGenerate = ExampleRegistryFiller.addSpecWithGenerateTo(registry);
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execSpec(registry, reporter, specWithGenerate.getClassName(), true);
+
+    let reports = reporter.getReports();
+    expect(reports.length).toBe(registry.getAllSpecContainer().length, 'number of reports differ from number of registered Specs');
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did use Mock instead of Real', 'did not Use Mock');
+  });
 });
 
-describe('SpecExecChooser.execBySubject', () => {
+describe('SpecExecChooser.execSubject', () => {
   let registry = new SpecRegistry();
 
   let specWithSubject = ExampleRegistryFiller.addSpecWithSubjectsTo(registry);
   let standardSpec = ExampleRegistryFiller.addStandardSpecTo(registry);
   let specWithoutSubject = ExampleRegistryFiller.addSpecWithoutSubjectTo(registry);
+  let specWithGenerate = ExampleRegistryFiller.addSpecWithGenerateTo(registry);
 
   let subjectNameUsedOnce = 'SubjectNameUsedOnce';
   let subjectUsedMultipleTimes = 'SubjectUsedMultipleTimes';
@@ -171,13 +233,14 @@ describe('SpecExecChooser.execBySubject', () => {
     registry.registerSpecForSubject(specWithSubject.getClassConstructor(), subjectNameUsedOnce);
     registry.registerSpecForSubject(specWithSubject.getClassConstructor(), subjectUsedMultipleTimes);
     registry.registerSpecForSubject(standardSpec.getClassConstructor(), subjectUsedMultipleTimes);
+    registry.registerSpecForSubject(specWithGenerate.getClassConstructor(), subjectUsedMultipleTimes);
   });
 
   it('should throw an Error for non existent Subjects', () => {
     let reporter = new SpecReporter();
 
     expect(() => {
-      SpecExecChooser.execSubject(registry, reporter, 'NonExistentSubject');
+      SpecExecChooser. execSubject(registry, reporter, 'NonExistentSubject');
     }).toThrowError(
       new RegExp('No Subject with Name "NonExistentSubject" found\nwe got: *')
     );
@@ -207,24 +270,49 @@ describe('SpecExecChooser.execBySubject', () => {
 
     let reports = reporter.getReports();
 
-    expect(reports.length).toBeGreaterThanOrEqual(2);
+    expect(reports.length).toBeGreaterThanOrEqual(3);
 
     let topics = reporter.getTopics();
     expect(topics.length).toBe(1);
     expect(topics[0]).toEqual(subjectUsedMultipleTimes);
 
     let specsOfTopic = reporter.getReportsOfTopic(subjectUsedMultipleTimes);
-    expect(specsOfTopic.length).toBe(2);
+    expect(specsOfTopic.length).toBe(3);
   });
 
+  it('should use real Implementation of Generated Dependencies by default', ()=>{
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execSubject(registry, reporter, subjectUsedMultipleTimes);
+
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did not use Mock', 'did Use Mock');
+  });
+
+  it('should use Mock of Generated Dependencies, when given', ()=>{
+
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execSubject(registry, reporter, subjectUsedMultipleTimes, true);
+
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did use Mock instead of Real', 'did not Use Mock');
+  });
 });
 
-describe('SpecExecChooser.execBySubjects', () => {
+describe('SpecExecChooser.execAllSubjects', () => {
   let registry = new SpecRegistry();
 
   let specWithSubject = ExampleRegistryFiller.addSpecWithSubjectsTo(registry);
   let standardSpec = ExampleRegistryFiller.addStandardSpecTo(registry);
   let specWithoutSubject = ExampleRegistryFiller.addSpecWithoutSubjectTo(registry);
+  let specWithGenerate = ExampleRegistryFiller.addSpecWithGenerateTo(registry);
 
   let subjectNameUsedOnce = 'SubjectNameUsedOnce';
   let subjectUsedMultipleTimes = 'SubjectUsedMultipleTimes';
@@ -233,13 +321,14 @@ describe('SpecExecChooser.execBySubjects', () => {
     registry.registerSpecForSubject(specWithSubject.getClassConstructor(), subjectNameUsedOnce);
     registry.registerSpecForSubject(specWithSubject.getClassConstructor(), subjectUsedMultipleTimes);
     registry.registerSpecForSubject(standardSpec.getClassConstructor(), subjectUsedMultipleTimes);
+    registry.registerSpecForSubject(specWithGenerate.getClassConstructor(), subjectUsedMultipleTimes);
   });
 
   it('should accept an empty registry', () => {
     let registry = new SpecRegistry();
     let reporter = new SpecReporter();
     expect(() => {
-      SpecExecChooser.execBySubjects(registry, reporter);
+      SpecExecChooser.execAllSubjects(registry, reporter);
     }).not.toThrowError();
   });
 
@@ -267,7 +356,7 @@ describe('SpecExecChooser.execBySubjects', () => {
 
 
     let reporter = new SpecReporter();
-    SpecExecChooser.execBySubjects(registry, reporter);
+    SpecExecChooser.execAllSubjects(registry, reporter);
     let reports = reporter.getReports();
 
     expect(reports.length).toBe(1);
@@ -291,7 +380,7 @@ describe('SpecExecChooser.execBySubjects', () => {
 
   it('should report all topics', () => {
     let reporter = new SpecReporter();
-    SpecExecChooser.execBySubjects(registry, reporter);
+    SpecExecChooser.execAllSubjects(registry, reporter);
 
     let topics = reporter.getTopics();
     let topicsToContain = registry.getSubjects().concat([null]).sort();
@@ -302,7 +391,7 @@ describe('SpecExecChooser.execBySubjects', () => {
 
   it('should execute all specs with subject and report into their topics', () =>{
     let reporter = new SpecReporter();
-    SpecExecChooser.execBySubjects(registry, reporter);
+    SpecExecChooser.execAllSubjects(registry, reporter);
 
     registry.getSubjects().forEach(subject => {
       let specsNamesOfSubject = registry.getSpecContainersForSubject(subject).map((spec)=>{
@@ -318,7 +407,7 @@ describe('SpecExecChooser.execBySubjects', () => {
 
   it('should als execute Specs without Subject and save into topic "null"', () =>{
     let reporter = new SpecReporter();
-    SpecExecChooser.execBySubjects(registry, reporter);
+    SpecExecChooser.execAllSubjects(registry, reporter);
 
     let specWithoutSubject = registry.getSpecContainersWithoutSubject().map((spec)=>{
       return spec.getClassName();
@@ -329,4 +418,60 @@ describe('SpecExecChooser.execBySubjects', () => {
     });
     expect(specWithoutTopic.sort()).toEqual(specWithoutSubject.sort());
   });
+
+  it('should use real Implementation of Generated Dependencies by default, for Specs with Subject', ()=>{
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execAllSubjects(registry, reporter);
+
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did not use Mock', 'did Use Mock');
+  });
+
+  it('should use Mock of Generated Dependencies, when given, for Specs with Subject', ()=>{
+
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execAllSubjects(registry, reporter,true);
+
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did use Mock instead of Real', 'did not Use Mock');
+  });
+
+  it('should use real Implementation of Generated Dependencies by default for Specs without Subject', ()=>{
+    let registry = new SpecRegistry();
+    ExampleRegistryFiller.addSpecWithGenerateTo(registry);
+
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execAllSubjects(registry, reporter);
+
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did not use Mock', 'did Use Mock');
+  });
+
+  it('should use Mock of Generated Dependencies, when given, for Specs without Subject', ()=>{
+    let registry = new SpecRegistry();
+    ExampleRegistryFiller.addSpecWithGenerateTo(registry);
+
+    let reporter = new SpecReporter();
+
+    SpecExecChooser.execAllSubjects(registry, reporter,true);
+
+    let reportForGenerate = reporter.getReportForSpec(specWithGenerate.getClassName());
+    expect(reportForGenerate).not.toBeNull('For Generate not logged');
+    let failReports = reportForGenerate.getFailReports();
+    expect(failReports.length).toBe(1, 'not 1 Fail Report as expected');
+    expect(failReports[0].getDescription()).toEqual('did use Mock instead of Real', 'did not Use Mock');
+  });
+
 });

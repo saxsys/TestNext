@@ -15,12 +15,12 @@ export class SpecRegistry {
    * @param specClassConstructor Constructor of the SpecClass
    * @param specDescription Description of the Spec
    */
-  registerSpec(specClassConstructor: Function, specDescription: string) {
+  registerSpec(specClassConstructor: Function, specDescription: string):SpecContainer {
     let specClassName = specClassConstructor.name;
 
     let registryEntry = this.getOrRegisterSpecContainerForClass(specClassConstructor);
     registryEntry.setDescription(specDescription);
-
+    return registryEntry;
   }
 
   /**

@@ -52,7 +52,7 @@ export var config = {
     },
     AllSubjects:{
       heading:'Specs ordered by Subject',
-      methodName:'execBySubjects',
+      methodName:'execAllSubjects',
       additionalArgumentCount:0,
     },
     Subject:{

@@ -20,7 +20,7 @@ export class Car{
     this.fuel -= fuelUsage;
   }
 
-  setFuel(fuel:number){
+  setFuelSpace(fuel:number){
     this.fuel = fuel;
   }
 

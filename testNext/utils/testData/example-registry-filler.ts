@@ -1,6 +1,8 @@
 import {SpecRegistry} from "../../SpecStorage/specRegistry/spec-registry";
 import {SpecContainer} from "../../SpecStorage/specContainer/specContainer";
 import {Assert} from "../../SpecDeclaration/assert/assert";
+import {Injectable} from "@angular/core";
+import {Generate} from "../../SpecDeclaration/specDecorators/spec-decorators";
 
 export class ExampleRegistryFiller {
   static  addStandardSpecTo(specRegistry: SpecRegistry): SpecContainer {
@@ -308,5 +310,72 @@ export class ExampleRegistryFiller {
     return specRegistry.getSpecContainerByClassName('SpecWithoutSubjects');
   }
 
+  static addSpecWithGenerateTo(specRegistry: SpecRegistry):SpecContainer{
+    @Injectable()
+    class Dependency {
+      public mock = false;
+      public doneSth = false;
+    }
+
+    @Injectable()
+    class AClass {
+      public something = 'sth';
+      public dep;
+
+      constructor(dep: Dependency) {
+        this.dep = dep;
+      }
+
+      public doSomethingOnDependency(){
+        this.dep.doneSth = true;
+      }
+    }
+
+    let mockDependency = {
+      mock:true,
+      doneSth:false
+    };
+
+
+    class SpecWithGenerate {
+
+      public property: AClass;
+
+      public executed = [];
+
+      aGiven(){
+        this.executed.push('aGiven')}
+      aWhen(){
+        this.executed.push('aWhen');
+        this.property.doSomethingOnDependency();
+      }
+      aThen(){
+        this.executed.push('aThen');
+        Assert.that(this.property.dep.doneSth).equals(true);
+      }
+      thenUsedMock(){
+        Assert.that(this.property.dep.mock).equals(true);
+      }
+      thenUsedReal(){
+        Assert.that(this.property.dep.mock).equals(false);
+      }
+
+    }
+
+    let specConstructor = SpecWithGenerate.prototype.constructor;
+    let depProviders = [
+      {provide:Dependency, mock:mockDependency}
+    ];
+
+    let container = specRegistry.registerSpec(specConstructor, 'A Spec with a Generate');
+    specRegistry.registerGenerate(specConstructor, 'property', AClass, depProviders);
+    specRegistry.registerGivenForSpec(specConstructor, 'aGiven', 'A Given');
+    specRegistry.registerWhenForSpec(specConstructor, 'aWhen', 'Something is done on a Generated Value');
+    specRegistry.registerThenForSpec(specConstructor, 'aThen', 'it really should have been set');
+    specRegistry.registerThenForSpec(specConstructor, 'thenUsedMock', 'did not use Mock');
+    specRegistry.registerThenForSpec(specConstructor, 'thenUsedReal', 'did use Mock instead of Real');
+
+    return container;
+  }
 
 }
