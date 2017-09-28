@@ -13,6 +13,7 @@ import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
 import {SpecReporter} from "../specReporting/specReporter/spec-reporter";
 import {ExampleSpecFiller} from "../../utils/testData/example-spec-filler";
+import {SpecContainer} from "../../SpecStorage/specContainer/specContainer";
 
 describe('specRunner.constructor', () => {
   it('should init', () => {
@@ -469,7 +470,75 @@ describe('specRunner.runSpec', () => {
 
   });
 
-  it('should execute The Specs with Mocks', ()=>{
-    fail('not implemented');
-  })
+
+});
+
+describe('SpecRunner.runSpec with Generate',()=>{
+  class Spec {
+    public generatedProp;
+
+    public aGiven(){}
+    public aWhen(){}
+    public aThen(){}
+  }
+  let specClassConstructor = Spec.prototype.constructor;
+
+  @Injectable()
+  class SomeSUT {
+    dep: ADependency;
+
+    constructor(dep: ADependency) {
+      this.dep = dep;
+    }
+  }
+
+  @Injectable()
+  class ADependency{
+    isMock:false;
+  }
+
+  @Injectable()
+  class AThingToGenerate{
+    public dep;
+
+    constructor(dep:ADependency){
+      this.dep = dep;
+    }
+  }
+
+  let genProviders = [{
+    provide:ADependency,
+    mock:{
+      isMock:true
+    }
+  }];
+
+  let specContainer;
+  let reporter;
+  beforeEach(()=>{
+    specContainer = new SpecContainer(specClassConstructor);
+    specContainer.setDescription('SpecContainer a with Generate');
+    specContainer.addGiven('aGiven', 'A Given');
+    specContainer.addWhen('aWhen', 'A When');
+    specContainer.addThen('aThen', 'A Then');
+    specContainer.addGeneratorOnProperty('generatedProp', AThingToGenerate, genProviders);
+  });
+
+  it('should use generated Properties, not mocked by default', ()=>{
+    reporter = new SpecReporter();
+    let runner = SpecRunner.runSpec(specContainer, reporter);
+
+    expect(runner.report.getValidationErrors().length).toBe(0, 'errors existed: ' + runner.report.getValidationErrors().toString());
+    expect(runner.report.getMethodReports().length).toBe(3, 'wrong amount of Reports');
+    expect(runner.usedObject.generatedProp.dep.isMock).toBeFalsy('used Mock Object');
+  });
+
+  it('should use generated Properties, use Mocks, when given as Argument',()=>{
+    reporter = new SpecReporter();
+    let runner = SpecRunner.runSpec(specContainer, reporter, true);
+
+    expect(runner.report.getValidationErrors().length).toBe(0, 'errors existed: ' + runner.report.getValidationErrors().toString());
+    expect(runner.report.getMethodReports().length).toBe(3, 'wrong amount of Reports');
+    expect(runner.usedObject.generatedProp.dep.isMock).toBeTruthy('not used Mock Object');
+  });
 });

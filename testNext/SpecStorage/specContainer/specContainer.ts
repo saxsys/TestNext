@@ -99,6 +99,25 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
+   * Adds Infomration about Types which should be automatically generated on a Property
+   * @param {string} propertyName Pryperty on which the Generated Object should be stored
+   * @param typeToGenerate Class of which the Object should be generated
+   * @param {SpecGenerationProvider[]} providers Dependencies of the Object, Real Implementation and Mocks
+   */
+  addGeneratorOnProperty(propertyName:string, typeToGenerate:any, providers?:SpecGenerationProvider[]){
+
+    if(this.generatorsOnProperties.get(propertyName) != null)
+      throw new SpecRegistryError('Cannot Generate multiple times on one Property: '+this.getClassName()+'.'+propertyName, this.getClassName(), propertyName);
+
+    let generateProp = new SpecGeneratorOfProperty(this.getClassName(), propertyName);
+    generateProp.setTypeToGenerate(typeToGenerate);
+    if(providers) {
+      generateProp.addProviders(providers);
+    }
+    this.generatorsOnProperties.set(propertyName, generateProp);
+  }
+
+  /**
    * Mark a Spec as ignored, give a reason
    * @param reason why the specTypes should not be run
    */
@@ -106,6 +125,7 @@ export class SpecContainer implements ISpecContainer{
     this.ignored = true;
     this.ignoreReason = reason;
   }
+
 
   /**
    * Add a function that does the Setup for the Spec.
@@ -187,6 +207,8 @@ export class SpecContainer implements ISpecContainer{
     this.cleanup.addMethod(functionName, description, execNumber);
   }
 
+
+
   /**
    *
    * @returns a string with the description of the Spec.
@@ -235,6 +257,177 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
+   *
+   * @returns whether the Spec is marked as ignored.
+   */
+  isIgnored():boolean{
+    return this.ignored;
+  }
+
+  /**
+   *
+   * @returns whether the Spec should be executable, depending on the Spec-Description
+   */
+  isExecutableSpec():boolean{
+    if(this.specDescription == null)
+      return false;
+    return true;
+  }
+
+  /**
+   * @returns the set SUT
+   */
+  getSUT():Provider {
+    if(this.sut != null)
+      return this.sut;
+    else if(this.parent != null)
+      return this.parent.getSUT();
+    else
+      return null;
+
+  }
+
+  /**
+   *
+   * @returns the Array of classes set as providers
+   */
+  getProviders():Array<Provider>{
+    let providers = this.providers;
+
+    if(this.parent != null) {
+      providers = _.union(providers, this.parent.getProviders());
+    }
+
+
+    return providers;
+  }
+
+  /**
+   * returns Information about everything that should be generated on the Spec
+   * @return {Array<SpecGeneratorOfProperty>}
+   */
+  getGeneratorOnProperties():Array<SpecGeneratorOfProperty> {
+    let allGenerators = [].concat(Array.from(this.generatorsOnProperties.values()));
+
+
+
+    //get parent Properties
+    if (this.parent != null) {
+      this.parent.getGeneratorOnProperties().forEach((generator) => {
+        //add only when no other Generator on same Property is added on Child
+        if (this.generatorsOnProperties.get(generator.getPropertyName()) == null)
+          allGenerators.push(generator);
+      });
+    }
+    return allGenerators;
+
+  }
+
+  /**
+   * Returns all Information which are used to Generate an Object on the given Property
+   * @param {string} propertyName Property on which something should be generated
+   * @return {SpecGeneratorOfProperty} Generate-Information
+   */
+  getGeneratorOfProperty(propertyName:string):SpecGeneratorOfProperty{
+    let allGenerates = this.getGeneratorOnProperties();
+    return allGenerates.find((gen)=>{return gen.getPropertyName() == propertyName})
+  }
+
+  /**
+   * @returns whether in the When-Method an error is expected, depending whether a ThenThrow-Method is set
+   */
+  isExpectingErrors():boolean{
+    if(this.thenThrow != null)
+      return true;
+    return false;
+  }
+
+
+  /**
+   *
+   * @returns the Array of ISpecMethodContainer, containing the Given-Methods set in this Spec and inherited from a Parent-Spec
+   */
+  getGiven():Array<ISpecMethodContainer>{
+    let returnMethods = new Array<ISpecMethodContainer>();
+
+    if(this.parent != null) {
+      returnMethods = returnMethods.concat(this.parent.getGiven());
+    }
+    returnMethods = returnMethods.concat(this.given.getMethods());
+    return returnMethods;
+  }
+
+  /**
+   *
+   * @returns the ISpecMethodContainer, containing the When-Method,  set either in this Spec or inherited from a Parent-Spec
+   */
+  getWhen():ISpecMethodContainer{
+    if(this.when != null)
+      return this.when;
+    if(this.parent != null)
+      return this.parent.getWhen();
+    return null;
+  }
+
+  /**
+   *
+   * @returns the Array of ISpecMethodContainer, containing the Then-Methods set in this Spec and inherited from a Parent-Spec
+   */
+  getThen():Array<ISpecMethodContainer>{
+    let returnMethods = new Array<ISpecMethodContainer>();
+    if(this.parent != null)
+      returnMethods = returnMethods.concat(this.parent.getThen());
+    returnMethods = returnMethods.concat(this.then.getMethods());
+
+    return returnMethods;
+  }
+
+  /**
+   *
+   * @returns the ISpecMethodContainer, containing the ThenTrow-Method,  set either in this Spec or inherited from a Parent-Spec
+   */
+  getThenThrow():ISpecMethodContainer{
+    if(this.thenThrow != null)
+      return this.thenThrow;
+    if(this.parent != null)
+      return this.parent.getThenThrow();
+  }
+
+  /**
+   * @returns the Array of ISpecMethodContainer, containing the Cleanup-Methods set in this Spec and inherited from a Parent-Spec
+   */
+  getCleanup():Array<ISpecMethodContainer>{
+    let returnMethods = new Array<ISpecMethodContainer>();
+    if(this.parent != null)
+      returnMethods = returnMethods.concat(this.parent.getCleanup());
+    returnMethods = returnMethods.concat(this.cleanup.getMethods());
+
+    return returnMethods;
+  }
+
+  /**
+   * @param methodName
+   * @returns the ISpecMethodContainer for a Spec-Method with the methodName from this Spec (not inherited Methods)
+   */
+  getOwnMethod(methodName: string):ISpecMethodContainer{
+    let method;
+
+    if(this.when != null && this.when.getName() == methodName)
+      return this.when;
+
+    if(this.thenThrow != null && this.thenThrow.getName() == methodName)
+      return this.thenThrow;
+
+    method = this.given.getMethod(methodName);
+    if(method != null )
+      return method;
+
+    method = this.then.getMethod(methodName);
+    return method;
+  }
+
+
+  /**
    * Creates a new Object of the SpecClass, on which the Spec-Methods can be executed.
    * Creates and sets the SUT in the Object, if one is set or inherited.
    * @returns a new Object of the SpecClass.
@@ -269,247 +462,6 @@ export class SpecContainer implements ISpecContainer{
 
     return object;
   };
-
-  /**
-   *
-   * @returns whether the Spec is marked as ignored.
-   */
-  isIgnored():boolean{
-    return this.ignored;
-  }
-
-  /**
-   * @returns the set SUT
-   */
-  getSUT():Provider {
-    if(this.sut != null)
-      return this.sut;
-    else if(this.parent != null)
-      return this.parent.getSUT();
-    else
-      return null;
-
-  }
-
-  /**
-   *
-   * @returns the Array of classes set as providers
-   */
-  getProviders():Array<Provider>{
-    let providers = this.providers;
-
-    if(this.parent != null) {
-      providers = _.union(providers, this.parent.getProviders());
-    }
-
-
-    return providers;
-  }
-
-  /**
-   *
-   * @returns the Array of ISpecMethodContainer, containing the Given-Methods set in this Spec and inherited from a Parent-Spec
-   */
-  getGiven():Array<ISpecMethodContainer>{
-    let returnMethods = new Array<ISpecMethodContainer>();
-
-    if(this.parent != null) {
-      returnMethods = returnMethods.concat(this.parent.getGiven());
-    }
-    returnMethods = returnMethods.concat(this.getOwnGiven());
-    return returnMethods;
-  }
-
-  /**
-   *
-   * @returns the ISpecMethodContainer, containing the When-Method,  set either in this Spec or inherited from a Parent-Spec
-   */
-  getWhen():ISpecMethodContainer{
-    if(this.when != null)
-      return this.when;
-    if(this.parent != null)
-      return this.parent.getWhen();
-    return null;
-  }
-
-  /**
-   *
-   * @returns the Array of ISpecMethodContainer, containing the Then-Methods set in this Spec and inherited from a Parent-Spec
-   */
-  getThen():Array<ISpecMethodContainer>{
-    let returnMethods = new Array<ISpecMethodContainer>();
-    if(this.parent != null)
-      returnMethods = returnMethods.concat(this.parent.getThen());
-    returnMethods = returnMethods.concat(this.getOwnThen());
-
-    return returnMethods;
-  }
-
-  /**
-   *
-   * @returns the ISpecMethodContainer, containing the ThenTrow-Method,  set either in this Spec or inherited from a Parent-Spec
-   */
-  getThenThrow():ISpecMethodContainer{
-    if(this.thenThrow != null)
-      return this.thenThrow;
-    if(this.parent != null)
-      return this.parent.getThenThrow();
-  }
-
-  /**
-   * @returns the Array of ISpecMethodContainer, containing the Cleanup-Methods set in this Spec and inherited from a Parent-Spec
-   */
-  getCleanup():Array<ISpecMethodContainer>{
-    let returnMethods = new Array<ISpecMethodContainer>();
-    if(this.parent != null)
-      returnMethods = returnMethods.concat(this.parent.getCleanup());
-    returnMethods = returnMethods.concat(this.getOwnCleanup());
-
-    return returnMethods;
-  }
-
-  /**
-   *
-   * @returns whether the Spec should be executable, depending on the Spec-Description
-   */
-  isExecutableSpec():boolean{
-    if(this.specDescription == null)
-      return false;
-    return true;
-  }
-
-  /**
-   * @returns whether in the When-Method an error is expected, depending whether a ThenThrow-Method is set
-   */
-  isExpectingErrors():boolean{
-    if(this.thenThrow != null)
-      return true;
-    return false;
-  }
-
-  /**
-   * get Generators for Properties
-   * @return {Array<SpecGeneratorOfProperty>}
-   */
-  getGeneratorOnProperties():Array<SpecGeneratorOfProperty> {
-    let allGenerators = [].concat(Array.from(this.generatorsOnProperties.values()));
-
-
-
-    //get parent Properties
-    if (this.parent != null) {
-      this.parent.getGeneratorOnProperties().forEach((generator) => {
-        //add only when no other Generator on same Property is added on Child
-        if (this.generatorsOnProperties.get(generator.getPropertyName()) == null)
-          allGenerators.push(generator);
-      });
-    }
-    return allGenerators;
-
-  }
-
-  /**
-   * @param methodName
-   * @returns the ISpecMethodContainer for a Given-Method with the methodName from this Spec (not inherited Methods)
-   */
-  private getOwnGivenByName(methodName:string): ISpecMethodContainer{
-    return this.given.getMethod(methodName);
-  }
-  /**
-   * @param methodName
-   * @returns the ISpecMethodContainer for a Then-Method with the methodName from this Spec (not inherited Methods)
-   */
-  private getOwnThenByName(methodName:string): ISpecMethodContainer{
-    return this.then.getMethod(methodName);
-  }
-
-  /**
-   *
-   * @returns an Array of ISpecMethodContainer, for all Given-Methods from this Spec (not inherited Methods)
-   */
-  private getOwnGiven(): Array<ISpecMethodContainer> {
-    return this.given.getMethods();
-  }
-
-  /**
-   *
-   * @returns an ISpecMethodContainer, for the When-Method from this Spec (not inherited Methods)
-   */
-  private getOwnWhen(): ISpecMethodContainer {
-    return this.when;
-  }
-
-  /**
-   *
-   * @returns an Array of ISpecMethodContainer, for all Then-Methods from this Spec (not inherited Methods)
-   */
-  private getOwnThen(): Array<ISpecMethodContainer> {
-    return this.then.getMethods();
-  }
-
-  /**
-   *
-   * @returns an ISpecMethodContainer, for the ThenThrow-Method from this Spec (not inherited Methods)
-   */
-  private getOwnThenThrow():ISpecMethodContainer{
-    return this.thenThrow;
-  }
-
-  private getOwnCleanup():Array<ISpecMethodContainer> {
-    return this.cleanup.getMethods();
-  }
-
-  /**
-   *
-   * @returns an Array of ISpecMethodContainer, for all Spec-Method from this Spec (not inherited Methods)
-   */
-  private getOwnMethods():Array<ISpecMethodContainer>{
-    let methods = new Array<ISpecMethodContainer>();
-    methods = methods.concat(this.getOwnGiven());
-    methods.push(this.getOwnWhen());
-    methods = methods.concat(this.getOwnThen());
-    methods = methods.concat(this.getOwnThenThrow());
-    return methods;
-  }
-
-  /**
-   * @param methodName
-   * @returns the ISpecMethodContainer for a Spec-Method with the methodName from this Spec (not inherited Methods)
-   */
-  getOwnMethod(methodName: string):ISpecMethodContainer{
-    let method;
-
-    if(this.when != null && this.when.getName() == methodName)
-      return this.when;
-
-    if(this.thenThrow != null && this.thenThrow.getName() == methodName)
-      return this.thenThrow;
-
-    method = this.getOwnGivenByName(methodName);
-    if(method != null )
-      return method;
-
-    method = this.getOwnThenByName(methodName);
-    return method;
-  }
-
-  addGeneratorOnProperty(propertyName:string, typeToGenerate:any, providers?:SpecGenerationProvider[]){
-
-    if(this.generatorsOnProperties.get(propertyName) != null)
-      throw new SpecRegistryError('Cannot Generate multiple times on one Property: '+this.getClassName()+'.'+propertyName, this.getClassName(), propertyName);
-
-    let generateProp = new SpecGeneratorOfProperty(this.getClassName(), propertyName);
-    generateProp.setTypeToGenerate(typeToGenerate);
-    if(providers) {
-      generateProp.addProviders(providers);
-    }
-    this.generatorsOnProperties.set(propertyName, generateProp);
-  }
-
-  getGeneratorOfProperty(propertyName:string):SpecGeneratorOfProperty{
-    let allGenerates = this.getGeneratorOnProperties();
-    return allGenerates.find((gen)=>{return gen.getPropertyName() == propertyName})
-  }
 }
 
 

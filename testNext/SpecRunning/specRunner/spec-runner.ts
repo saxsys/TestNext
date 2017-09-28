@@ -46,7 +46,7 @@ export class SpecRunner {
    * @param specReporter to report the run-result
    * @return {SpecRunner} containing the results of the run
    */
-  static runSpec(specContainer:ISpecContainer, specReporter:ISpecReporter): SpecRunner{
+  static runSpec(specContainer:ISpecContainer, specReporter:ISpecReporter, useMock?: boolean): SpecRunner{
     let specReport = specReporter.getOrCreateSpecReport(specContainer);
     let specRunner = new SpecRunner(specContainer, specReport);
 
@@ -65,9 +65,10 @@ export class SpecRunner {
       return specRunner;
     }
 
-    specRunner.usedObject =  specContainer.getNewSpecObject();
 
-    specRunner.runAndLog()
+    specRunner.usedObject =  specContainer.getNewSpecObject(useMock);
+
+    specRunner.runAndLog();
 
     return specRunner;
   }

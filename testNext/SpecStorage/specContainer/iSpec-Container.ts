@@ -44,7 +44,7 @@ export interface ISpecContainer{
    * Creates and sets the SUT in the Object, if one is set or inherited.
    * @returns a new Object of the SpecClass.
    */
-  getNewSpecObject(): any;
+  getNewSpecObject(useMock?:boolean): any;
 
   /**
    * @returns the set SUT
