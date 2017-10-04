@@ -4,6 +4,10 @@
 /dist
 /tmp
 /out-tsc
+*.d.ts
+*.js.map
+src/**/*.js
+
 
 # dependencies
 /node_modules
@@ -40,3 +44,5 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+
