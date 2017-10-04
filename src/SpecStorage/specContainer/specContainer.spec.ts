@@ -759,7 +759,7 @@ describe('SpecContainer.getNewSpecObject', () => {
 
   it('should throw Error, if SpecClass has constructor-arguments', () => {
     class SpecContainer_NewObject_ClassWitArguments {
-      constructor() {
+      constructor(arg:number) {
       }
     }
     let specClassConstructor = SpecContainer_NewObject_ClassWitArguments.prototype.constructor;
