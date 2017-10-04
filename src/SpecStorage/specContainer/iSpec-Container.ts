@@ -47,17 +47,6 @@ export interface ISpecContainer{
   getNewSpecObject(useMock?:boolean): any;
 
   /**
-   * @returns the set SUT
-   */
-  getSUT():Provider;
-
-  /**
-   *
-   * @returns the Array of classes set as providers
-   */
-  getProviders():Array<Provider>;
-
-  /**
    * Gives Information about the Values to be generated on the Properties
    * @return {Array<SpecGeneratorOfProperty>}
    */

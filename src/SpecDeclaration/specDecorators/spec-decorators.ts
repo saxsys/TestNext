@@ -126,35 +126,13 @@ export function Ignore(reason: string) {
 }
 
 /**
- * Class-Decorator
- * Gives the Class which should be tested (System-under-Test).
- * An Instance of the Class will be created automatically, as long as all dependencies are given in @Providers()
- * Class gets registered so it can be inherited, but the SpecClass will not necessarily be executed.
- *
- * @param provider Class
- */
-export function SUT(provider:Provider){
-  return (constructor: Function) => {
-    specRegistry.registerSutForSpec(constructor, provider);
-  }
-}
-
-/**
- * Class-Decorator
- * Register Providers (Dependencies) of SUT.
- * Necessary if SUT has injected dependencies.
- * Class gets registered so it can be inherited, but the SpecClass will not necessarily be executed.
- *
- * @param providers Array of classes, necessary for instantiating the SUT
- * @return {(constructor:Function)=>undefined}
+ * Property-Decorator
+ * Marks a Property on which an Object should be generated automatically
+ * @param ofType Class of the Object to be generated
+ * @param {Array<SpecGenerationProvider>} withProviders Array of SpecGenerationProvider, containing Dependencies of the Class and optionally a mock
+ * @return {(target: any, key: string) => any}
  * @constructor
  */
-export function Providers(providers:Provider[]){
-  return (constructor: Function) => {
-    specRegistry.registerProvidersForSpec(constructor, providers);
-  }
-}
-
 export function Generate(ofType:any, withProviders?:Array<SpecGenerationProvider>){
   return (target: any, key: string) => {
     let constructor = target.constructor;

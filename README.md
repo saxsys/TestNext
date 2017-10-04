@@ -89,13 +89,6 @@ Example
   * the execution-numbers only refer to the methods inside the SpecClass (so parent and child separated)
 * Careful when inheriting:
   * overriding methods by their name can cause trouble
-  
-#### SUT
-* The SUT (System under Test) can be created automatically
-  * Use the Decorator `@SUT(ClassToTest)` as Decorator for the SpecClass
-  * Give all dependencies in `@Providers([DependencyClass, OtherDependencyClass])`
-  * extend the Class `SpecWithSUT` (or declare an own public field SUT)
-* use the SUT in the SpecClass by calling `this.SUT`
 
 #### Generate
 * It is possible to generate an object of a type on a class-Property

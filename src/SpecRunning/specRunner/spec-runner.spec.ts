@@ -1,15 +1,9 @@
-import {
-  Cleanup,
-  Given, Ignore, Providers, Spec, SUT, Then, ThenThrow,
-  When
-} from "../../SpecDeclaration/specDecorators/spec-decorators";
+import {Cleanup,  Given, Ignore, Spec, Then, ThenThrow, When} from "../../SpecDeclaration/specDecorators/spec-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {SpecRunner} from "./spec-runner";
 import {SpecValidationError} from "../specValidator/spec-validation-error";
 import {AssertionError} from "../../SpecDeclaration/assert/assertion-Error";
 import {AssertProportion} from "../../SpecDeclaration/assert/assert-proportion";
-import {SpecWithSUT} from "../../SpecDeclaration/specTypes/spec-with-sut";
-import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
 import {SpecReporter} from "../specReporting/specReporter/spec-reporter";
 import {ExampleSpecFiller} from "../../utils/testData/example-spec-filler";
@@ -165,30 +159,6 @@ describe('specRunner.runSpec', () => {
   });
 
 
-  xit('should stop executing the test, if an error is thrown (which is not an AssertionError/ValidationError/expected', () => {
-
-    @Spec('a test with Error')
-    class SpecRunner_runSpec_WithRandomError {
-      @Given('given')given() {
-        throw randomError;
-      }
-
-      @When('when') when() {
-      }
-
-      @Then('then') then() {
-      }
-    }
-    let specClassName = 'SpecRunner_runSpec_WithRandomError';
-    let specEntry = specRegistry.getSpecContainerByClassName(specClassName);
-
-
-    expect(() => {
-      SpecRunner.runSpec(specEntry, specReporter);
-    }).toThrow(randomError);
-
-  });
-
   it('should be allowed to run a test multiple times, with different reporters', () => {
     let newSpecReporter = new SpecReporter();
     let specRunner = SpecRunner.runSpec(specEntry, newSpecReporter);
@@ -242,95 +212,6 @@ describe('specRunner.runSpec', () => {
 
     let specRunner = SpecRunner.runSpec(spec, specReporter);
     expect(specRunner.report.getValidationErrors().length).toBe(0, 'tried to build ignored Spec');
-
-  });
-
-  it('should build the SUT not having dependencies', () => {
-
-    class SpecRunner_runSpec_SutNoDependencies_SUT {
-      public firstNumber: number;
-      public secondNumber = 2;
-      public result;
-    }
-
-    @Spec('SpecRunner runSpec SUT no dependencies')
-      @SUT(SpecRunner_runSpec_SutNoDependencies_SUT)
-    class SpecRunner_runSpec_SutNoDependencies_Spec extends SpecWithSUT {
-      @Given('first Number is set to 1') setSutFirstNumber() {
-        this.SUT.firstNumber = 1;
-      }
-
-      @When('firstNumber is added with 2nd Number') resultIsFirstAddSecond() {
-        this.SUT.result = this.SUT.firstNumber + this.SUT.secondNumber;
-      }
-
-      @Then('result should be 3') resultIs3() {
-        Assert.that(this.SUT.result).equals(3);
-      }
-    }
-    let specClassName = 'SpecRunner_runSpec_SutNoDependencies_Spec';
-
-    let specContainer = specRegistry.getSpecContainerByClassName(specClassName);
-
-    let specRunner = SpecRunner.runSpec(specContainer, specReporter);
-    let obj = specRunner.usedObject;
-
-    expect(obj.SUT).not.toBeUndefined();
-    expect(obj.SUT instanceof SpecRunner_runSpec_SutNoDependencies_SUT).toBeTruthy();
-    expect(obj.SUT.firstNumber).toBe(1);
-    expect(obj.SUT.result).toBe(3);
-  });
-
-  it('should build the SUT having dependencies, providers given', () => {
-
-
-    class SpecRunner_runSpec_SutWithDependency_Provider{
-      getNumber():number{
-        return 1;
-      }
-    }
-
-    @Injectable()
-    class SpecRunner_runSpec_SutWithDependencies_SUT {
-      constructor(numberProvider:SpecRunner_runSpec_SutWithDependency_Provider){
-        this.firstNumber = numberProvider.getNumber()
-      }
-
-      public firstNumber: number;
-      public secondNumber = 2;
-      public result;
-    }
-
-    @Spec('SpecRunner runSpec SUT')
-      @SUT(SpecRunner_runSpec_SutWithDependencies_SUT)
-      @Providers([SpecRunner_runSpec_SutWithDependency_Provider])
-    class SpecRunner_runSpec_SutWithDependencies_Spec extends SpecWithSUT {
-      @Given('first Number is set to 1') setSutFirstNumber() {
-        this.SUT.firstNumber = 1;
-      }
-
-      @When('firstNumber is added with 2nd Number') resultIsFirstAddSecond() {
-        this.SUT.result = this.SUT.firstNumber + this.SUT.secondNumber;
-      }
-
-      @Then('result should be 3') resultIs3() {
-        Assert.that(this.SUT.result).equals(3);
-      }
-    }
-    let specClassName = 'SpecRunner_runSpec_SutWithDependencies_Spec';
-
-    let specContainer = specRegistry.getSpecContainerByClassName(specClassName);
-
-    let specRunner = SpecRunner.runSpec(specContainer, specReporter);
-    let obj = specRunner.usedObject;
-
-    expect(obj.SUT).not.toBeUndefined();
-    expect(obj.SUT instanceof SpecRunner_runSpec_SutWithDependencies_SUT).toBeTruthy();
-    expect(obj.SUT.firstNumber).toBe(1);
-    expect(obj.SUT.result).toBe(3);
-
-
-
 
   });
 

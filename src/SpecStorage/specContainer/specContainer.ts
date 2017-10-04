@@ -6,7 +6,6 @@ import {SpecMethodContainer} from "./specMethodContainer/spec-method-container";
 import {SpecMethodType} from "./specMethodContainer/spec-method-type";
 
 import {SpecRegistryError} from "../spec-registry-error";
-import * as _ from "underscore";
 import {SpecMethodList} from "./specMethodList/spec-method-list";
 import {SpecGenerationProvider} from "./SpecGenerate/SpecGenerateProvider";
 import {SpecGeneratorOfProperty} from "./SpecGenerate/SpecGenerate";
@@ -18,13 +17,11 @@ export class SpecContainer implements ISpecContainer{
 
   private specClassConstructor: any;
   private specDescription: string;
-  private subjects = new Array<string>();
+  private subjects = [];
   private ignored: boolean = false;
   private ignoreReason: string = '';
 
   private parent: ISpecContainer;
-  private sut:Provider;
-  private providers =  new Array<Provider>();
   private generatorsOnProperties = new Map<string, SpecGeneratorOfProperty>();
   //private given = new Map<number, SpecMethodContainer>(); // exec-Number, MethodName
   private given:SpecMethodList;
@@ -63,39 +60,12 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
-   * Sets the SUT-Class (System under Test), it will be set in the Spec-Class as "this.SUT".
-   * The SUT will be created via ReflectiveInjector, all other injected dependencies necessary for it, must be set via "addProviders".
-   * @param sut SUT-Class as Provider, the Class directly
-   */
-  setSUT(sut:Provider){
-    if(this.sut != null)
-      throw new SpecRegistryError('Multiple @SUT on SpecWithSUT "' + this.getClassName() + '", only one is possible', this.getClassName());
-
-    if(!this.providers.includes(sut))
-      this.providers.push(sut);
-
-    this.sut = sut;
-
-
-  }
-
-  /**
    * Add a Subject of the Spec, multiple can be saved.
    * @param subject
    */
   addSubject(subject:string){
     if(!this.subjects.includes(subject))
       this.subjects.push(subject);
-  }
-
-  /**
-   * Providers for automated SUT creation are added.
-   * Make sure providing classes are decorated with '@Injectable()' if necessary.
-   * @param newProviders Array of Providers for SUT (use the Class directly)
-   */
-  addProviders(newProviders: Array<Provider>) {
-    this.providers = _.union(newProviders, this.providers);
-
   }
 
   /**
@@ -275,34 +245,6 @@ export class SpecContainer implements ISpecContainer{
   }
 
   /**
-   * @returns the set SUT
-   */
-  getSUT():Provider {
-    if(this.sut != null)
-      return this.sut;
-    else if(this.parent != null)
-      return this.parent.getSUT();
-    else
-      return null;
-
-  }
-
-  /**
-   *
-   * @returns the Array of classes set as providers
-   */
-  getProviders():Array<Provider>{
-    let providers = this.providers;
-
-    if(this.parent != null) {
-      providers = _.union(providers, this.parent.getProviders());
-    }
-
-
-    return providers;
-  }
-
-  /**
    * returns Information about everything that should be generated on the Spec
    * @return {Array<SpecGeneratorOfProperty>}
    */
@@ -439,17 +381,6 @@ export class SpecContainer implements ISpecContainer{
       throw new SpecRegistryError('Class of "' + this.getClassName() + '" has constructor-arguments, this is forbidden', this.getClassName());
 
     let object =  new this.specClassConstructor;
-
-    try {
-      let sut = this.getSUT();
-      if (sut != null) {
-        let injector = ReflectiveInjector.resolveAndCreate(this.getProviders());
-        object['SUT'] = injector.get(sut);
-      }
-    } catch(error){
-      throw new SpecRegistryError(error.message, this.getClassName());
-    }
-
 
     this.getGeneratorOnProperties().forEach((generator)=>{
       let propName = generator.getPropertyName();

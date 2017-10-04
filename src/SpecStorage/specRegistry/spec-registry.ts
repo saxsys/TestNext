@@ -124,28 +124,6 @@ export class SpecRegistry {
     spec.setIgnored(reason);
   }
 
-  /**
-   * Registers a Class as SUT in the SpecContainer
-   * Registers a SpecContainer for the Spec, if not existing, but not marks it as executable
-   *
-   * @param specClassConstructor Constructor of the SpecClass
-   * @param sut
-   */
-  registerSutForSpec(specClassConstructor: Function, sut: Provider) {
-    let spec = this.getOrRegisterSpecContainerForClass(specClassConstructor);
-    spec.setSUT(sut);
-  };
-
-  /**
-   * Register Providers of SUT in the SpecContainer.
-   * @param specClassConstructor Constructor of the SpecClass
-   * @param providers
-   */
-  registerProvidersForSpec(specClassConstructor: Function, providers: Array<Provider>) {
-    let spec = this.getOrRegisterSpecContainerForClass(specClassConstructor);
-    spec.addProviders(providers);
-  }
-
 
   /**
    * @return {string[]} with all the names of all SpecClasses in this registry

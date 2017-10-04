@@ -5,7 +5,6 @@ import {SpecContainer} from "./specContainer";
 import {SpecRegistryError} from "../spec-registry-error";
 import {Injectable} from "@angular/core";
 import {SpecMethodContainer} from "./specMethodContainer/spec-method-container";
-import {debugOutputAstAsTypeScript} from "@angular/compiler";
 
 class SpecContainer_ExampleSpecClass {
 
@@ -38,85 +37,6 @@ describe('SpecContainer', () => {
     expect(specContainer.getDescription()).toEqual(specDescription);
     expect(specContainer.getClassConstructor()).toEqual(specClassConstructor);
   });
-});
-
-describe('SpecContainer.setSUT', () => {
-  class SpecContainer_setSUT {
-  }
-  let specClassConstructor = SpecContainer_setSUT.prototype.constructor;
-  class SomeSUT {
-  }
-  let SUT = SomeSUT;
-  let specContainer = new SpecContainer(specClassConstructor);
-
-  it('should be possible to set the SUT', () => {
-    specContainer.setSUT(SUT);
-
-    let retSut = specContainer.getSUT();
-
-    expect(retSut).toEqual(SUT);
-  });
-
-  it('should have added SUT to Providers', () => {
-    expect(specContainer.getProviders()).toContain(SUT);
-  });
-
-
-  it('should refuse adding multiple SUT', () => {
-    class OtherSUT {
-    }
-    let otherSUT = OtherSUT;
-
-    let specContainer = new SpecContainer(specClassConstructor);
-    specContainer.setSUT(SUT);
-
-
-    expect(() => {
-      specContainer.setSUT(otherSUT);
-    }).toThrowError(
-      SpecRegistryError,
-      'Multiple @SUT on SpecWithSUT "SpecContainer_setSUT", only one is possible'
-    );
-  })
-});
-
-describe('SpecContainer.setProviders', () => {
-  class SpecContainer_setProviders {
-  }
-  let specClassConstructor = SpecContainer_setProviders.prototype.constructor;
-  class OneProvider {
-  }
-  class AnotherProvider {
-  }
-  let providers = [OneProvider, AnotherProvider];
-
-  it('should be possible to set the Provider', () => {
-    let specContainer = new SpecContainer(specClassConstructor);
-    specContainer.addProviders(providers);
-
-    let retProviders = specContainer.getProviders();
-
-    expect(retProviders).toEqual(providers);
-  });
-
-  it('should add providers with union', () => {
-    class ThirdProvider {
-    }
-    let otherProviders = [AnotherProvider, ThirdProvider];
-    let specContainer = new SpecContainer(specClassConstructor);
-
-    specContainer.addProviders(providers);
-    specContainer.addProviders(otherProviders);
-
-    let retProviders = specContainer.getProviders();
-
-    expect(retProviders.length).toBe(3);
-    expect(retProviders).toContain(OneProvider);
-    expect(retProviders).toContain(AnotherProvider);
-    expect(retProviders).toContain(ThirdProvider);
-
-
-  })
 });
 
 //Steps
@@ -806,19 +726,6 @@ describe('SpecContainer.getNewSpecObject', () => {
   }
   let specClassConstructor = SpecContainer_SpecObject.prototype.constructor;
 
-  class SutDependency {
-    public str = 'abc'
-  }
-
-  @Injectable()
-  class SomeSUT {
-    dep: SutDependency;
-
-    constructor(dep: SutDependency) {
-      this.dep = dep;
-    }
-  }
-
   @Injectable()
   class ADependency{
     mock:false;
@@ -833,8 +740,6 @@ describe('SpecContainer.getNewSpecObject', () => {
     }
   }
 
-  let SUT = SomeSUT;
-  let provider = SutDependency;
   let genProviders = [{
     provide:ADependency,
     mock:{
@@ -844,24 +749,17 @@ describe('SpecContainer.getNewSpecObject', () => {
 
   it('it should return a valid Object of the Class', () => {
     let specContainer = new SpecContainer(specClassConstructor);
-    specContainer.setDescription('SpecContainer a new Spec wit SUT');
-    specContainer.setSUT(SUT);
-    specContainer.addProviders([provider]);
+    specContainer.setDescription('SpecContainer a new Spec');
 
     let specObject;
     expect(() => {
       specObject = specContainer.getNewSpecObject();
     }).not.toThrowError();
-
-    expect(specObject.SUT).not.toBeUndefined();
-    expect(specObject.SUT instanceof SUT).toBeTruthy();
-
-
   });
 
   it('should throw Error, if SpecClass has constructor-arguments', () => {
     class SpecContainer_NewObject_ClassWitArguments {
-      constructor(num: number) {
+      constructor() {
       }
     }
     let specClassConstructor = SpecContainer_NewObject_ClassWitArguments.prototype.constructor;
@@ -876,46 +774,6 @@ describe('SpecContainer.getNewSpecObject', () => {
     );
   });
 
-  it('should throw Error, if not possible to build SUT, due to missing right Providers', () => {
-    let specContainer = new SpecContainer(specClassConstructor);
-    specContainer.setDescription('SpecContainer a new Spec wit SUT');
-    specContainer.setSUT(SUT);
-
-    expect(() => {
-      specContainer.getNewSpecObject();
-    }).toThrowError(
-      SpecRegistryError
-    );
-  });
-
-  it('should have an accessible SUT', () => {
-    let specContainer = new SpecContainer(specClassConstructor);
-    specContainer.setDescription('SpecContainer a new Spec wit SUT');
-    specContainer.setSUT(SUT);
-    specContainer.addProviders([SutDependency]);
-
-    let specObj = specContainer.getNewSpecObject();
-
-    expect(specObj).not.toBeNull();
-    expect(specObj.SUT).not.toBeUndefined();
-    expect(specObj.SUT.dep).not.toBeUndefined();
-    expect(specObj.SUT.dep.str).toEqual('abc');
-
-  });
-
-  it('should use the SUT of the Parent, if no own is set', () => {
-    let parentContainer = new SpecContainer(parentSpecClassConstructor);
-    parentContainer.setSUT(SUT);
-    parentContainer.addProviders([SutDependency]);
-    let childSpecContainer = new SpecContainer(specClassConstructor, parentContainer);
-
-    let childSpecObj = childSpecContainer.getNewSpecObject();
-    expect(childSpecObj).not.toBeNull();
-    expect(childSpecObj.SUT).not.toBeUndefined();
-    expect(childSpecObj.SUT.dep).not.toBeUndefined();
-    expect(childSpecObj.SUT.dep.str).toEqual('abc');
-
-  });
 
   it('should generate the Properties which should be generated, not mocked by default', ()=>{
     let specContainer = new SpecContainer(specClassConstructor);

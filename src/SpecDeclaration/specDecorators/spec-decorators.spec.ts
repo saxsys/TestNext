@@ -1,5 +1,5 @@
 import {
-  Cleanup, Generate, Given, Ignore, Providers, Spec, Subject, SUT, Then, ThenThrow,
+  Cleanup, Generate, Given, Ignore, Spec, Subject, Then, ThenThrow,
   When
 } from "./spec-decorators";
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
@@ -709,57 +709,6 @@ describe('TestDecorators.Ignore', () => {
 
 });
 
-describe('TestDecorators.SUT', () => {
-
-  class TestDecorators_SUT_SUT {
-  }
-
-  @Spec('TestDecorators SUT')
-  @SUT(TestDecorators_SUT_SUT)
-  class TestDecorators_SUT_Spec {
-
-  }
-
-  let specClassName = 'TestDecorators_SUT_Spec';
-
-  let specContainer = specRegistry.getSpecContainerByClassName(specClassName);
-
-  it('should register SUT for Spec', () => {
-    expect(specContainer.getSUT()).toEqual(TestDecorators_SUT_SUT);
-  });
-});
-
-describe('TestDecorators.Providers', () => {
-
-  class TestDecorators_Providers_Provider1 {
-  }
-
-  class TestDecorators_Providers_Provider2 {
-  }
-
-  class TestDecorators_Providers_Provider3 {
-  }
-
-
-  @Spec('TestDecorators Providers')
-  @Providers([TestDecorators_Providers_Provider1, TestDecorators_Providers_Provider2])
-  @Providers([TestDecorators_Providers_Provider3])
-  class TestDecorators_Providers_Spec {
-
-  }
-
-  let specClassName = 'TestDecorators_Providers_Spec';
-
-  let specContainer = specRegistry.getSpecContainerByClassName(specClassName);
-
-  it('should register Providers for Spec', () => {
-    expect(specContainer.getProviders().length).toBe(3);
-    expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider1);
-    expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider2);
-    expect(specContainer.getProviders()).toContain(TestDecorators_Providers_Provider3);
-  })
-});
-
 
 describe('TestDecorators.parentSpec', () => {
   class TestDecorators_ParentSpec_ParentSpecClass {
@@ -810,7 +759,7 @@ describe('TestDecorators.parentSpec', () => {
 
 });
 
-describe('TestDecorators - Mocking', () => {
+describe('TestDecorators.Generate', () => {
 
   it('should allow a Generate Decorator without Dependencies', () => {
 
