@@ -389,7 +389,7 @@ describe('SpecRunner.runSpec with Generate',()=>{
 
   let genProviders = [{
     provide:ADependency,
-    mock:{
+    mockObject:{
       isMock:true
     }
   }];

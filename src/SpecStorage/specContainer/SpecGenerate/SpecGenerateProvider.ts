@@ -1,4 +1,7 @@
-export interface SpecGenerationProvider{
+export interface SpecGenerateProvider{
   provide:any;
-  mock?:any;
+  useClass?:any;
+  useObject?:any;
+  mockClass?:any;
+  mockObject?:any;
 }

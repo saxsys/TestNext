@@ -364,7 +364,7 @@ export class ExampleRegistryFiller {
 
     let specConstructor = SpecWithGenerate.prototype.constructor;
     let depProviders = [
-      {provide:Dependency, mock:mockDependency}
+      {provide:Dependency, mockObject:mockDependency}
     ];
 
     let container = specRegistry.registerSpec(specConstructor, 'A Spec with a Generate');

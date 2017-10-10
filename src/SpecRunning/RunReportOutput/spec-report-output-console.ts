@@ -319,7 +319,6 @@ export class SpecReportOutputConsole implements ISpecReportOutput {
     console.log(style.invalid + 'invalid:        ' + stat.invalid + '/' + stat.count + command.resetStyle);
     console.log(style.notExecuted + 'ignored:        ' + stat.ignored + '/' + stat.count + command.resetStyle);
     console.log(style.notExecuted + 'not Executable: ' + stat.notExecutable + '/' + stat.count + command.resetStyle);
-    console.log(stat.count +' SpecClasses and ' + stat.topics + ' defined Subjects');
   }
 
   /**

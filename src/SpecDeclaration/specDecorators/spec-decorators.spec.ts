@@ -803,7 +803,7 @@ describe('TestDecorators.Generate', () => {
 
     class ClassWithGenerateAndDep {
       @Generate(AClass, [
-          {provide:Dependency, mock:{mock:true}}
+          {provide:Dependency, mockObject:{mock:true}}
       ])
       public property: any;
     }
@@ -843,7 +843,7 @@ describe('TestDecorators.Generate', () => {
 
     class ClassWithGenerateAndDepMock {
       @Generate(AClass, [
-        {provide:Dependency, mock:{mock:true}}
+        {provide:Dependency, mockObject:{mock:true}}
       ])
       public property: any;
     }

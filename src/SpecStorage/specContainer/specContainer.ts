@@ -7,7 +7,7 @@ import {SpecMethodType} from "./specMethodContainer/spec-method-type";
 
 import {SpecRegistryError} from "../spec-registry-error";
 import {SpecMethodList} from "./specMethodList/spec-method-list";
-import {SpecGenerationProvider} from "./SpecGenerate/SpecGenerateProvider";
+import {SpecGenerateProvider} from "./SpecGenerate/SpecGenerateProvider";
 import {SpecGeneratorOfProperty} from "./SpecGenerate/SpecGenerate";
 
 /**
@@ -72,9 +72,9 @@ export class SpecContainer implements ISpecContainer{
    * Adds Infomration about Types which should be automatically generated on a Property
    * @param {string} propertyName Pryperty on which the Generated Object should be stored
    * @param typeToGenerate Class of which the Object should be generated
-   * @param {SpecGenerationProvider[]} providers Dependencies of the Object, Real Implementation and Mocks
+   * @param {SpecGenerateProvider[]} providers Dependencies of the Object, Real Implementation and Mocks
    */
-  addGeneratorOnProperty(propertyName:string, typeToGenerate:any, providers?:SpecGenerationProvider[]){
+  addGeneratorOnProperty(propertyName:string, typeToGenerate:any, providers?:SpecGenerateProvider[]){
 
     if(this.generatorsOnProperties.get(propertyName) != null)
       throw new SpecRegistryError('Cannot Generate multiple times on one Property: '+this.getClassName()+'.'+propertyName, this.getClassName(), propertyName);

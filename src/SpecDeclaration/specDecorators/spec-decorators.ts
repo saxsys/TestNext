@@ -1,6 +1,6 @@
 import {specRegistry} from "../../SpecStorage/specRegistry/spec-registry-storage";
 import {Provider} from "@angular/core";
-import {SpecGenerationProvider} from "../../SpecStorage/specContainer/SpecGenerate/SpecGenerateProvider";
+import {SpecGenerateProvider} from "../../SpecStorage/specContainer/SpecGenerate/SpecGenerateProvider";
 
 /**
  * Class-Decorator
@@ -129,11 +129,11 @@ export function Ignore(reason: string) {
  * Property-Decorator
  * Marks a Property on which an Object should be generated automatically
  * @param ofType Class of the Object to be generated
- * @param {Array<SpecGenerationProvider>} withProviders Array of SpecGenerationProvider, containing Dependencies of the Class and optionally a mock
+ * @param {Array<SpecGenerateProvider>} withProviders Array of SpecGenerateProvider, containing Dependencies of the Class and optionally a mock
  * @return {(target: any, key: string) => any}
  * @constructor
  */
-export function Generate(ofType:any, withProviders?:Array<SpecGenerationProvider>){
+export function Generate(ofType:any, withProviders?:Array<SpecGenerateProvider>){
   return (target: any, key: string) => {
     let constructor = target.constructor;
     specRegistry.registerGenerate(constructor, key, ofType, withProviders);

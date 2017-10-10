@@ -617,7 +617,7 @@ describe('SpecContainer.addGeneratorOnProperty', ()=>{
   let genType = AThingToGenerate;
   let genProviders = [{
       provide:ADependency,
-      mock:{
+      mockObject:{
         mockDep:true
       }
     }];
@@ -742,7 +742,7 @@ describe('SpecContainer.getNewSpecObject', () => {
 
   let genProviders = [{
     provide:ADependency,
-    mock:{
+    mockObject:{
       mock:true
     }
   }];

@@ -1,12 +1,13 @@
 import {Provider, ReflectiveInjector, Type} from "@angular/core";
 import {SpecRegistryError} from "../../spec-registry-error";
-import {SpecGenerationProvider} from "./SpecGenerateProvider";
+import {SpecGenerateProvider} from "./SpecGenerateProvider";
+import {log} from "util";
 
 export class SpecGeneratorOfProperty {
   private specClassName: string;
   private propertyName: string;
   private typeToGenerate: Provider;
-  private providers: Map<string, SpecGenerationProvider> = new Map<string, SpecGenerationProvider>();
+  private providers: Map<string, SpecGenerateProvider> = new Map<string, SpecGenerateProvider>();
 
   constructor(specClassName: string, propertyName: string) {
     this.specClassName = specClassName;
@@ -19,8 +20,8 @@ export class SpecGeneratorOfProperty {
     this.typeToGenerate = typeToGenerate;
   }
 
-  addProviders(providers: Array<SpecGenerationProvider>) {
-    providers.forEach((prov: SpecGenerationProvider) => {
+  addProviders(providers: Array<SpecGenerateProvider>) {
+    providers.forEach((prov: SpecGenerateProvider) => {
       if (this.providers.get(prov.provide) != null)
         return;
 
@@ -28,14 +29,15 @@ export class SpecGeneratorOfProperty {
     });
   }
 
-  getPropertyName():string{
+  getPropertyName(): string {
     return this.propertyName;
   }
+
   getTypeToGenerate(): Provider {
     return this.typeToGenerate;
   }
 
-  getDependencies(): Array<SpecGenerationProvider> {
+  getDependencies(): Array<SpecGenerateProvider> {
     return Array.from(this.providers.values());
   }
 
@@ -43,28 +45,41 @@ export class SpecGeneratorOfProperty {
     let providers = [this.typeToGenerate];
 
     this.providers.forEach((prov) => {
-      if (prov.mock != null)
-        providers.push({provide: prov.provide, useValue: prov.mock});
-      else
-        providers.push({provide: prov.provide, useClass: prov.provide});
-
-    });
+        if (prov.mockClass != null) {
+          providers.push({provide: prov.provide, useClass: prov.mockClass});
+        } else if (prov.mockObject != null) {
+          providers.push({provide: prov.provide, useValue: prov.mockObject});
+        } else if (prov.useClass != null) {
+          providers.push({provide: prov.provide, useClass: prov.useClass});
+        } else {
+          providers.push({provide: prov.provide, useClass: prov.provide});
+        }
+      }
+    );
 
     return this.generate(providers);
 
   }
 
-  generateReal():any {
+  generateReal(): any {
     let providers = [this.typeToGenerate];
 
     this.providers.forEach((prov) => {
+      if(prov.useClass != null){
+        providers.push({provide: prov.provide, useClass: prov.useClass});
+      } else if(prov.useObject != null){
+        providers.push({provide: prov.provide, useValue: prov.useObject});
+      } else {
         providers.push({provide: prov.provide, useClass: prov.provide});
+      }
     });
 
     return this.generate(providers);
   }
 
-  private generate(providers:Array<Provider>):any{
+  private
+
+  generate(providers: Array<Provider>): any {
     let injector;
     try {
       injector = ReflectiveInjector.resolveAndCreate(providers);
