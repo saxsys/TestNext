@@ -1,5 +1,3 @@
-import {Provider, ReflectiveInjector} from "@angular/core";
-
 import {ISpecContainer} from './iSpec-Container';
 import {ISpecMethodContainer} from "./specMethodContainer/iSpec-method-Container";
 import {SpecMethodContainer} from "./specMethodContainer/spec-method-container";
@@ -11,7 +9,7 @@ import {SpecGenerateProvider} from "./SpecGenerate/SpecGenerateProvider";
 import {SpecGeneratorOfProperty} from "./SpecGenerate/SpecGenerate";
 
 /**
- * Class to contain a SpecClass and store additional information on the Spec (such as Given-, When-, Then-Methods, Ignored or the SUT)
+ * @class Class to contain a SpecClass and store additional information on the Spec (such as Given-, When-, Then-Methods, Ignored or the SUT)
  */
 export class SpecContainer implements ISpecContainer{
 

@@ -20,6 +20,7 @@ src/**/*.js
 *.launch
 .settings/
 *.sublime-workspace
+/doc/
 
 # IDE - VSCode
 .vscode/*

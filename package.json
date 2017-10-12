@@ -10,6 +10,7 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
+    "docs": "typedoc --out ./doc/ --mode file --exclude '**/*.spec.ts,**/app/*.ts' testNext.ts src/",
     "tNxt": "rimraf ./dist && ntsc -p tsconfig.json --skipLibCheck && node dist/testNext/testExec/execSpecs.js",
     "testNext": "node ./RunTestNext.js"
   },
@@ -27,6 +28,7 @@
     "@angular/router": "^4.0.0",
     "@types/underscore": "^1.8.1",
     "core-js": "^2.4.1",
+    "rimraf": "^2.6.2",
     "rxjs": "^5.1.0",
     "underscore": "^1.8.3",
     "zone.js": "^0.8.4"
@@ -47,6 +49,7 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "ts-node": "~2.0.0",
     "tslint": "~4.5.0",
+    "typedoc": "^0.9.0",
     "typescript": "^2.2.2"
   }
 }

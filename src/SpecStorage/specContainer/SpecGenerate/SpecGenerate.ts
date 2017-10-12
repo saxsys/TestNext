@@ -1,8 +1,10 @@
 import {Provider, ReflectiveInjector, Type} from "@angular/core";
 import {SpecRegistryError} from "../../spec-registry-error";
 import {SpecGenerateProvider} from "./SpecGenerateProvider";
-import {log} from "util";
 
+/**
+ * @class for automated generating of Object on Property from a Type with Dependencies
+ */
 export class SpecGeneratorOfProperty {
   private specClassName: string;
   private propertyName: string;

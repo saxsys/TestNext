@@ -4,7 +4,7 @@ Test-framework for the usage on different levels of abstraction, in Angular/Type
 ## How-To
 ### Write Specs
 * With TestNext Specs are written as classes
-* A Spec is defined by 
+* A basic Spec is defined by 
   * at least one Given
   * exactly one When 
   * at least one Then step.
@@ -93,10 +93,15 @@ Example
 #### Generate
 * It is possible to generate an object of a type on a class-Property
 * Use the `@Generate(TypeToGenerate, providerArray)` decorator on a class-property
-  * the provider-Array contains the dependencies of the type with `{provide:Dependency, mock:mockObj}`
-  * it is possible to mock the dependency with a Object
+  * the provider-Array contains the dependencies of the type like `{provide:Dependency, mock:mockObj}`
+    * it is possible to give:
+      * useClass: alternative class for Provider, seen as real implementation for integrationtesting
+      * useObject: alternative object for Provider, seen as real implementation for integrationtesting
+      * mockClass: class to mock Provider, used in unittests
+      * mockObject: object to mock Provider, used in unittests
+      * mock: short for mockObject
   * when no mock is given the real-dependency is always used
-  * choose whether the  mock or real-implementation should be used, when you execute the thests
+  * choose whether the  mock or real-implementation should be used, when you execute the tests
 
 
 #### Take Care
@@ -105,8 +110,14 @@ Example
 * if you use variables in the Decorator-descriptions, they must be from static
 
 ### Asserts
-// TODO
-
+* Class to check weather a value fits an expected value
+* Created with `Assert.that(value, 'value Description')`
+* the Description is optional
+* Comparisons are added like `Assert.that(value, 'value Description').equals(otherValue, 'other Description')`
+  * Comparing operators are: `equal(val)`, `isGreaterThan(val)`, `isLessThan(val)`,`isGreaterOrEquals(val)`, `isLessOrEquals(val)`, `isNull()`
+  * it is possible to invert the comparison by using a `not` before the operation like `Assert.that(value).not.equals(otherValue)`
+* if the comparison is negative an `AssertionError` is thrown
+   
 ### Run Tests
 #### CLI
 ```shell
