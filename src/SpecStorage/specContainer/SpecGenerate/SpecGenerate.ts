@@ -49,8 +49,12 @@ export class SpecGeneratorOfProperty {
           providers.push({provide: prov.provide, useClass: prov.mockClass});
         } else if (prov.mockObject != null) {
           providers.push({provide: prov.provide, useValue: prov.mockObject});
+        } else if(prov.mock != null) {
+          providers.push({provide: prov.provide, useValue: prov.mock});
         } else if (prov.useClass != null) {
           providers.push({provide: prov.provide, useClass: prov.useClass});
+        } else if (prov.useObject != null) {
+          providers.push({provide: prov.provide, useValue: prov.useObject});
         } else {
           providers.push({provide: prov.provide, useClass: prov.provide});
         }

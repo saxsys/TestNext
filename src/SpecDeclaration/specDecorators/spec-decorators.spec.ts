@@ -864,6 +864,176 @@ describe('TestDecorators.Generate', () => {
     expect(specObject.property.dep.mock).toBeTruthy('not used Mock');
   });
 
+  it('should accept useClass in Provider',()=>{
+    @Injectable()
+    class Dependency {
+      public mock = false;
+    }
+
+    @Injectable()
+    class AClass {
+      public something = 'sth';
+      public dep;
+
+      constructor(dep: Dependency) {
+        this.dep = dep;
+      }
+    }
+
+    class DependencyAlternative{
+      public mock = false;
+      public alternative = true;
+    }
+
+    class ClassWithGenerateAndUseClass {
+      @Generate(AClass, [
+        {provide:Dependency, useClass:DependencyAlternative}
+      ])
+      public property: any;
+    }
+
+    let specContainer = specRegistry.getSpecContainerByClassName('ClassWithGenerateAndUseClass');
+
+    expect(specContainer).not.toBeNull('SpecContainer not returned by Registry');
+    expect(specContainer).not.toBeUndefined('SpecContainer not returned by Registry');
+
+    let specObject = specContainer.getNewSpecObject();
+
+    expect(specObject.property).not.toBeUndefined();
+    expect(specObject.property).not.toBeNull();
+    expect(specObject.property instanceof AClass).toBeTruthy('not right Type');
+    expect(specObject.property.something).toEqual('sth', 'Property of Generated not set');
+
+    expect(specObject.property.dep).not.toBeUndefined('dep undefined');
+    expect(specObject.property.dep.mock).toBeFalsy('used Mock');
+    expect(specObject.property.dep.alternative).toBeTruthy('did not use UseClass');
+  });
+
+  it('should accept useObject in Provider', ()=>{
+    @Injectable()
+    class Dependency {
+      public mock = false;
+    }
+
+    @Injectable()
+    class AClass {
+      public something = 'sth';
+      public dep;
+
+      constructor(dep: Dependency) {
+        this.dep = dep;
+      }
+    }
+
+    let  dependencyObj = new Dependency();
+    dependencyObj['alternative'] = true;
+
+    class ClassWithGenerateAndUseObject {
+      @Generate(AClass, [
+        {provide:Dependency, useObject:dependencyObj}
+      ])
+      public property: any;
+    }
+
+    let specContainer = specRegistry.getSpecContainerByClassName('ClassWithGenerateAndUseObject');
+
+    expect(specContainer).not.toBeNull('SpecContainer not returned by Registry');
+    expect(specContainer).not.toBeUndefined('SpecContainer not returned by Registry');
+
+    let specObject = specContainer.getNewSpecObject();
+
+    expect(specObject.property).not.toBeUndefined();
+    expect(specObject.property).not.toBeNull();
+
+    expect(specObject.property.something).toEqual('sth', 'Property of Generated not set');
+
+    expect(specObject.property.dep).not.toBeUndefined('dep undefined');
+    expect(specObject.property.dep.mock).toBeFalsy('used Mock');
+    expect(specObject.property.dep.alternative).toBeTruthy('did not use UseObject');
+  });
+
+  it('should accept mockClass in Provider',()=>{
+    @Injectable()
+    class Dependency {
+      public mock = false;
+    }
+
+    @Injectable()
+    class AClass {
+      public something = 'sth';
+      public dep;
+
+      constructor(dep: Dependency) {
+        this.dep = dep;
+      }
+    }
+
+    class DependencyMockClass{
+      public mock = true;
+    }
+
+    class ClassWithGenerateAndMockClass {
+      @Generate(AClass, [
+        {provide:Dependency, mockClass:DependencyMockClass}
+      ])
+      public property: any;
+    }
+
+    let specContainer = specRegistry.getSpecContainerByClassName('ClassWithGenerateAndMockClass');
+
+    expect(specContainer).not.toBeNull('SpecContainer not returned by Registry');
+    expect(specContainer).not.toBeUndefined('SpecContainer not returned by Registry');
+
+    let specObject = specContainer.getNewSpecObject(true);
+
+    expect(specObject.property).not.toBeUndefined();
+    expect(specObject.property).not.toBeNull();
+    expect(specObject.property instanceof AClass).toBeTruthy('not right Type');
+    expect(specObject.property.something).toEqual('sth', 'Property of Generated not set');
+
+    expect(specObject.property.dep).not.toBeUndefined('dep undefined');
+    expect(specObject.property.dep.mock).toBeTruthy('not used Mock');
+  });
+
+  it('should Accept mock in Provider', ()=>{
+    @Injectable()
+    class Dependency {
+      public mock = false;
+    }
+
+    @Injectable()
+    class AClass {
+      public something = 'sth';
+      public dep;
+
+      constructor(dep: Dependency) {
+        this.dep = dep;
+      }
+    }
+
+    class ClassWithGenerateAndMock {
+      @Generate(AClass, [
+        {provide:Dependency, mockObject:{mock:true}}
+      ])
+      public property: any;
+    }
+
+    let specContainer = specRegistry.getSpecContainerByClassName('ClassWithGenerateAndMock');
+
+    expect(specContainer).not.toBeNull('SpecContainer not returned by Registry');
+    expect(specContainer).not.toBeUndefined('SpecContainer not returned by Registry');
+
+    let specObject = specContainer.getNewSpecObject(true);
+
+    expect(specObject.property).not.toBeUndefined();
+    expect(specObject.property).not.toBeNull();
+    expect(specObject.property instanceof AClass).toBeTruthy('not right Type');
+    expect(specObject.property.something).toEqual('sth', 'Property of Generated not set');
+
+    expect(specObject.property.dep).not.toBeUndefined('dep undefined');
+    expect(specObject.property.dep.mock).toBeTruthy('not used Mock');
+  })
+
 
 
 });

@@ -156,7 +156,7 @@ describe('SpecGeneratorOfProperty.generateWithMock', () => {
     expect(retObj.otherDep.mock).toBeTruthy();
   });
 
-  it('should use the Mock Class when given',()=>{
+  it('should use the mockClass when given',()=>{
     let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
     specDep.setTypeToGenerate(TypeToGenerateWithDep);
     specDep.addProviders([
@@ -173,7 +173,7 @@ describe('SpecGeneratorOfProperty.generateWithMock', () => {
     expect(retObj.dep.mockClass).toBeTruthy();
   });
 
-  it('should prefer the MockClass over MockObject', ()=>{
+  it('should prefer the mockClass over mockObject', ()=>{
     let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
     specDep.setTypeToGenerate(TypeToGenerateWithDep);
     specDep.addProviders([
@@ -188,6 +188,43 @@ describe('SpecGeneratorOfProperty.generateWithMock', () => {
     expect(retObj.dep.depVal).toBe(8);
     expect(retObj.dep.mock).toBeTruthy();
     expect(retObj.dep.mockClass).toBeTruthy();
+  });
+
+  it('should use Property mock as alternative for mockObject', ()=>{
+    let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
+    specDep.setTypeToGenerate(TypeToGenerateWithDep);
+    specDep.addProviders([
+      {provide:ADependency},
+      {provide:OtherDependency, mock:{mock:true}},
+      {provide:NestedDependency, mock:{}}
+    ]);
+    let retObj = specDep.generateWithMock();
+
+    expect(retObj).not.toBeNull();
+    expect(retObj).not.toBeUndefined();
+    expect(retObj.dep.depVal).toBe(3);
+    expect(retObj.otherDep.mock).toBeTruthy();
+  });
+
+  it('should prefer the mockObject over mock', ()=>{
+
+    let objMock = {mocking:true, prop:'mock'};
+    let objMockObject = {mocking:true, prop:'mockObject'};
+
+
+    let specDep = new SpecGeneratorOfProperty('SpecClass', 'prop');
+    specDep.setTypeToGenerate(TypeToGenerateWithDep);
+    specDep.addProviders([
+      {provide:ADependency}, {provide:NestedDependency},
+      {provide:OtherDependency, mockObject:objMockObject, mock:objMock}
+      //{provide:NestedDependency, mockClass:}
+    ]);
+    let retObj = specDep.generateWithMock();
+
+    expect(retObj).not.toBeNull();
+    expect(retObj).not.toBeUndefined();
+    expect(retObj.otherDep.mocking).toBeTruthy();
+    expect(retObj.otherDep.prop).toEqual('mockObject');
   });
 });
 
