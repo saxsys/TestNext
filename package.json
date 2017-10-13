@@ -10,7 +10,7 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "docs": "typedoc --out ./doc/ --mode file --exclude '**/*.spec.ts,**/app/*.ts' testNext.ts src/",
+    "docs": "typedoc --out ./doc/ --mode file --exclude '{**/app/*.ts,**/*.spec.ts}' testNext.ts src/",
     "tNxt": "rimraf ./dist && ntsc -p tsconfig.json --skipLibCheck && node dist/testNext/testExec/execSpecs.js",
     "testNext": "node ./RunTestNext.js"
   },

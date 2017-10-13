@@ -3,6 +3,10 @@ import {SpecRegistryError} from "../../spec-registry-error";
 import {SpecMethodContainer} from "../specMethodContainer/spec-method-container";
 import {SpecMethodType} from "../specMethodContainer/spec-method-type";
 
+/**
+ * @class for Classes containing data about one Type of SpecMethods of one Spec(e.g. all Given of a Spec)
+ * the SpecMethods must be numbered
+ */
 export class SpecMethodNumberedList implements ISpecMethodList{
   private methodByExecNumber = new Map<number, SpecMethodContainer>();
   private className:string;
@@ -14,6 +18,12 @@ export class SpecMethodNumberedList implements ISpecMethodList{
 
   }
 
+  /**
+   * add a Method to the List
+   * @param {string} functionName must not be registered before
+   * @param {string} description
+   * @param {Number} execNumber must be given and not be used before
+   */
   addMethod(functionName: string, description: string, execNumber: Number) {
     if(execNumber == null)
       throw new SpecRegistryError('@'+ this.methodType + ' ' + this.className + '.' + functionName + ' is invalid, you either have to give execNumbers for all, or for none', this.className, functionName);
@@ -27,6 +37,10 @@ export class SpecMethodNumberedList implements ISpecMethodList{
     );
   }
 
+  /**
+   * get all the data about all here set SpecMethods
+   * @return {Array<ISpecMethodContainer>}
+   */
   getMethods(): SpecMethodContainer[] {
     let keys = Array.from(this.methodByExecNumber.keys()).sort();
 
@@ -37,6 +51,11 @@ export class SpecMethodNumberedList implements ISpecMethodList{
     return returnArray;
   }
 
+  /**
+   * get all data about one SpecMethod
+   * @param {string} methodName
+   * @return {ISpecMethodContainer}
+   */
   getMethod(methodName: string): SpecMethodContainer {
     let returnMethod = null;
     this.methodByExecNumber.forEach((method) => {

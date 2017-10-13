@@ -1,6 +1,9 @@
 import {ISpecReportOutput} from "../SpecRunning/RunReportOutput/iSpec-report-output";
 import {config} from "../testNext.config";
 
+/**
+ * Class to apply an argument String on the SpecReport output
+ */
 export class SpecExecArgumentParser{
   args:string[];
 
@@ -9,6 +12,10 @@ export class SpecExecArgumentParser{
     this.args = args;
   }
 
+  /**
+   * apply the arguments on the output using the testNext.config
+   * @param {ISpecReportOutput} output object of Class to generate the output
+   */
   applyOnOutput(output:ISpecReportOutput){
     this.args.forEach((arg)=>{
       let runConfig = config.outputParameters[arg];

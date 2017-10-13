@@ -80,7 +80,7 @@ export class SpecContainer implements ISpecContainer{
     let generateProp = new SpecGeneratorOfProperty(this.getClassName(), propertyName);
     generateProp.setTypeToGenerate(typeToGenerate);
     if(providers) {
-      generateProp.addProviders(providers);
+      generateProp.addDependencies(providers);
     }
     this.generatorsOnProperties.set(propertyName, generateProp);
   }

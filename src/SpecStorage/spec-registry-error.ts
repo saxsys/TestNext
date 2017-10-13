@@ -1,3 +1,6 @@
+/**
+ * Error which is used when something is invalid registering Specs
+ */
 export class SpecRegistryError extends Error{
 
   public className;

@@ -1,3 +1,6 @@
+/**
+ * values to replace objectproperties as mock
+ */
 export class DefaultMockValues {
   public static defaultValues = {
     func: ([]: any) => {

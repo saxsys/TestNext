@@ -2,8 +2,10 @@ import {SpecRegistry} from "../../SpecStorage/specRegistry/spec-registry";
 import {SpecContainer} from "../../SpecStorage/specContainer/specContainer";
 import {Assert} from "../../SpecDeclaration/assert/assert";
 import {Injectable} from "@angular/core";
-import {Generate} from "../../SpecDeclaration/specDecorators/spec-decorators";
 
+/**
+ * Generator of test data on SpecRegistry
+ */
 export class ExampleRegistryFiller {
   static  addStandardSpecTo(specRegistry: SpecRegistry): SpecContainer {
     //@Spec('a Spec of one Test')

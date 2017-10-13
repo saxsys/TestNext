@@ -15,6 +15,12 @@ export class SpecMethodUnnumberedList implements ISpecMethodList{
     this.methodType = methodType;
   }
 
+  /**
+   * add a Method to the List
+   * @param {string} functionName
+   * @param {string} description
+   * @param {Number} execNumber DO not use, only used for error detection
+   */
   addMethod(functionName: string, description: string, execNumber: Number) {
     if(execNumber != null)
       throw new SpecRegistryError('@' + this.methodType + ' ' + this.className + '.' + functionName + ' is invalid, you either have to give execNumbers for all, or for none', this.className, functionName);
@@ -25,10 +31,19 @@ export class SpecMethodUnnumberedList implements ISpecMethodList{
     );
   }
 
+  /**
+   * get all the data about all here set SpecMethods
+   * @return {Array<ISpecMethodContainer>}
+   */
   getMethods(): SpecMethodContainer[] {
     return this.methods;
   }
 
+  /**
+   * get all data about one SpecMethod
+   * @param {string} methodName
+   * @return {ISpecMethodContainer}
+   */
   getMethod(methodName: string): SpecMethodContainer {
     let returnMethod = null;
     this.methods.forEach((method) => {

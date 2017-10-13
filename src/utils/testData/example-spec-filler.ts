@@ -1,6 +1,9 @@
 import {SpecContainer} from "../../SpecStorage/specContainer/specContainer";
 import {Assert} from "../../SpecDeclaration/assert/assert";
 
+/**
+ * Example generator for SpecContainers
+ */
 export class ExampleSpecFiller {
 
   static getStandardSpec():SpecContainer{

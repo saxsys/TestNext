@@ -1,3 +1,6 @@
+/**
+ * List of all Object properties which should not be mocked, they are set automated
+ */
 export class IgnoredMockProperties {
 
   private static IGNORED_MOCK_PROPERTIES = [

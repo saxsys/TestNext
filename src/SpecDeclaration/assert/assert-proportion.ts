@@ -1,7 +1,13 @@
+/**
+ * Type to store the compare-operator of Asserts
+ */
 export type AssertProportion =
   'equal'|'not equal'|'greater'|'less'|'greater than or equal to'|'less than or equal to' | 'null'|
   'not greater than' | 'not less than' | 'not greater than or equal to' | 'not less than or equal to' | 'not null';
 
+/**
+ * Type to store the compare-operator of Asserts
+ */
 export const AssertProportion = {
   EQUAL: "equal to" as AssertProportion,
   NOT_EQUAL: "not equal to" as AssertProportion,

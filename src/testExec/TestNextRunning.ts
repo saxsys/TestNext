@@ -5,7 +5,11 @@ import {SpecExecArgumentParser} from "./spec-exec-argument-parser";
 import {config} from "../testNext.config";
 import {SpecExecChooser} from "../SpecRunning/specExecChooser/spec-exec-chooser";
 
-
+/**
+ * executing all Specs in dirPath
+ * @param {string} dirPath
+ * @param {string[]} args arguments for runMode, runMode-Argument, mock and output
+ */
 export function runTestNext(dirPath:string, args: string[]) {
   let runMode = null;
   let mock = false;

@@ -124,6 +124,22 @@ export class SpecRegistry {
     spec.setIgnored(reason);
   }
 
+  /**
+   * register a Property of a Spec-Class, on which an object should be generated automatically
+   * @param constructor of the SpecClass
+   * @param {string} property name of the property to reference the object
+   * @param {Provider} typeToGenerate Class of the Object to be generated
+   * @param {Array<SpecGenerateProvider>} providers Array of injected dependencies of the TypeToGenerate. Containing an alternative class or object and a mock class or object
+   * @return {SpecContainer}
+   */
+  registerGenerate(constructor: any, property: string, typeToGenerate: Provider, providers?:Array<SpecGenerateProvider>):SpecContainer {
+    let specContainer = this.getOrRegisterSpecContainerForClass(constructor);
+    specContainer.addGeneratorOnProperty(property, typeToGenerate, providers);
+    return specContainer
+
+  }
+
+
 
   /**
    * @return {string[]} with all the names of all SpecClasses in this registry
@@ -207,6 +223,8 @@ export class SpecRegistry {
     return executableSpecs;
   }
 
+
+
   /**
    *  returns the SpecConatainer for the SpecClass, creates it if not existant, does not mark  ir as executable
    * @param specClassConstructor Constructor of the SpecClass
@@ -234,13 +252,5 @@ export class SpecRegistry {
       }
     }
     return specRegEntry;
-  }
-
-
-  registerGenerate(constructor: any, property: string, typeToGenerate: Provider, providers?:Array<SpecGenerateProvider>):SpecContainer {
-    let specContainer = this.getOrRegisterSpecContainerForClass(constructor);
-    specContainer.addGeneratorOnProperty(property, typeToGenerate, providers);
-    return specContainer
-
   }
 }
