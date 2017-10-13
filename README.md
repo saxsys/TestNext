@@ -1,6 +1,16 @@
 # TestNext
 Test-Framework zur Anwendung auf verschiedenen Abstraktionsstufen, basierend auf Angular/TypeScript.
 Test-framework for the usage on different levels of abstraction, in Angular/TypeScript
+
+## Table of Contents
+1. How-To
+
+  1.1. Write Specs
+
+  1.2. Run Tests
+
+2. Structure of the Framework
+
 ## How-To
 ### Write Specs
 * With TestNext Specs are written as classes
@@ -100,7 +110,7 @@ Example
       * mockClass: class to mock Provider, used in unittests
       * mockObject: object to mock Provider, used in unittests
       * mock: short for mockObject
-  * when no mock is given the real-dependency is always used
+  * when no mock is given the real-dependency is always used, Classes are favored over Objects 
   * choose whether the  mock or real-implementation should be used, when you execute the tests
 
 
@@ -181,3 +191,17 @@ If you want to use the real-implementation, simply omit this modifier.
    * `oExecStat`
    * order output by ExecutionStatus/Success
     * Failed-->Invalid-->Successful-->Ignored-->nonExecutable
+
+## Structure of the Framework
+In SpecClasses you can use the Decorators provided by this Framework.
+The Decorators access a registry and save all Data given there. Each SpecClass gets a SpecContainer.
+
+The SpecContainer stores all for one Spec. It contains e.g. a Description, weather the Spec is ignored and so on. It contains also all Data for the Methods of a Spec decorated with the "@Given" or "@Then" etc, in properties with separated Classes. the Properties with "@Generate" are saved also there.
+
+To use the Spec the SpecContainer can generate an Object of the Spec, ob which the Methods can be applied.
+
+To Run a Spec the SpecRunner is used. It runs a single Spec, using the SpecContainer. It creates a SpecReport, which it saves into a SpecReporter. The SpecRunner lets the SpecContainer create an Object. The Object gets validated, if invalid this is reported in the Report and the SpecRunner ends. If the Spec-Object is valid, the SpecRunner starts executing the Spec Methods Given, When, Then and Cleanup. All Errors occurring, unforeseen errors and Assertion Errors get logged in the Report. If there are no Errors, the success is logged.
+
+To choose which Specs to run and to run multiple Specs the Class SpecExecChooser loads the Specs from the SpecRegistry and starts all the SpecRunner. It gets the specRegistry and the SpecReporter as arguments.
+
+The SpecExecChooser is started from the function runTestNext in the file "src/testExec/TestNextRunning.ts". it is necessary to start the process with the function, because it must be possible to run it from JavaScript.  In the Function the run-arguments are parsed and the execution of the Specs is triggered, with the registry and a SpecReporter. After the Specs are executed the Output is specified and started, based on the SpecReports. 
