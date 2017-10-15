@@ -205,3 +205,5 @@ To Run a Spec the SpecRunner is used. It runs a single Spec, using the SpecConta
 To choose which Specs to run and to run multiple Specs the Class SpecExecChooser loads the Specs from the SpecRegistry and starts all the SpecRunner. It gets the specRegistry and the SpecReporter as arguments.
 
 The SpecExecChooser is started from the function runTestNext in the file "src/testExec/TestNextRunning.ts". it is necessary to start the process with the function, because it must be possible to run it from JavaScript.  In the Function the run-arguments are parsed and the execution of the Specs is triggered, with the registry and a SpecReporter. After the Specs are executed the Output is specified and started, based on the SpecReports. 
+
+![Class-structure of TestNext](TestNext_Structure.png "TestNext Class-structure")
