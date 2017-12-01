@@ -104,6 +104,9 @@ export class SpecRunner {
       //Handle and thrown and expected Errors
       if(thrownWhenError == null && expectedWhenError != null){
         //No Error Thrown
+        
+        this.report.reportRun(when, true);
+        
         let errorReport =
           new AssertionError(thrownWhenError, expectedWhenError, AssertProportion.EQUAL,'thrown Error', 'expected Error',
             'No Error was thrown, expected "' + expectedWhenError.message + '"');
